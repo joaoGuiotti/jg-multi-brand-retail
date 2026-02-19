@@ -1,0 +1,71 @@
+/* Dark Theme Design Tokens - Improved Slate Palette */
+:root[data-theme="dark"] {
+    /* Primary Colors */
+    --color-primary: #60a5fa;
+    /* blue-400 */
+    --color-primary-hover: #3b82f6;
+    /* blue-500 */
+    --color-primary-light: #1e3a8a;
+    /* blue-900 */
+
+    /* Background Colors */
+    --color-bg-primary: #0f172a;
+    /* slate-900 */
+    --color-bg-secondary: #1e293b;
+    /* slate-800 */
+    --color-bg-tertiary: #334155;
+    /* slate-700 */
+    --color-bg-hover: #475569;
+    /* slate-600 */
+
+    /* Text Colors */
+    --color-text-primary: #f1f5f9;
+    /* slate-100 */
+    --color-text-secondary: #94a3b8;
+    /* slate-400 */
+    --color-text-tertiary: #64748b;
+    /* slate-500 */
+    --color-text-inverse: #0f172a;
+    /* slate-900 */
+
+    /* Border Colors */
+    --color-border: #334155;
+    /* slate-700 */
+    --color-border-hover: #475569;
+    /* slate-600 */
+
+    /* Status Colors */
+    --color-success: #34d399;
+    /* emerald-400 */
+    --color-success-bg: #064e3b;
+    /* emerald-900 */
+    --color-warning: #fbbf24;
+    /* amber-400 */
+    --color-warning-bg: #78350f;
+
+    /* color danger */
+    --color-danger: #b63b3b;
+    /* red-400 */
+    --color-danger-bg: #7f1d1d;
+    /* red-900 */
+
+    /* amber-900 */
+    --color-error: #f87171;
+    /* red-400 */
+    --color-error-bg: #7f1d1d;
+    /* red-900 */
+    --color-info: #60a5fa;
+    /* blue-400 */
+    --color-info-bg: #1e3a8a;
+    /* blue-900 */
+
+    /* Shadow */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.5);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.5);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.5);
+
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}

@@ -1,0 +1,54 @@
+<div class="min-h-screen bg-surface flex items-center justify-center p-4">
+  <div class="max-w-md w-full">
+    <!-- Logo/Brand -->
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-bold text-content mb-2">Retail POS</h1>
+      <p class="text-content-secondary">Sign in to your account</p>
+    </div>
+
+    <!-- Login Card -->
+    <ui-card padding="lg" [shadow]="true">
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <!-- Email Field -->
+        <ui-input-field class="mb-6" label="Email" type="email" formControlName="email"
+          [class.border-error]="email?.invalid && email?.touched" placeholder="you@example.com"
+          [error]="email?.invalid && email?.touched ? 'Email is required' : null"
+          [hint]="email?.invalid && email?.touched ? 'Please enter a valid email' : null">
+        </ui-input-field>
+
+        <!-- Password Field -->
+        <ui-input-field class="mb-6" label="Password" type="password" formControlName="password"
+          [class.border-error]="password?.invalid && password?.touched" placeholder="••••••••"
+          [error]="password?.invalid && password?.touched ? 'Password is required' : null"
+          [hint]="password?.invalid && password?.touched ? 'Please enter a valid password' : null">
+        </ui-input-field>
+
+        <!-- Error Message -->
+        <div *ngIf="errorMessage" class="mb-4 p-3 bg-error-bg border border-error rounded-lg">
+          <p class="text-sm text-error">{{ errorMessage }}</p>
+        </div>
+
+        <!-- Submit Button -->
+        <ui-button type="submit" variant="primary" [fullWidth]="true" [loading]="isLoading"
+          [disabled]="loginForm.invalid || isLoading">
+          Sign In
+        </ui-button>
+      </form>
+
+      <!-- Register Link -->
+      <div class="mt-6 text-center">
+        <p class="text-sm text-content-secondary">
+          Don't have an account?
+          <a routerLink="/register" class="text-primary hover:text-primary-hover font-medium">Sign up</a>
+        </p>
+      </div>
+    </ui-card>
+
+    <!-- Demo Credentials -->
+    <div class="mt-4 p-4 bg-info-bg rounded-lg border border-info">
+      <p class="text-sm text-info font-medium mb-2">Demo Credentials:</p>
+      <p class="text-xs text-info">Email: admin&#64;lojademo.com</p>
+      <p class="text-xs text-info">Password: loja123</p>
+    </div>
+  </div>
+</div>

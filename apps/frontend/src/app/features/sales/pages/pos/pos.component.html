@@ -1,0 +1,175 @@
+<div class="max-w-7xl mx-auto">
+    <h1 class="text-3xl font-bold text-content mb-6">Point of Sale</h1>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Product Search -->
+        <div class="lg:col-span-2">
+            <div class="bg-surface rounded-lg shadow p-6 mb-6">
+                <label class="label">Search Products</label>
+                <input type="text" [(ngModel)]="searchTerm" (input)="searchProducts()" class="input-field"
+                    placeholder="Search by name, SKU, or barcode" autofocus />
+
+                <!-- Search Results -->
+                <div *ngIf="searchResults().length > 0" class="mt-4 max-h-96 overflow-y-auto">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div *ngFor="let product of searchResults()" (click)="addToCart(product)"
+                            class="p-4 border border-outline rounded-lg hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-colors">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium text-content">{{ product.name }}</h3>
+                                    <p class="text-sm text-content-secondary">{{ product.sku }}</p>
+                                </div>
+                                <span class="text-lg font-bold text-blue-600">R$ {{ product.salePrice.toFixed(2)
+                                    }}</span>
+                            </div>
+                            <div class="mt-2 flex justify-between items-center">
+                                <span class="text-xs text-content-secondary">Stock: {{ product.stockQuantity }}</span>
+                                <span *ngIf="product.stockQuantity <= 0" class="text-xs text-red-600 font-medium">Out of
+                                    Stock</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="isSearching()" class="mt-4 text-center text-content-secondary">
+                    Searching...
+                </div>
+            </div>
+
+            <!-- Cart Items -->
+            <div class="bg-surface rounded-lg shadow p-6">
+                <h2 class="text-xl font-semibold text-content mb-4">Cart Items</h2>
+
+                <div *ngIf="cartStore.itemCount() === 0" class="text-center py-12 text-content-secondary">
+                    Cart is empty. Search and add products to start a sale.
+                </div>
+
+                <div *ngIf="cartStore.itemCount() > 0" class="space-y-3">
+                    <div *ngFor="let item of cartStore.cartItems()"
+                        class="flex items-center justify-between p-4 border border-outline rounded-lg">
+                        <div class="flex-1">
+                            <h3 class="font-medium text-content">{{ item.product.name }}</h3>
+                            <p class="text-sm text-content-secondary">R$ {{ item.unitPrice.toFixed(2) }} each</p>
+                        </div>
+
+                        <div class="flex items-center gap-3">
+                            <div class="flex items-center gap-2">
+                                <ui-button (click)="incrementQuantity(item.product.id)" variant="secondary">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 4v16m8-8H4"></path>
+                                    </svg>
+                                </ui-button>
+                                <span class="w-12 text-center font-medium">{{ item.quantity }}</span>
+                                <ui-button (click)="decrementQuantity(item.product.id)" variant="secondary">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M20 12H4"></path>
+                                    </svg>
+                                </ui-button>
+                            </div>
+
+                            <span class="w-24 text-right font-bold text-content">
+                                R$ {{ (item.unitPrice * item.quantity).toFixed(2) }}
+                            </span>
+
+                            <ui-button (click)="removeFromCart(item.product.id)" variant="danger">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                    </path>
+                                </svg>
+                            </ui-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cart Summary -->
+        <div class="lg:col-span-1">
+            <div class="bg-surface rounded-lg shadow p-6 sticky top-6">
+                <h2 class="text-xl font-semibold text-content mb-4">Summary</h2>
+
+                <div class="space-y-3 mb-6">
+                    <div class="flex justify-between text-gray-600">
+                        <span>Items:</span>
+                        <span>{{ cartStore.itemCount() }}</span>
+                    </div>
+                    <div class="flex justify-between text-gray-600">
+                        <span>Subtotal:</span>
+                        <span>R$ {{ cartStore.subtotal().toFixed(2) }}</span>
+                    </div>
+                    <div *ngIf="cartStore.totalDiscount() > 0" class="flex justify-between text-red-600">
+                        <span>Discount:</span>
+                        <span>- R$ {{ cartStore.totalDiscount().toFixed(2) }}</span>
+                    </div>
+                    <div class="border-t pt-3 flex justify-between text-xl font-bold text-content">
+                        <span>Total:</span>
+                        <span>R$ {{ cartStore.total().toFixed(2) }}</span>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <ui-button class="mb-2" [fullWidth]="true" variant="secondary" (click)="openPaymentModal()"
+                        [disabled]="cartStore.itemCount() === 0">
+                        Process Payment
+                    </ui-button>
+                    <ui-button class="mt-2" [fullWidth]="true" variant="primary" (click)="clearCart()"
+                        [disabled]="cartStore.itemCount() === 0">
+                        Clear Cart
+                    </ui-button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div *ngIf="showPaymentModal()" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-surface rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+            <h2 class="text-2xl font-bold text-content mb-4">Process Payment</h2>
+
+            <!-- Error Message -->
+            <div *ngIf="errorMessage()" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <p class="text-sm text-red-600">{{ errorMessage() }}</p>
+            </div>
+
+            <div class="mb-4">
+                <label class="label">Payment Method</label>
+                <select [(ngModel)]="selectedPaymentMethod" class="input-field">
+                    <option value="CASH">Cash</option>
+                    <option value="CREDIT_CARD">Credit Card</option>
+                    <option value="DEBIT_CARD">Debit Card</option>
+                    <option value="PIX">PIX</option>
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label class="label">Amount (R$)</label>
+                <input type="number" [(ngModel)]="paymentAmount" step="0.01" class="input-field" />
+            </div>
+
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <div class="flex justify-between mb-2">
+                    <span class="text-gray-600">Total:</span>
+                    <span class="font-bold">R$ {{ cartStore.total().toFixed(2) }}</span>
+                </div>
+                <div *ngIf="paymentAmount > cartStore.total()" class="flex justify-between text-success">
+                    <span>Change:</span>
+                    <span class="font-bold">R$ {{ (paymentAmount - cartStore.total()).toFixed(2) }}</span>
+                </div>
+            </div>
+
+            <div class="flex gap-3 align-center justify-center">
+                <ui-button (click)="processPayment()"
+                    [disabled]="isProcessingSale() || paymentAmount < cartStore.total()" variant="primary">
+                    <span *ngIf="!isProcessingSale()">Confirm Payment</span>
+                    <span *ngIf="isProcessingSale()">Processing...</span>
+                </ui-button>
+                <ui-button (click)="closePaymentModal()" [disabled]="isProcessingSale()" variant="secondary">
+                    Cancel
+                </ui-button>
+            </div>
+        </div>
+    </div>
+</div>

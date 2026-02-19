@@ -1,0 +1,12 @@
+{
+    "name": "@shared/ui",
+    "version": "1.0.0",
+    "description": "Shared UI component library for the retail SaaS monorepo",
+    "private": true,
+    "main": "src/index.ts",
+    "peerDependencies": {
+        "@angular/core": ">=17.0.0",
+        "@angular/common": ">=17.0.0",
+        "@angular/forms": ">=17.0.0"
+    }
+}

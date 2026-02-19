@@ -1,0 +1,95 @@
+import { HttpClient } from '@angular/common/http';
+import { Injectable, signal } from '@angular/core';
+import { Router } from '@angular/router';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
+import { LoginRequest, LoginResponse, RegisterRequest, User } from '../models/auth.model';
+
+@Injectable({
+    providedIn: 'root'
+})
+export class AuthService {
+    private readonly API_URL = environment.apiUrl;
+    private readonly TOKEN_KEY = 'access_token';
+
+    private currentUserSubject = new BehaviorSubject<User | null>(null);
+    public currentUser$ = this.currentUserSubject.asObservable();
+
+    // Signal for reactive components
+    public user = signal<User | null>(null);
+
+    constructor(
+        private http: HttpClient,
+        private router: Router
+    ) {
+        this.loadUserFromToken();
+    }
+
+    login(credentials: LoginRequest): Observable<LoginResponse> {
+        return this.http.post<LoginResponse>(`${this.API_URL}/auth/login`, credentials)
+            .pipe(
+                tap((response: LoginResponse) => this.handleAuthResponse(response))
+            );
+    }
+
+    register(data: RegisterRequest): Observable<LoginResponse> {
+        return this.http.post<LoginResponse>(`${this.API_URL}/auth/register`, data)
+            .pipe(
+                tap((response: LoginResponse) => this.handleAuthResponse(response))
+            );
+    }
+
+    logout(): void {
+        localStorage.removeItem(this.TOKEN_KEY);
+        this.currentUserSubject.next(null);
+        this.user.set(null);
+        this.router.navigate(['/login']);
+    }
+
+    getToken(): string | null {
+        return localStorage.getItem(this.TOKEN_KEY);
+    }
+
+    isAuthenticated(): boolean {
+        return !!this.getToken();
+    }
+
+    private handleAuthResponse(response: LoginResponse): void {
+        if (response.accessToken) {
+            localStorage.setItem(this.TOKEN_KEY, response.accessToken);
+            // Assuming the 'user' object within LoginResponse already conforms to the User interface
+            // If the backend sends snake_case properties for the user object,
+            // you might need to map them here, e.g.,
+            // const user: User = {
+            //     id: response.user.id,
+            //     email: response.user.email,
+            //     name: response.user.name,
+            //     role: response.user.role,
+            //     tenantId: response.user.tenant_id // Example if backend sends tenant_id
+            // };
+            this.currentUserSubject.next(response.user);
+            this.user.set(response.user);
+        }
+    }
+
+    private loadUserFromToken(): void {
+        const token = this.getToken();
+        if (token) {
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                const user: User = {
+                    id: payload.sub,
+                    email: payload.email,
+                    name: payload.name,
+                    role: payload.role,
+                    tenantId: payload.tenantId
+                };
+                this.currentUserSubject.next(user);
+                this.user.set(user);
+            } catch (error) {
+                this.logout();
+            }
+        }
+    }
+}

@@ -1,0 +1,337 @@
+// This is your Prisma schema file
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =====================
+// CORE ENTITIES
+// =====================
+
+model Tenant {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  settings  Json?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  users         User[]
+  products      Product[]
+  categories    Category[]
+  brands        Brand[]
+  suppliers     Supplier[]
+  sales         Sale[]
+  payments      Payment[]
+  conditionals  Conditional[]
+  inventory     InventoryMovement[]
+  auditLogs     AuditLog[]
+
+  @@map("tenants")
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  USER
+}
+
+model User {
+  id            String   @id @default(uuid())
+  tenantId      String   @map("tenant_id")
+  email         String   @unique
+  passwordHash  String   @map("password_hash")
+  role          Role
+  name          String
+  active        Boolean  @default(true)
+  twoFaSecret   String?  @map("two_fa_secret")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  tenant        Tenant          @relation(fields: [tenantId], references: [id])
+  sales         Sale[]
+  conditionals  Conditional[]
+  inventory     InventoryMovement[]
+  auditLogs     AuditLog[]
+
+  @@index([tenantId])
+  @@map("users")
+}
+
+// =====================
+// PRODUCT  MANAGEMENT
+// =====================
+
+model Category {
+  id        String    @id @default(uuid())
+  tenantId  String    @map("tenant_id")
+  name      String
+  parentId  String?   @map("parent_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  tenant    Tenant    @relation(fields: [tenantId], references: [id])
+  parent    Category? @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children  Category[] @relation("CategoryHierarchy")
+  products  Product[]
+
+  @@index([tenantId])
+  @@map("categories")
+}
+
+model Brand {
+  id        String   @id @default(uuid())
+  tenantId  String   @map("tenant_id")
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  products  Product[]
+
+  @@index([tenantId])
+  @@map("brands")
+}
+
+model Supplier {
+  id        String   @id @default(uuid())
+  tenantId  String   @map("tenant_id")
+  name      String
+  document  String?
+  contact   String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  products  Product[]
+
+  @@index([tenantId])
+  @@map("suppliers")
+}
+
+model Product {
+  id            String   @id @default(uuid())
+  tenantId      String   @map("tenant_id")
+  name          String
+  description   String?
+  sku           String
+  barcode       String?
+  categoryId    String?  @map("category_id")
+  brandId       String?  @map("brand_id")
+  supplierId    String?  @map("supplier_id")
+  costPrice     Decimal  @map("cost_price") @db.Decimal(10, 2)
+  salePrice     Decimal  @map("sale_price") @db.Decimal(10, 2)
+  margin        Decimal  @db.Decimal(10, 2)
+  stockQuantity Int      @default(0) @map("stock_quantity")
+  unit          String   @default("UN")
+  active        Boolean  @default(true)
+  metadata      Json?
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  tenant            Tenant              @relation(fields: [tenantId], references: [id])
+  category          Category?           @relation(fields: [categoryId], references: [id])
+  brand             Brand?              @relation(fields: [brandId], references: [id])
+  supplier          Supplier?           @relation(fields: [supplierId], references: [id])
+  saleItems         SaleItem[]
+  conditionalItems  ConditionalItem[]
+  inventory         InventoryMovement[]
+
+  @@unique([tenantId, sku])
+  @@index([tenantId])
+  @@index([barcode])
+  @@map("products")
+}
+
+// =====================
+// SALES
+// =====================
+
+enum SaleStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+
+model Sale {
+  id            String     @id @default(uuid())
+  tenantId      String     @map("tenant_id")
+  userId        String     @map("user_id")
+  invoiceNumber String?    @map("invoice_number")
+  subtotal      Decimal    @db.Decimal(10, 2)
+  discount      Decimal    @default(0) @db.Decimal(10, 2)
+  total         Decimal    @db.Decimal(10, 2)
+  status        SaleStatus @default(PENDING)
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+
+  tenant    Tenant      @relation(fields: [tenantId], references: [id])
+  user      User        @relation(fields: [userId], references: [id])
+  items     SaleItem[]
+  payments  Payment[]
+
+  @@index([tenantId])
+  @@index([createdAt])
+  @@map("sales")
+}
+
+model SaleItem {
+  id         String  @id @default(uuid())
+  saleId     String  @map("sale_id")
+  productId  String  @map("product_id")
+  quantity   Int
+  unitPrice  Decimal @map("unit_price") @db.Decimal(10, 2)
+  discount   Decimal @default(0) @db.Decimal(10, 2)
+  total      Decimal @db.Decimal(10, 2)
+
+  sale    Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@index([saleId])
+  @@map("sale_items")
+}
+
+// =====================
+// PAYMENTS
+// =====================
+
+enum PaymentMethod {
+  PIX
+  CREDIT_CARD
+  DEBIT_CARD
+  CASH
+  BOLETO
+  STORE_CREDIT
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
+model Payment {
+  id           String        @id @default(uuid())
+  tenantId     String        @map("tenant_id")
+  saleId       String        @map("sale_id")
+  method       PaymentMethod
+  amount       Decimal       @db.Decimal(10, 2)
+  installments Int           @default(1)
+  fee          Decimal       @default(0) @db.Decimal(10, 2)
+  status       PaymentStatus @default(PENDING)
+  paidAt       DateTime?     @map("paid_at")
+  metadata     Json?
+  createdAt    DateTime      @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  sale   Sale   @relation(fields: [saleId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([saleId])
+  @@map("payments")
+}
+
+// =====================
+// CONDITIONALS
+// =====================
+
+enum ConditionalStatus {
+  ACTIVE
+  RETURNED
+  CONVERTED
+}
+
+model Conditional {
+  id              String            @id @default(uuid())
+  tenantId        String            @map("tenant_id")
+  userId          String            @map("user_id")
+  customerId      String?           @map("customer_id")
+  status          ConditionalStatus @default(ACTIVE)
+  dueDate         DateTime?         @map("due_date")
+  createdAt       DateTime          @default(now()) @map("created_at")
+  returnedAt      DateTime?         @map("returned_at")
+  convertedAt     DateTime?         @map("converted_at")
+  convertedSaleId String?           @map("converted_sale_id")
+
+  tenant Tenant            @relation(fields: [tenantId], references: [id])
+  user   User              @relation(fields: [userId], references: [id])
+  items  ConditionalItem[]
+
+  @@index([tenantId])
+  @@index([status])
+  @@map("conditionals")
+}
+
+model ConditionalItem {
+  id            String  @id @default(uuid())
+  conditionalId String  @map("conditional_id")
+  productId     String  @map("product_id")
+  quantity      Int
+  unitPrice     Decimal @map("unit_price") @db.Decimal(10, 2)
+
+  conditional Conditional @relation(fields: [conditionalId], references: [id], onDelete: Cascade)
+  product     Product     @relation(fields: [productId], references: [id])
+
+  @@index([conditionalId])
+  @@map("conditional_items")
+}
+
+// =====================
+// INVENTORY
+// =====================
+
+enum MovementType {
+  ENTRY
+  EXIT
+  ADJUSTMENT
+  RETURN
+}
+
+model InventoryMovement {
+  id        String       @id @default(uuid())
+  tenantId  String       @map("tenant_id")
+  productId String       @map("product_id")
+  userId    String       @map("user_id")
+  type      MovementType
+  quantity  Int
+  reference String?
+  createdAt DateTime     @default(now()) @map("created_at")
+
+  tenant  Tenant  @relation(fields: [tenantId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+  @@index([productId])
+  @@map("inventory_movements")
+}
+
+// =====================
+// AUDIT
+// =====================
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+}
+
+model AuditLog {
+  id         String      @id @default(uuid())
+  tenantId   String      @map("tenant_id")
+  userId     String      @map("user_id")
+  entityType String      @map("entity_type")
+  entityId   String      @map("entity_id")
+  action     AuditAction
+  changes    Json?
+  createdAt  DateTime    @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+  @@index([entityType, entityId])
+  @@map("audit_logs")
+}

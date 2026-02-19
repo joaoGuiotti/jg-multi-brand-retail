@@ -1,0 +1,89 @@
+<div class="min-h-screen bg-surface flex items-center justify-center p-4">
+    <div class="max-w-md w-full">
+        <!-- Logo/Brand -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-content mb-2">Retail POS</h1>
+            <p class="text-content-secondary">Create your account</p>
+        </div>
+
+        <!-- Register Card -->
+        <ui-card padding="lg" [shadow]="true">
+            <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+                <!-- Name Field -->
+                <div class="mb-4">
+                    <label for="name" class="label">Full Name</label>
+                    <input id="name" type="text" formControlName="name" class="input-field"
+                        [class.border-error]="name?.invalid && name?.touched" placeholder="John Doe" />
+                    <p *ngIf="name?.invalid && name?.touched" class="mt-1 text-sm text-error">
+                        <span *ngIf="name?.errors?.['required']">Name is required</span>
+                        <span *ngIf="name?.errors?.['minlength']">Name must be at least 3 characters</span>
+                    </p>
+                </div>
+
+                <!-- Email Field -->
+                <div class="mb-4">
+                    <label for="email" class="label">Email</label>
+                    <input id="email" type="email" formControlName="email" class="input-field"
+                        [class.border-error]="email?.invalid && email?.touched" placeholder="you@example.com" />
+                    <p *ngIf="email?.invalid && email?.touched" class="mt-1 text-sm text-error">
+                        <span *ngIf="email?.errors?.['required']">Email is required</span>
+                        <span *ngIf="email?.errors?.['email']">Please enter a valid email</span>
+                    </p>
+                </div>
+
+                <!-- Tenant Name Field -->
+                <div class="mb-4">
+                    <label for="tenantName" class="label">Store Name</label>
+                    <input id="tenantName" type="text" formControlName="tenantName" class="input-field"
+                        [class.border-error]="tenantName?.invalid && tenantName?.touched" placeholder="My Store" />
+                    <p *ngIf="tenantName?.invalid && tenantName?.touched" class="mt-1 text-sm text-error">
+                        <span *ngIf="tenantName?.errors?.['required']">Store name is required</span>
+                        <span *ngIf="tenantName?.errors?.['minlength']">Store name must be at least 3 characters</span>
+                    </p>
+                </div>
+
+                <!-- Password Field -->
+                <div class="mb-4">
+                    <label for="password" class="label">Password</label>
+                    <input id="password" type="password" formControlName="password" class="input-field"
+                        [class.border-error]="password?.invalid && password?.touched" placeholder="••••••••" />
+                    <p *ngIf="password?.invalid && password?.touched" class="mt-1 text-sm text-error">
+                        <span *ngIf="password?.errors?.['required']">Password is required</span>
+                        <span *ngIf="password?.errors?.['minlength']">Password must be at least 6 characters</span>
+                    </p>
+                </div>
+
+                <!-- Confirm Password Field -->
+                <div class="mb-6">
+                    <label for="confirmPassword" class="label">Confirm Password</label>
+                    <input id="confirmPassword" type="password" formControlName="confirmPassword" class="input-field"
+                        [class.border-error]="confirmPassword?.invalid && confirmPassword?.touched"
+                        placeholder="••••••••" />
+                    <p *ngIf="confirmPassword?.invalid && confirmPassword?.touched" class="mt-1 text-sm text-error">
+                        <span *ngIf="confirmPassword?.errors?.['required']">Please confirm your password</span>
+                        <span *ngIf="confirmPassword?.errors?.['passwordMismatch']">Passwords do not match</span>
+                    </p>
+                </div>
+
+                <!-- Error Message -->
+                <div *ngIf="errorMessage" class="mb-4 p-3 bg-error-bg border border-error rounded-lg">
+                    <p class="text-sm text-error">{{ errorMessage }}</p>
+                </div>
+
+                <!-- Submit Button -->
+                <ui-button type="submit" variant="primary" [fullWidth]="true" [loading]="isLoading"
+                    [disabled]="registerForm.invalid || isLoading">
+                    Create Account
+                </ui-button>
+            </form>
+
+            <!-- Login Link -->
+            <div class="mt-6 text-center">
+                <p class="text-sm text-content-secondary">
+                    Already have an account?
+                    <a routerLink="/login" class="text-primary hover:text-primary-hover font-medium">Sign in</a>
+                </p>
+            </div>
+        </ui-card>
+    </div>
+</div>

@@ -20,7 +20,6 @@ export class ThemeService {
         @Inject(DOCUMENT) private document: Document
     ) {
         this.renderer = rendererFactory.createRenderer(null, null);
-        this.initializeTheme();
         this.setupThemeEffect();
 
         // Effect to inject stylesheet when theme changes
@@ -32,7 +31,7 @@ export class ThemeService {
     /**
      * Initialize theme from localStorage or system preference
      */
-    private initializeTheme(): void {
+    public initializeTheme(): void {
         const savedTheme = this.getSavedTheme();
         const systemTheme = this.getSystemTheme();
         const initialTheme = savedTheme || systemTheme;
@@ -117,9 +116,9 @@ export class ThemeService {
     /**
      * Toggle between light and dark theme
      */
-    toggleTheme(): void {
+    toggleTheme(saveToStorage = true): void {
         const newTheme = this.currentTheme() === 'light' ? 'dark' : 'light';
-        this.setTheme(newTheme);
+        this.setTheme(newTheme, saveToStorage);
     }
 
     /**

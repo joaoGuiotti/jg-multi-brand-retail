@@ -4,10 +4,9 @@ import {
     Component,
     computed,
     EventEmitter,
+    inject,
     input,
-    Optional,
     Output,
-    Self,
     signal
 } from '@angular/core';
 import {
@@ -34,6 +33,7 @@ export class UiInputFieldComponent implements ControlValueAccessor {
     hint = input<string | null>(null);
     error = input<string | null>(null);
     id = input<string>(`ui-input-${Math.random().toString(36).slice(2, 9)}`);
+    step = input<string>('');
     required = input<boolean | undefined>(undefined);
     disabled = input<boolean>(false);
 
@@ -48,6 +48,8 @@ export class UiInputFieldComponent implements ControlValueAccessor {
     private onChange: (value: string) => void = () => { };
     private onTouched: () => void = () => { };
 
+    private ngControl = inject(NgControl, { optional: true, self: true });
+
     inputClasses = computed(() => {
         const base =
             'w-full px-3 py-2 bg-surface border rounded-lg text-content ' +
@@ -61,7 +63,7 @@ export class UiInputFieldComponent implements ControlValueAccessor {
     });
 
     // pegar ngControl e validar se tem required
-    constructor(@Optional() @Self() public ngControl: NgControl) {
+    constructor() {
         if (this.ngControl) {
             this.ngControl.valueAccessor = this;
         }

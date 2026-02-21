@@ -1,5 +1,5 @@
 import { DOCUMENT } from '@angular/common';
-import { effect, Inject, Injectable, Renderer2, RendererFactory2, signal } from '@angular/core';
+import { effect, inject, Injectable, Renderer2, RendererFactory2, signal } from '@angular/core';
 
 export type Theme = 'light' | 'dark';
 
@@ -9,17 +9,17 @@ export type Theme = 'light' | 'dark';
 export class ThemeService {
     private readonly THEME_KEY = 'app-theme';
     private currentTheme = signal<Theme>('light');
+
+    private document = inject(DOCUMENT);
+    private rendererFactory = inject(RendererFactory2);
     private renderer: Renderer2;
     private themeStyleElement: HTMLLinkElement | null = null;
 
     // Public readonly signal
     theme = this.currentTheme.asReadonly();
 
-    constructor(
-        rendererFactory: RendererFactory2,
-        @Inject(DOCUMENT) private document: Document
-    ) {
-        this.renderer = rendererFactory.createRenderer(null, null);
+    constructor() {
+        this.renderer = this.rendererFactory.createRenderer(null, null);
         this.setupThemeEffect();
 
         // Effect to inject stylesheet when theme changes

@@ -13,7 +13,6 @@ function initializeThemeFactory(themeService: ThemeService) {
  */
 export function provideTheme(): EnvironmentProviders {
     return makeEnvironmentProviders([
-        ThemeService,
         {
             provide: APP_INITIALIZER,
             useFactory: initializeThemeFactory,

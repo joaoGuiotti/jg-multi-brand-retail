@@ -10,7 +10,6 @@ export type BadgeSize = 'sm' | 'md';
 
 @Component({
     selector: 'ui-badge',
-    standalone: true,
     imports: [CommonModule],
     template: `
     <span [class]="classes">
@@ -19,7 +18,7 @@ export type BadgeSize = 'sm' | 'md';
     </span>
   `,
     styles: [],
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UiBadgeComponent {
     @Input() variant: BadgeVariant = 'default';

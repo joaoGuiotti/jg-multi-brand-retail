@@ -9,11 +9,10 @@ export type CardPadding = 'none' | 'sm' | 'md' | 'lg';
 
 @Component({
     selector: 'ui-card',
-    standalone: true,
     imports: [CommonModule],
     templateUrl: './card.component.html',
     styleUrl: './card.component.scss',
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UiCardComponent {
     @Input() padding: CardPadding = 'md';

@@ -13,11 +13,10 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
 
 @Component({
     selector: 'ui-button',
-    standalone: true,
     imports: [CommonModule],
     templateUrl: './button.component.html',
     styleUrl: './button.component.scss',
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UiButtonComponent {
     @Input() variant: ButtonVariant = 'primary';

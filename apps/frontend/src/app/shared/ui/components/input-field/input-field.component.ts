@@ -20,11 +20,10 @@ export type InputType = 'text' | 'email' | 'password' | 'number' | 'search' | 't
 
 @Component({
     selector: 'ui-input-field',
-    standalone: true,
     imports: [CommonModule, FormsModule],
     templateUrl: './input-field.component.html',
     styleUrl: './input-field.component.scss',
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UiInputFieldComponent implements ControlValueAccessor {
     label = input<string>('');

@@ -5,7 +5,6 @@ import { UiButtonComponent } from '../button/button.component';
 
 @Component({
     selector: 'ui-theme-toggle',
-    standalone: true,
     imports: [CommonModule, UiButtonComponent],
     templateUrl: './theme-toggle.component.html',
     styleUrl: './theme-toggle.component.scss'

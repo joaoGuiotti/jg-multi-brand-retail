@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Output } from '@angular/core';
 import { ThemeToggleComponent } from '@shared/ui';
 import { AuthService } from '../../core/services/auth.service';
 
@@ -12,11 +12,11 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class HeaderComponent {
   @Output() toggleSidebar = new EventEmitter<void>();
-
+  private authService = inject(AuthService);
   isUserMenuOpen = false;
   user = this.authService.user;
 
-  constructor(public authService: AuthService) { }
+  constructor() { }
 
   onToggleSidebar(): void {
     this.toggleSidebar.emit();

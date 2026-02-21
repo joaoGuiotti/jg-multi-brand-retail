@@ -2,10 +2,10 @@
 module.exports = {
   content: [
     "./src/**/*.{html,ts}",
-    "../../libs/shared/ui/src/**/*.{html,ts}",
+    "./src/app/shared/ui/**/*.{html,ts}",
   ],
   presets: [
-    require('../../libs/shared/ui/tailwind.preset.js'),
+    require('./src/app/shared/ui/tailwind.preset.js'),
   ],
   plugins: [],
 }

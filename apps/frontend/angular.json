@@ -32,12 +32,12 @@
               "src/assets",
               {
                 "glob": "**/*",
-                "input": "../../libs/shared/ui/src/styles",
+                "input": "src/app/shared/ui/styles",
                 "output": "/styles"
               }
             ],
             "styles": [
-              "../../libs/shared/ui/src/styles/design-tokens.css",
+              "src/app/shared/ui/styles/design-tokens.css",
               "src/styles.css"
             ],
             "scripts": []
@@ -97,7 +97,7 @@
               "src/assets"
             ],
             "styles": [
-              "../../libs/shared/ui/src/styles/design-tokens.css",
+              "src/app/shared/ui/styles/design-tokens.css",
               "src/styles.css"
             ],
             "scripts": []

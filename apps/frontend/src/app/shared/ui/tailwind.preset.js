@@ -2,7 +2,7 @@
  * Tailwind CSS Preset — @shared/ui
  *
  * Use this in any app's tailwind.config.js:
- *   presets: [require('../../libs/shared/ui/tailwind.preset.js')]
+ *   presets: [require('./tailwind.preset.js')]
  *
  * The preset maps Tailwind class names to the CSS custom properties
  * defined in design-tokens.css, so the same classes work in any theme.

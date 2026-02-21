@@ -2,6 +2,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "baseUrl": ".",
     "outDir": "./dist/out-tsc",
     "strict": true,
     "noImplicitOverride": true,
@@ -24,19 +25,19 @@
     ],
     "paths": {
       "rxjs": [
-        "../../node_modules/rxjs"
+        "./node_modules/rxjs"
       ],
       "rxjs/*": [
-        "../../node_modules/rxjs/*"
+        "./node_modules/rxjs/*"
       ],
       "@angular/*": [
-        "../../node_modules/@angular/*"
+        "./node_modules/@angular/*"
       ],
       "@shared/ui": [
-        "../../libs/shared/ui/src/index.ts"
+        "src/app/shared/ui/index.ts"
       ],
       "@shared/ui/*": [
-        "../../libs/shared/ui/src/*"
+        "src/app/shared/ui/*"
       ]
     }
   },

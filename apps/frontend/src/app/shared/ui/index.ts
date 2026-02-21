@@ -6,10 +6,10 @@
  */
 
 // ── Components ───────────────────────────────────────────────────────────────
-export * from './lib/components';
+export * from './components';
 
 // ── Services ───────────────────────────────────────────────────────────────
-export * from './lib/services';
+export * from './services';
 
 
 

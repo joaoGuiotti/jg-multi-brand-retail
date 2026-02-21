@@ -15,10 +15,10 @@ export class RegisterDto {
     name: string;
 
     @IsString()
-    @IsNotEmpty()
-    tenantSlug: string;
+    @IsOptional()
+    tenantSlug?: string;
 
     @IsString()
-    @IsOptional()
-    tenantName?: string;
+    @IsNotEmpty()
+    tenantName: string;
 }

@@ -27,18 +27,20 @@ export class AuthService {
         if (existingUser) {
             throw new ConflictException('User with this email already exists');
         }
+        // Normalize email to create tenant slug
+        const tenantSlug = dto.tenantSlug || this.normalizeString(dto.tenantName);
 
         // Check if tenant exists or create new one
         let tenant = await this.prisma.tenant.findUnique({
-            where: { slug: dto.tenantSlug },
+            where: { slug: tenantSlug },
         });
 
         if (!tenant) {
             // Create new tenant (first user will be admin)
             tenant = await this.prisma.tenant.create({
                 data: {
-                    name: dto.tenantName || dto.tenantSlug,
-                    slug: dto.tenantSlug,
+                    name: dto.tenantName,
+                    slug: tenantSlug,
                     active: true,
                     settings: {
                         currency: 'BRL',
@@ -200,5 +202,13 @@ export class AuthService {
             accessToken,
             refreshToken,
         };
+    }
+
+    private normalizeString(value: string): string {
+        return value.normalize("NFD")
+            .replaceAll(' ', '-')
+            .replaceAll('@', '-')
+            .replaceAll('.', '-')
+            .toLowerCase();
     }
 }

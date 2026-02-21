@@ -10,14 +10,14 @@
     <ui-card padding="lg" [shadow]="true">
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
         <!-- Email Field -->
-        <ui-input-field class="mb-6" label="Email" type="email" formControlName="email"
+        <ui-input-field class="mb-6" [required]="false" label="Email" type="email" formControlName="email"
           [class.border-error]="email?.invalid && email?.touched" placeholder="you@example.com"
           [error]="email?.invalid && email?.touched ? 'Email is required' : null"
           [hint]="email?.invalid && email?.touched ? 'Please enter a valid email' : null">
         </ui-input-field>
 
         <!-- Password Field -->
-        <ui-input-field class="mb-6" label="Password" type="password" formControlName="password"
+        <ui-input-field class="mb-6" [required]="false" label="Password" type="password" formControlName="password"
           [class.border-error]="password?.invalid && password?.touched" placeholder="••••••••"
           [error]="password?.invalid && password?.touched ? 'Password is required' : null"
           [hint]="password?.invalid && password?.touched ? 'Please enter a valid password' : null">

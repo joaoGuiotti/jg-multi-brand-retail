@@ -11,8 +11,7 @@
             <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
                 <!-- Name Field -->
                 <div class="mb-4">
-                    <label for="name" class="label">Full Name</label>
-                    <input id="name" type="text" formControlName="name" class="input-field"
+                    <ui-input-field id="name" label="Full Name" formControlName="name"
                         [class.border-error]="name?.invalid && name?.touched" placeholder="John Doe" />
                     <p *ngIf="name?.invalid && name?.touched" class="mt-1 text-sm text-error">
                         <span *ngIf="name?.errors?.['required']">Name is required</span>
@@ -22,8 +21,7 @@
 
                 <!-- Email Field -->
                 <div class="mb-4">
-                    <label for="email" class="label">Email</label>
-                    <input id="email" type="email" formControlName="email" class="input-field"
+                    <ui-input-field id="email" label="Email" formControlName="email"
                         [class.border-error]="email?.invalid && email?.touched" placeholder="you@example.com" />
                     <p *ngIf="email?.invalid && email?.touched" class="mt-1 text-sm text-error">
                         <span *ngIf="email?.errors?.['required']">Email is required</span>
@@ -33,8 +31,7 @@
 
                 <!-- Tenant Name Field -->
                 <div class="mb-4">
-                    <label for="tenantName" class="label">Store Name</label>
-                    <input id="tenantName" type="text" formControlName="tenantName" class="input-field"
+                    <ui-input-field id="tenantName" label="Store Name" formControlName="tenantName"
                         [class.border-error]="tenantName?.invalid && tenantName?.touched" placeholder="My Store" />
                     <p *ngIf="tenantName?.invalid && tenantName?.touched" class="mt-1 text-sm text-error">
                         <span *ngIf="tenantName?.errors?.['required']">Store name is required</span>
@@ -44,8 +41,7 @@
 
                 <!-- Password Field -->
                 <div class="mb-4">
-                    <label for="password" class="label">Password</label>
-                    <input id="password" type="password" formControlName="password" class="input-field"
+                    <ui-input-field id="password" label="Password" formControlName="password"
                         [class.border-error]="password?.invalid && password?.touched" placeholder="••••••••" />
                     <p *ngIf="password?.invalid && password?.touched" class="mt-1 text-sm text-error">
                         <span *ngIf="password?.errors?.['required']">Password is required</span>
@@ -55,8 +51,7 @@
 
                 <!-- Confirm Password Field -->
                 <div class="mb-6">
-                    <label for="confirmPassword" class="label">Confirm Password</label>
-                    <input id="confirmPassword" type="password" formControlName="confirmPassword" class="input-field"
+                    <ui-input-field id="confirmPassword" label="Confirm Password" formControlName="confirmPassword"
                         [class.border-error]="confirmPassword?.invalid && confirmPassword?.touched"
                         placeholder="••••••••" />
                     <p *ngIf="confirmPassword?.invalid && confirmPassword?.touched" class="mt-1 text-sm text-error">

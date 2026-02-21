@@ -2,13 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { UiButtonComponent, UiCardComponent } from '@shared/ui';
+import { UiButtonComponent, UiCardComponent, UiInputFieldComponent } from '@shared/ui';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
     selector: 'app-register',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, RouterModule, UiButtonComponent, UiCardComponent],
+    imports: [CommonModule, ReactiveFormsModule, RouterModule, UiButtonComponent, UiCardComponent, UiInputFieldComponent],
     templateUrl: './register.component.html',
     styleUrl: './register.component.scss'
 })

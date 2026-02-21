@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import {
     ChangeDetectionStrategy,
     Component,
@@ -13,7 +13,7 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
 
 @Component({
     selector: 'ui-button',
-    imports: [CommonModule],
+    imports: [],
     templateUrl: './button.component.html',
     styleUrl: './button.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush

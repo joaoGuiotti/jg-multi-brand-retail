@@ -1,11 +1,11 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, inject } from '@angular/core';
 import { ThemeService } from '../../services/theme';
 import { UiButtonComponent } from '../button/button.component';
 
 @Component({
     selector: 'ui-theme-toggle',
-    imports: [CommonModule, UiButtonComponent],
+    imports: [UiButtonComponent],
     templateUrl: './theme-toggle.component.html',
     styleUrl: './theme-toggle.component.scss'
 })

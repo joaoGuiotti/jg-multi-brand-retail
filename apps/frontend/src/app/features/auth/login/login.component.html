@@ -24,9 +24,11 @@
         </ui-input-field>
 
         <!-- Error Message -->
-        <div *ngIf="errorMessage" class="mb-4 p-3 bg-error-bg border border-error rounded-lg">
-          <p class="text-sm text-error">{{ errorMessage }}</p>
-        </div>
+        @if (errorMessage) {
+          <div class="mb-4 p-3 bg-error-bg border border-error rounded-lg">
+            <p class="text-sm text-error">{{ errorMessage }}</p>
+          </div>
+        }
 
         <!-- Submit Button -->
         <ui-button type="submit" variant="primary" [fullWidth]="true" [loading]="isLoading"

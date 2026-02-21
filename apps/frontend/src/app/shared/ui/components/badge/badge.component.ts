@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import {
     ChangeDetectionStrategy,
     Component,
@@ -10,13 +10,15 @@ export type BadgeSize = 'sm' | 'md';
 
 @Component({
     selector: 'ui-badge',
-    imports: [CommonModule],
+    imports: [],
     template: `
     <span [class]="classes">
-      <span *ngIf="dot" [class]="dotClasses" aria-hidden="true"></span>
+      @if (dot) {
+        <span [class]="dotClasses" aria-hidden="true"></span>
+      }
       <ng-content></ng-content>
     </span>
-  `,
+    `,
     styles: [],
     changeDetection: ChangeDetectionStrategy.OnPush
 })

@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import {
     ChangeDetectionStrategy,
     Component,
@@ -20,7 +20,7 @@ export type InputType = 'text' | 'email' | 'password' | 'number' | 'search' | 't
 
 @Component({
     selector: 'ui-input-field',
-    imports: [CommonModule, FormsModule],
+    imports: [FormsModule],
     templateUrl: './input-field.component.html',
     styleUrl: './input-field.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush

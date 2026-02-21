@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import {
     ChangeDetectionStrategy,
     Component,
@@ -9,7 +9,7 @@ export type CardPadding = 'none' | 'sm' | 'md' | 'lg';
 
 @Component({
     selector: 'ui-card',
-    imports: [CommonModule],
+    imports: [],
     templateUrl: './card.component.html',
     styleUrl: './card.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush

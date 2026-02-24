@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, input, output, signal } from '@angular/core';
 import { UiNumberPipe } from '../../pipes/number.pipe';
 import { UiLoadingComponent } from '../loading/loading.component';
-import { RowExpandConfig, SortDirection, TableColumn, TableConfig, TableSort } from './table.types';
+import { RowExpandConfig, SortDirection, TableColumn, TableConfig, TableSort } from './models/table.types';
 
 @Component({
     selector: 'ui-table',

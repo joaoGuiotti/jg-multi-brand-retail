@@ -1,8 +1,8 @@
 import { Component, input } from '@angular/core';
 import { ComponentFixture, DeferBlockState, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { UiTableComponent } from './table.component';
-import { TableColumn } from './table.types';
+import { TableColumn } from '../models/table.types';
+import { UiTableComponent } from '../table.component';
 
 @Component({
     standalone: true,

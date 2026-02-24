@@ -13,7 +13,7 @@
                 <div *ngIf="searchResults().length > 0" class="mt-4 max-h-96 overflow-y-auto">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div *ngFor="let product of searchResults()" (click)="addToCart(product)"
-                            class="p-4 border border-outline rounded-lg hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-colors">
+                            class="p-4 border border-outline rounded-lg hover:border-blue-500 hover:bg-surface-hover cursor-pointer transition-colors">
                             <div class="flex justify-between items-start">
                                 <div>
                                     <h3 class="font-medium text-content">{{ product.name }}</h3>
@@ -105,15 +105,15 @@
                     </div>
                     <div class="flex justify-between text-gray-600">
                         <span>Subtotal:</span>
-                        <span>R$ {{ cartStore.subtotal().toFixed(2) }}</span>
+                        <span>R$ {{ cartStore.subtotal() | uiNumber: { prefix: 'R$ ' } }}</span>
                     </div>
                     <div *ngIf="cartStore.totalDiscount() > 0" class="flex justify-between text-red-600">
                         <span>Discount:</span>
-                        <span>- R$ {{ cartStore.totalDiscount().toFixed(2) }}</span>
+                        <span>- R$ {{ cartStore.totalDiscount() | uiNumber: { prefix: 'R$ ' } }}</span>
                     </div>
                     <div class="border-t pt-3 flex justify-between text-xl font-bold text-content">
                         <span>Total:</span>
-                        <span>R$ {{ cartStore.total().toFixed(2) }}</span>
+                        <span>R$ {{ cartStore.total() | uiNumber: { prefix: 'R$ ' } }}</span>
                     </div>
                 </div>
 
@@ -151,19 +151,17 @@
                 </select>
             </div>
 
-            <div class="mb-4">
-                <label class="label">Amount (R$)</label>
-                <input type="number" [(ngModel)]="paymentAmount" step="0.01" class="input-field" />
-            </div>
+            <ui-input-field class="mb-4" label="Amount" type="number" [(ngModel)]="paymentAmount" prefix="R$ " />
 
-            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+            <div class="mb-6 p-4 bg-surface border rounded-lg">
                 <div class="flex justify-between mb-2">
-                    <span class="text-gray-600">Total:</span>
+                    <span class="text-content-secondary">Total:</span>
                     <span class="font-bold">R$ {{ cartStore.total().toFixed(2) }}</span>
                 </div>
                 <div *ngIf="paymentAmount > cartStore.total()" class="flex justify-between text-success">
                     <span>Change:</span>
-                    <span class="font-bold">R$ {{ (paymentAmount - cartStore.total()).toFixed(2) }}</span>
+                    <span class="font-bold">R$ {{ paymentAmount - cartStore.total() | uiNumber: { prefix: 'R$ ' }
+                        }}</span>
                 </div>
             </div>
 

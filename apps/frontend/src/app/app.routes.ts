@@ -1,10 +1,21 @@
+import { isDevMode } from '@angular/core';
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { LoginComponent } from './features/auth/login/login.component';
 import { RegisterComponent } from './features/auth/register/register.component';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 
+const DemosRoutes: Routes = [
+    {
+        path: 'demo',
+        children: [
+            { path: 'table', loadComponent: () => import('./features/demo/table-demo/table-demo.component').then(m => m.TableDemoComponent) },
+        ]
+    }
+];
+
 export const routes: Routes = [
+    ...(isDevMode() ? DemosRoutes : []),
     { path: 'login', component: LoginComponent },
     { path: 'register', component: RegisterComponent },
     {

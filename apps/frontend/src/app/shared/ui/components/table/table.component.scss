@@ -1,0 +1,28 @@
+.ui-table-container {
+    &.scrollable {
+        max-height: 500px;
+        overflow-y: auto;
+    }
+}
+
+.table-striped {
+    tbody tr:nth-child(even) {
+        --tw-bg-opacity: 0.03;
+        background-color: rgb(var(--surface-secondary-rgb) / var(--tw-bg-opacity));
+    }
+}
+
+// Resizable column support (Future enhancement if needed via directive)
+.resize-handle {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    cursor: col-resize;
+    background-color: transparent;
+
+    &:hover {
+        background-color: var(--primary);
+    }
+}

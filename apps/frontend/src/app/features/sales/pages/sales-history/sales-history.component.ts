@@ -54,8 +54,8 @@ export class SalesHistoryComponent implements OnInit {
         this.salesService.getSales(this.currentPage(), this.pageSize, filter).subscribe({
             next: (response) => {
                 this.sales.set(response.data);
-                this.totalItems.set(response.meta.total);
-                this.totalPages.set(Math.ceil(response.meta.total / this.pageSize));
+                this.totalItems.set(response?.meta?.total!);
+                this.totalPages.set(Math.ceil(response?.meta?.total! / this.pageSize));
                 this.isLoading.set(false);
             },
             error: (error) => {

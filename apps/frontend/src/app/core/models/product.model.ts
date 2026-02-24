@@ -45,11 +45,3 @@ export interface ProductFilter {
     isActive?: boolean;
     lowStock?: boolean;
 }
-
-export interface PaginatedProducts {
-    data: Product[];
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-}

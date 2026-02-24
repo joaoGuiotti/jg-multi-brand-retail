@@ -5,6 +5,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { LoginRequest, LoginResponse, RegisterRequest, User } from '../models/auth.model';
+import { IResponse } from '../models/response-base';
 
 @Injectable({
     providedIn: 'root'
@@ -26,17 +27,17 @@ export class AuthService {
         this.loadUserFromToken();
     }
 
-    login(credentials: LoginRequest): Observable<LoginResponse> {
-        return this.http.post<LoginResponse>(`${this.API_URL}/auth/login`, credentials)
+    login(credentials: LoginRequest): Observable<IResponse<LoginResponse>> {
+        return this.http.post<IResponse<LoginResponse>>(`${this.API_URL}/auth/login`, credentials)
             .pipe(
-                tap((response: LoginResponse) => this.handleAuthResponse(response))
+                tap((response: IResponse<LoginResponse>) => this.handleAuthResponse(response.data))
             );
     }
 
-    register(data: RegisterRequest): Observable<LoginResponse> {
-        return this.http.post<LoginResponse>(`${this.API_URL}/auth/register`, data)
+    register(data: RegisterRequest): Observable<IResponse<LoginResponse>> {
+        return this.http.post<IResponse<LoginResponse>>(`${this.API_URL}/auth/register`, data)
             .pipe(
-                tap((response: LoginResponse) => this.handleAuthResponse(response))
+                tap((response: IResponse<LoginResponse>) => this.handleAuthResponse(response.data))
             );
     }
 

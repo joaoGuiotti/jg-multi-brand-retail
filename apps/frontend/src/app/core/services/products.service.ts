@@ -2,7 +2,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { PaginatedProducts, Product, ProductCreateDto, ProductFilter, ProductUpdateDto } from '../models/product.model';
+import { Product, ProductCreateDto, ProductFilter, ProductUpdateDto } from '../models/product.model';
+import { IResponse } from '../models/response-base';
 
 @Injectable({
     providedIn: 'root'
@@ -11,7 +12,7 @@ export class ProductsService {
     private http = inject(HttpClient);
     private apiUrl = `${environment.apiUrl}/products`;
 
-    getProducts(page = 1, limit = 10, filter?: ProductFilter): Observable<PaginatedProducts> {
+    getProducts(page = 1, limit = 10, filter?: ProductFilter): Observable<IResponse<Product[]>> {
         let params = new HttpParams()
             .set('page', page.toString())
             .set('limit', limit.toString());
@@ -32,7 +33,7 @@ export class ProductsService {
             params = params.set('lowStock', 'true');
         }
 
-        return this.http.get<PaginatedProducts>(this.apiUrl, { params });
+        return this.http.get<IResponse<Product[]>>(this.apiUrl, { params });
     }
 
     getProduct(id: string): Observable<Product> {

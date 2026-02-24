@@ -3,6 +3,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { BadgeVariant, UiBadgeComponent, UiButtonComponent, UiCardComponent } from '@shared/ui';
+import { IResponse } from 'src/app/core/models/response-base';
 import { Product, ProductFilter } from '../../../../core/models/product.model';
 import { ProductsService } from '../../../../core/services/products.service';
 
@@ -52,10 +53,11 @@ export class ProductListComponent implements OnInit {
         };
 
         this.productsService.getProducts(this.currentPage(), this.pageSize, filter).subscribe({
-            next: (response) => {
-                this.products.set(response.data);
-                this.totalItems.set(response.total);
-                this.totalPages.set(response.totalPages);
+            next: (response: IResponse<Product[]>) => {
+                const { meta, data } = response;
+                this.products.set(data);
+                this.totalItems.set(meta?.total!);
+                this.totalPages.set(meta?.totalPages!);
                 this.isLoading.set(false);
             },
             error: (error) => {

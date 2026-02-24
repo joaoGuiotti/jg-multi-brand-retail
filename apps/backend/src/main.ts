@@ -1,3 +1,4 @@
+import { WrapperDataInterceptor } from '@infrastructure/interceptors/wrapper-data/wrapper-data.interceptor';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { Reflector } from '@nestjs/core/services/reflector.service';
@@ -19,6 +20,7 @@ async function bootstrap() {
   );
 
   app.useGlobalInterceptors(
+    new WrapperDataInterceptor(),
     new ClassSerializerInterceptor(app.get(Reflector)),
   );
 

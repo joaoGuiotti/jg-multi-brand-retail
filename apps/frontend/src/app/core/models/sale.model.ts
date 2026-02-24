@@ -1,3 +1,5 @@
+import { IResponse } from "./response-base";
+
 export interface Sale {
     id: string;
     invoiceNumber: string;
@@ -60,13 +62,7 @@ export interface CreatePaymentDto {
     metadata?: Record<string, any>;
 }
 
-export interface SaleListResponse {
-    data: Sale[];
-    meta: {
-        total: number;
-        page: number;
-        limit: number;
-    };
+export interface SaleListResponse extends IResponse<Sale[]> {
 }
 
 export interface SaleFilter {

@@ -20,7 +20,7 @@ import {
     Query,
     UseGuards
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { Roles } from '../decorators/roles.decorator';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
@@ -34,6 +34,7 @@ enum Role {
 }
 
 @ApiTags('products')
+@ApiBearerAuth()
 @Controller('products')
 @UseGuards(JwtAuthGuard)
 export class ProductsController {

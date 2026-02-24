@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { provideTransformInterceptor } from './common/interceptors/transform-interceptor.provider';
+import { provideTransformInterceptor } from './infrastructure/interceptors/transform/transform-interceptor.provider';
 import { AuthModule } from './infrastructure/modules/auth.module';
 import { ConfigModule } from './infrastructure/modules/config.module';
 import { InventoryModule } from './infrastructure/modules/inventory.module';

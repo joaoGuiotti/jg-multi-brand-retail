@@ -1,0 +1,47 @@
+<div class="p-6 flex flex-col gap-5">
+    <!-- Error Message -->
+    @if (errorMessage) {
+    <div class="p-3 bg-red-50 border border-red-200 rounded-lg">
+        <p class="text-sm text-red-600">{{ errorMessage }}</p>
+    </div>
+    }
+
+    <!-- Payment Method -->
+    <div>
+        <label class="label">Payment Method</label>
+        <select [(ngModel)]="selectedPaymentMethod" class="input-field">
+            <option value="CASH">Cash</option>
+            <option value="CREDIT_CARD">Credit Card</option>
+            <option value="DEBIT_CARD">Debit Card</option>
+            <option value="PIX">PIX</option>
+        </select>
+    </div>
+
+    <!-- Amount -->
+    <ui-input-field label="Amount" type="number" [(ngModel)]="paymentAmount" prefix="R$ " />
+
+    <!-- Summary -->
+    <div class="p-4 bg-surface border border-outline rounded-lg flex flex-col gap-2">
+        <div class="flex justify-between">
+            <span class="text-content-secondary">Total:</span>
+            <span class="font-bold">{{ cartStore.total() | uiNumber: { prefix: 'R$ ' } }}</span>
+        </div>
+        @if (change > 0) {
+        <div class="flex justify-between text-success">
+            <span>Change:</span>
+            <span class="font-bold">{{ change | uiNumber: { prefix: 'R$ ' } }}</span>
+        </div>
+        }
+    </div>
+
+    <!-- Actions -->
+    <div class="flex gap-3 justify-center">
+        <ui-button variant="secondary" (click)="cancel()" [disabled]="isProcessing">
+            Cancel
+        </ui-button>
+        <ui-button variant="primary" (click)="processPayment()" [loading]="isProcessing"
+            [disabled]="isProcessing || paymentAmount < cartStore.total()">
+            Confirm Payment
+        </ui-button>
+    </div>
+</div>

@@ -3,6 +3,7 @@ export * from './badge/badge.component';
 export * from './button/button.component';
 export * from './card/card.component';
 export * from './input-field/input-field.component';
+export * from './modal/modal.component';
 export * from './theme-toggle/theme-toggle.component';
 
 // ── Types ───────────────────────────────────────────────────────────────────

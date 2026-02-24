@@ -2,6 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { IResponse } from '../models/response-base';
 import { CreateSaleDto, Sale, SaleFilter, SaleListResponse } from '../models/sale.model';
 
 @Injectable({
@@ -33,8 +34,8 @@ export class SalesService {
         return this.http.get<Sale>(`${this.apiUrl}/${id}`);
     }
 
-    createSale(sale: CreateSaleDto): Observable<Sale> {
-        return this.http.post<Sale>(this.apiUrl, sale);
+    createSale(sale: CreateSaleDto): Observable<IResponse<Sale>> {
+        return this.http.post<IResponse<Sale>>(this.apiUrl, sale);
     }
 
     cancelSale(id: string): Observable<void> {

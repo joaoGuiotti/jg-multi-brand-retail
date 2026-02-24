@@ -1,18 +1,16 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { AuthModule } from './auth/auth.module';
 import { provideTransformInterceptor } from './common/interceptors/transform-interceptor.provider';
-import { InventoryModule } from './inventory/inventory.module';
-import { PaymentsModule } from './payments/payments.module';
-import { PrismaModule } from './prisma/prisma.module';
-import { ProductsModule } from './products/products.module';
-import { SalesModule } from './sales/sales.module';
+import { AuthModule } from './infrastructure/modules/auth.module';
+import { ConfigModule } from './infrastructure/modules/config.module';
+import { InventoryModule } from './infrastructure/modules/inventory.module';
+import { PaymentsModule } from './infrastructure/modules/payments.module';
+import { PrismaModule } from './infrastructure/modules/prisma.module';
+import { ProductsModule } from './infrastructure/modules/products.module';
+import { SalesModule } from './infrastructure/modules/sales.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
+    ConfigModule.forRoot(),
     PrismaModule,
     AuthModule,
     ProductsModule,

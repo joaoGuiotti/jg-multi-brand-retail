@@ -1,7 +1,19 @@
+import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient, Role } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import * as dotenv from 'dotenv';
+import { expand } from 'dotenv-expand';
+import { join } from 'path';
+import { Pool } from 'pg';
 
-const prisma = new PrismaClient();
+// Load environment variables from envs/.env
+const envPath = join(__dirname, '../envs/.env');
+const myEnv = dotenv.config({ path: envPath });
+expand(myEnv);
+
+const pool = new Pool({ connectionString: process.env.DB_URL });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log('🌱 Seeding database...');

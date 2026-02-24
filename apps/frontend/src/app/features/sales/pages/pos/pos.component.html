@@ -56,7 +56,8 @@
                         class="flex items-center justify-between p-4 border border-outline rounded-lg">
                         <div class="flex-1">
                             <h3 class="font-medium text-content">{{ item.product.name }}</h3>
-                            <p class="text-sm text-content-secondary">R$ {{ item.unitPrice.toFixed(2) }} each</p>
+                            <p class="text-sm text-content-secondary"> {{ item.unitPrice | uiNumber: { prefix: 'R$ ' }
+                                }} each</p>
                         </div>
 
                         <div class="flex items-center gap-3">
@@ -77,7 +78,7 @@
                             </div>
 
                             <span class="w-24 text-right font-bold text-content">
-                                R$ {{ (item.unitPrice * item.quantity).toFixed(2) }}
+                                {{ (item.unitPrice * item.quantity) | uiNumber: { prefix: 'R$ ' } }}
                             </span>
 
                             <ui-button (click)="removeFromCart(item.product.id)" variant="danger">

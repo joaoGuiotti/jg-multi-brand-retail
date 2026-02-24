@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, signal } from '@angular/core';
+import { AfterViewInit, Component, computed, OnInit, signal, TemplateRef, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { BadgeVariant, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiNumberPipe } from '@shared/ui';
+import { BadgeVariant, TableColumn, TableConfig, TableSort, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiNumberPipe, UiTableComponent } from '@shared/ui';
 import { IResponse } from 'src/app/core/models/response-base';
 import { Product, ProductFilter } from '../../../../core/models/product.model';
 import { ProductsService } from '../../../../core/services/products.service';
@@ -10,18 +10,22 @@ import { ProductsService } from '../../../../core/services/products.service';
 @Component({
     selector: 'app-product-list',
     standalone: true,
-    imports: [CommonModule, RouterModule, FormsModule, UiButtonComponent, UiCardComponent, UiBadgeComponent, UiNumberPipe],
+    imports: [CommonModule, RouterModule, FormsModule, UiButtonComponent, UiCardComponent, UiBadgeComponent, UiNumberPipe, UiTableComponent],
     templateUrl: './product-list.component.html',
     styleUrl: './product-list.component.scss'
 })
-export class ProductListComponent implements OnInit {
+export class ProductListComponent implements OnInit, AfterViewInit {
+    @ViewChild('nameTemplate', { static: true }) nameTmpl!: TemplateRef<any>;
+    @ViewChild('stockQuantityTemplate', { static: true }) stockTmpl!: TemplateRef<any>;
+    @ViewChild('activeTemplate', { static: true }) activeTmpl!: TemplateRef<any>;
+    @ViewChild('actionsTemplate', { static: true }) actionsTmpl!: TemplateRef<any>;
+
     products = signal<Product[]>([]);
     isLoading = signal(false);
     errorMessage = signal('');
 
     // Pagination
     currentPage = signal(1);
-    totalPages = signal(1);
     totalItems = signal(0);
     pageSize = 10;
 
@@ -29,9 +33,40 @@ export class ProductListComponent implements OnInit {
     searchTerm = '';
     showActiveOnly = true;
     showLowStockOnly = false;
+    currentSort = signal<TableSort | null>(null);
 
-    // Expose Math to template
-    Math = Math;
+
+    columns = signal<TableColumn[]>([
+        { key: 'name', label: 'Product', type: 'template', sortable: true },
+        { key: 'sku', label: 'SKU', sortable: true },
+        { key: 'salePrice', label: 'Price', type: 'currency', sortable: true },
+        { key: 'costPrice', label: 'Cost', type: 'currency' },
+        { key: 'stockQuantity', label: 'Stock', type: 'template', sortable: true },
+        { key: 'active', label: 'Status', type: 'template' },
+        { key: 'actions', label: 'Actions', type: 'template', width: '150px' }
+    ]);
+
+    tableConfig = computed<TableConfig>(() => ({
+        stripedRow: true,
+        loading: this.isLoading(),
+        pagination: {
+            enabled: true,
+            pageSize: this.pageSize,
+            totalItems: this.totalItems(),
+            currentPage: this.currentPage()
+        },
+        rowIdKey: 'id'
+    }));
+
+    ngAfterViewInit(): void {
+        this.columns.update(cols => cols.map(col => {
+            if (col.key === 'name') col.cellTemplate = this.nameTmpl;
+            if (col.key === 'stockQuantity') col.cellTemplate = this.stockTmpl;
+            if (col.key === 'active') col.cellTemplate = this.activeTmpl;
+            if (col.key === 'actions') col.cellTemplate = this.actionsTmpl;
+            return col;
+        }));
+    }
 
     constructor(
         private productsService: ProductsService,
@@ -49,7 +84,9 @@ export class ProductListComponent implements OnInit {
         const filter: ProductFilter = {
             search: this.searchTerm || undefined,
             isActive: this.showActiveOnly,
-            lowStock: this.showLowStockOnly || undefined
+            lowStock: this.showLowStockOnly || undefined,
+            sortBy: this.currentSort()?.column as string,
+            sortOrder: this.currentSort()?.direction as 'asc' | 'desc'
         };
 
         this.productsService.getProducts(this.currentPage(), this.pageSize, filter).subscribe({
@@ -57,7 +94,6 @@ export class ProductListComponent implements OnInit {
                 const { meta, data } = response;
                 this.products.set(data);
                 this.totalItems.set(meta?.total!);
-                this.totalPages.set(meta?.totalPages!);
                 this.isLoading.set(false);
             },
             error: (error) => {
@@ -77,22 +113,14 @@ export class ProductListComponent implements OnInit {
         this.loadProducts();
     }
 
-    nextPage(): void {
-        if (this.currentPage() < this.totalPages()) {
-            this.currentPage.update(p => p + 1);
-            this.loadProducts();
-        }
-    }
 
-    previousPage(): void {
-        if (this.currentPage() > 1) {
-            this.currentPage.update(p => p - 1);
-            this.loadProducts();
-        }
-    }
-
-    goToPage(page: number): void {
+    onPageChange(page: number): void {
         this.currentPage.set(page);
+        this.loadProducts();
+    }
+
+    onSortChange(sort: TableSort): void {
+        this.currentSort.set(sort.direction === 'none' ? null : sort);
         this.loadProducts();
     }
 
@@ -113,16 +141,6 @@ export class ProductListComponent implements OnInit {
         }
     }
 
-    getStockLevelClass(product: Product): string {
-        if (product.stockQuantity <= 0) {
-            return 'text-red-600 bg-red-50';
-        } else if (product.stockQuantity <= 10) {
-            return 'text-yellow-600 bg-yellow-50';
-        } else {
-            return 'text-green-600 bg-green-50';
-        }
-    }
-
     getStockVariant(product: Product): BadgeVariant {
         if (product.stockQuantity <= 0) return 'error';
         if (product.stockQuantity <= 10) return 'warning';
@@ -139,19 +157,4 @@ export class ProductListComponent implements OnInit {
         }
     }
 
-    get pageNumbers(): number[] {
-        const pages: number[] = [];
-        const maxVisible = 5;
-        let start = Math.max(1, this.currentPage() - Math.floor(maxVisible / 2));
-        let end = Math.min(this.totalPages(), start + maxVisible - 1);
-
-        if (end - start + 1 < maxVisible) {
-            start = Math.max(1, end - maxVisible + 1);
-        }
-
-        for (let i = start; i <= end; i++) {
-            pages.push(i);
-        }
-        return pages;
-    }
 }

@@ -44,4 +44,6 @@ export interface ProductFilter {
     brandId?: string;
     isActive?: boolean;
     lowStock?: boolean;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
 }

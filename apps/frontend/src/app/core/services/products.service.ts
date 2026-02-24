@@ -32,6 +32,12 @@ export class ProductsService {
         if (filter?.lowStock) {
             params = params.set('lowStock', 'true');
         }
+        if (filter?.sortBy) {
+            params = params.set('sortBy', filter.sortBy);
+        }
+        if (filter?.sortOrder) {
+            params = params.set('sortOrder', filter.sortOrder);
+        }
 
         return this.http.get<IResponse<Product[]>>(this.apiUrl, { params });
     }

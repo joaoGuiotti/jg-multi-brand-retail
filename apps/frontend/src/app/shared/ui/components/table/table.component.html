@@ -84,7 +84,7 @@
                     @case ('template') {
                     @if (col.cellTemplate) {
                     <ng-container
-                        *ngTemplateOutlet="col.cellTemplate; context: { $implicit: row, column: col }"></ng-container>
+                        *ngTemplateOutlet="col.cellTemplate; context: { $implicit: row, row: row, column: col }"></ng-container>
                     }
                     }
                     @default {
@@ -101,7 +101,7 @@
                     @defer (on idle) {
                     @if (rowExpandConfig()?.template) {
                     <ng-container
-                        *ngTemplateOutlet="rowExpandConfig()!.template!; context: { $implicit: row }"></ng-container>
+                        *ngTemplateOutlet="rowExpandConfig()!.template!; context: { $implicit: row, row: row }"></ng-container>
                     }
                     @if (rowExpandConfig()?.component) {
                     <ng-container

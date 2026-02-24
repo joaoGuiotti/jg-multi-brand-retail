@@ -4,7 +4,8 @@
     </div>
 
     <!-- Loading State -->
-    <div *ngIf="isLoading" class="flex justify-center items-center py-12">
+    @if (isLoading) {
+    <div class="flex justify-center items-center py-12">
         <svg class="animate-spin h-8 w-8 text-primary" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none">
             </circle>
@@ -13,28 +14,24 @@
             </path>
         </svg>
     </div>
-
+    } @else {
     <!-- Form -->
-    <ui-card *ngIf="!isLoading" padding="lg" [shadow]="true">
+    <ui-card padding="lg" [shadow]="true">
         <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
             <!-- Error Message -->
-            <div *ngIf="errorMessage" class="mb-4 p-3 bg-error-bg border border-error rounded-lg">
+            @if (errorMessage) {
+            <div class="mb-4 p-3 bg-error-bg border border-error rounded-lg">
                 <p class="text-sm text-error">{{ errorMessage }}</p>
             </div>
+            }
 
             <!-- Basic Information -->
             <div class="mb-6">
                 <h2 class="text-lg font-semibold text-content mb-4">Basic Information</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="md:col-span-2">
-                        <label for="name" class="label">Product Name *</label>
-                        <input id="name" type="text" formControlName="name" class="input-field"
-                            [class.border-error]="name?.invalid && name?.touched" placeholder="e.g., Blue T-Shirt" />
-                        <p *ngIf="name?.invalid && name?.touched" class="mt-1 text-sm text-error">
-                            <span *ngIf="name?.errors?.['required']">Product name is required</span>
-                            <span *ngIf="name?.errors?.['minlength']">Name must be at least 3 characters</span>
-                        </p>
-                    </div>
+                    <ui-input-field class="md:col-span-2" id="name" label="Product Name" type="text"
+                        formControlName="name" placeholder="e.g., Blue T-Shirt">
+                    </ui-input-field>
 
                     <div class="md:col-span-2">
                         <label for="description" class="label">Description</label>
@@ -42,20 +39,11 @@
                             placeholder="Product description (optional)"></textarea>
                     </div>
 
-                    <div>
-                        <label for="sku" class="label">SKU *</label>
-                        <input id="sku" type="text" formControlName="sku" class="input-field"
-                            [class.border-error]="sku?.invalid && sku?.touched" placeholder="e.g., SHIRT-001" />
-                        <p *ngIf="sku?.invalid && sku?.touched" class="mt-1 text-sm text-error">
-                            <span *ngIf="sku?.errors?.['required']">SKU is required</span>
-                        </p>
-                    </div>
+                    <ui-input-field id="sku" label="SKU" type="text" formControlName="sku"
+                        placeholder="e.g., SHIRT-001" />
 
-                    <div>
-                        <label for="barcode" class="label">Barcode</label>
-                        <input id="barcode" type="text" formControlName="barcode" class="input-field"
-                            placeholder="e.g., 7891234567890" />
-                    </div>
+                    <ui-input-field id="barcode" label="Barcode" type="text" formControlName="barcode"
+                        placeholder="e.g., 7891234567890" />
                 </div>
             </div>
 
@@ -63,21 +51,12 @@
             <div class="mb-6">
                 <h2 class="text-lg font-semibold text-content mb-4">Pricing</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label for="costPrice" class="label">Cost Price (R$)</label>
-                        <input id="costPrice" type="number" formControlName="costPrice" step="0.01" class="input-field"
-                            placeholder="0.00" />
-                    </div>
 
-                    <div>
-                        <label for="salePrice" class="label">Sale Price (R$) *</label>
-                        <input id="salePrice" type="number" formControlName="salePrice" step="0.01" class="input-field"
-                            [class.border-error]="salePrice?.invalid && salePrice?.touched" placeholder="0.00" />
-                        <p *ngIf="salePrice?.invalid && salePrice?.touched" class="mt-1 text-sm text-error">
-                            <span *ngIf="salePrice?.errors?.['required']">Sale price is required</span>
-                            <span *ngIf="salePrice?.errors?.['min']">Price must be positive</span>
-                        </p>
-                    </div>
+                    <ui-input-field id="costPrice" label="Cost Price" type="number" formControlName="costPrice"
+                        placeholder="0.00" prefix="R$ " />
+
+                    <ui-input-field id="salePrice" label="Sale Price" type="number" formControlName="salePrice"
+                        placeholder="0.00" prefix="R$ " />
 
                     <div>
                         <label class="label">Margin</label>
@@ -92,15 +71,8 @@
             <!-- Stock -->
             <div class="mb-6">
                 <h2 class="text-lg font-semibold text-content mb-4">Stock</h2>
-                <div>
-                    <label for="stockQuantity" class="label">Current Stock *</label>
-                    <input id="stockQuantity" type="number" formControlName="stockQuantity" class="input-field"
-                        [class.border-error]="stockQuantity?.invalid && stockQuantity?.touched" placeholder="0" />
-                    <p *ngIf="stockQuantity?.invalid && stockQuantity?.touched" class="mt-1 text-sm text-error">
-                        <span *ngIf="stockQuantity?.errors?.['required']">Stock quantity is required</span>
-                        <span *ngIf="stockQuantity?.errors?.['min']">Stock cannot be negative</span>
-                    </p>
-                </div>
+                <ui-input-field id="stockQuantity" label="Current Stock *" type="number" formControlName="stockQuantity"
+                    [decimalPlaces]="0" placeholder="0" />
             </div>
 
             <!-- Status -->
@@ -121,4 +93,5 @@
             </div>
         </form>
     </ui-card>
+    }
 </div>

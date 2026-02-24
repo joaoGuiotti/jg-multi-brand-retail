@@ -79,13 +79,15 @@
                         <div *ngIf="product.barcode" class="text-sm text-content-secondary">{{ product.barcode }}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-content">{{ product.sku }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-content">R$ {{ product.salePrice.toFixed(2) }}
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-content"> {{ product.salePrice | uiNumber : {
+                        prefix: 'R$ '} }}
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-content-secondary">R$ {{ (product.costPrice ||
-                        0).toFixed(2) }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-content-secondary"> {{ (product.costPrice ||
+                        0) | uiNumber : { prefix: 'R$ '} }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         @if (product.stockQuantity !== null) {
-                        <ui-badge [variant]="getStockVariant(product)" size="sm">{{ product.stockQuantity }}</ui-badge>
+                        <ui-badge [variant]="getStockVariant(product)" size="sm">{{ product.stockQuantity | uiNumber : {
+                            decimalPlaces: 0} }}</ui-badge>
                         }
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">

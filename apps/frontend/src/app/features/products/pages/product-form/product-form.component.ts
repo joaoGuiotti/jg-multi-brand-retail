@@ -1,15 +1,14 @@
-import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { UiButtonComponent, UiCardComponent } from '@shared/ui';
+import { UiButtonComponent, UiCardComponent, UiInputFieldComponent } from '@shared/ui';
 import { Product } from '../../../../core/models/product.model';
 import { ProductsService } from '../../../../core/services/products.service';
 
 @Component({
     selector: 'app-product-form',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, UiButtonComponent, UiCardComponent],
+    imports: [ReactiveFormsModule, UiButtonComponent, UiCardComponent, UiInputFieldComponent],
     templateUrl: './product-form.component.html',
     styleUrl: './product-form.component.scss'
 })

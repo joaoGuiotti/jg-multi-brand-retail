@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { BadgeVariant, UiBadgeComponent, UiButtonComponent, UiCardComponent } from '@shared/ui';
+import { BadgeVariant, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiNumberPipe } from '@shared/ui';
 import { IResponse } from 'src/app/core/models/response-base';
 import { Product, ProductFilter } from '../../../../core/models/product.model';
 import { ProductsService } from '../../../../core/services/products.service';
@@ -10,7 +10,7 @@ import { ProductsService } from '../../../../core/services/products.service';
 @Component({
     selector: 'app-product-list',
     standalone: true,
-    imports: [CommonModule, RouterModule, FormsModule, UiButtonComponent, UiCardComponent, UiBadgeComponent],
+    imports: [CommonModule, RouterModule, FormsModule, UiButtonComponent, UiCardComponent, UiBadgeComponent, UiNumberPipe],
     templateUrl: './product-list.component.html',
     styleUrl: './product-list.component.scss'
 })

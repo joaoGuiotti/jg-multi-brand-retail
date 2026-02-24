@@ -17,15 +17,22 @@
                             <div class="flex justify-between items-start">
                                 <div>
                                     <h3 class="font-medium text-content">{{ product.name }}</h3>
-                                    <p class="text-sm text-content-secondary">{{ product.sku }}</p>
+                                    <p class="text-sm text-content-secondary flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                                            <path
+                                                d="M2 4h2v16H2V4zm3 0h1v16H5V4zm2 0h2v16H7V4zm3 0h1v16h-1V4zm2 0h2v16h-2V4zm3 0h1v16h-1V4zm2 0h3v16h-3V4z" />
+                                        </svg>
+                                        {{ product.sku }}
+                                    </p>
                                 </div>
-                                <span class="text-lg font-bold text-blue-600">R$ {{ product.salePrice.toFixed(2)
-                                    }}</span>
+                                <span class="text-lg font-bold text-blue-600">{{ product.salePrice | uiNumber :{ prefix:
+                                    'R$ ' } }}</span>
                             </div>
                             <div class="mt-2 flex justify-between items-center">
-                                <span class="text-xs text-content-secondary">Stock: {{ product.stockQuantity }}</span>
-                                <span *ngIf="product.stockQuantity <= 0" class="text-xs text-red-600 font-medium">Out of
-                                    Stock</span>
+                                <ui-badge size="sm"
+                                    [variant]="product.stockQuantity <= 0 ? 'error' : product.stockQuantity < 10 ? 'warning' : 'success'">
+                                    @if (product.stockQuantity <= 0) { Out of Stock } @else { {{ product.stockQuantity |
+                                        uiNumber: { decimalPlaces: 0 } }} in stock } </ui-badge>
                             </div>
                         </div>
                     </div>

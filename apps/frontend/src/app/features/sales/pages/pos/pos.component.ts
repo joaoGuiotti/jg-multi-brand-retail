@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { UiButtonComponent } from '@shared/ui';
+import { UiBadgeComponent, UiButtonComponent, UiNumberPipe } from '@shared/ui';
 import { Product } from '../../../../core/models/product.model';
 import { CreatePaymentDto } from '../../../../core/models/sale.model';
 import { ProductsService } from '../../../../core/services/products.service';
@@ -12,7 +12,7 @@ import { CartStore } from '../../store/cart.store';
 @Component({
     selector: 'app-pos',
     standalone: true,
-    imports: [CommonModule, FormsModule, UiButtonComponent],
+    imports: [CommonModule, FormsModule, UiBadgeComponent, UiButtonComponent, UiNumberPipe],
     templateUrl: './pos.component.html',
     styleUrl: './pos.component.scss'
 })

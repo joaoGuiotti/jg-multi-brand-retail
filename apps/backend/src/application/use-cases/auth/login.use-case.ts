@@ -1,4 +1,5 @@
 import { UseCase } from '@common/application/use-case.interface';
+import { User } from '@domain/entities/users/user.entity';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -51,7 +52,7 @@ export class LoginUseCase implements UseCase<LoginInput, LoginOutput> {
 
         // Check if tenant is active
         const tenant = await this.tenantRepository.findById(user.tenantId);
-        
+
         if (!tenant || !tenant.active) {
             throw new UnauthorizedException('Tenant is inactive');
         }
@@ -64,12 +65,7 @@ export class LoginUseCase implements UseCase<LoginInput, LoginOutput> {
         }
 
         // Generate tokens
-        const tokens = await this.generateTokens(
-            user.id.toString(),
-            user.email,
-            user.tenantId,
-            user.role,
-        );
+        const tokens = await this.generateTokens(user);
 
         return {
             user: {
@@ -87,13 +83,14 @@ export class LoginUseCase implements UseCase<LoginInput, LoginOutput> {
         };
     }
 
-    private async generateTokens(
-        userId: string,
-        email: string,
-        tenantId: string,
-        role: Role,
-    ) {
-        const payload = { sub: userId, email, tenantId, role };
+    private async generateTokens(user: User) {
+        const payload = {
+            sub: user.id.toString(),
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            tenantId: user.tenantId,
+        };
 
         const [accessToken, refreshToken] = await Promise.all([
             this.jwtService.signAsync(payload, {

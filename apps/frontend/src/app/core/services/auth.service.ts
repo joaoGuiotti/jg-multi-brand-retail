@@ -59,18 +59,7 @@ export class AuthService {
     private handleAuthResponse(response: LoginResponse): void {
         if (response.accessToken) {
             localStorage.setItem(this.TOKEN_KEY, response.accessToken);
-            // Assuming the 'user' object within LoginResponse already conforms to the User interface
-            // If the backend sends snake_case properties for the user object,
-            // you might need to map them here, e.g.,
-            // const user: User = {
-            //     id: response.user.id,
-            //     email: response.user.email,
-            //     name: response.user.name,
-            //     role: response.user.role,
-            //     tenantId: response.user.tenant_id // Example if backend sends tenant_id
-            // };
-            this.currentUserSubject.next(response.user);
-            this.user.set(response.user);
+            this.loadUserFromToken();
         }
     }
 

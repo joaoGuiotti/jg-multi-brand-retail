@@ -78,36 +78,27 @@ export class RegisterUseCase implements UseCase<RegisterInput, AuthOutput> {
         await this.userRepository.create(user);
 
         // Generate tokens
-        const tokens = await this.generateTokens(
-            user.id.toString(),
-            user.email,
-            user.tenantId,
-            user.role,
-        );
+        const tokens = await this.generateTokens(user, role);
 
         return {
-            user: {
-                id: user.id.toString(),
-                email: user.email,
-                name: user.name,
-                role: user.role,
-                tenant: {
-                    id: tenant.id.toString(),
-                    name: tenant.name,
-                    slug: tenant.slug,
-                },
-            },
             ...tokens,
         } satisfies AuthOutput;
     }
 
     private async generateTokens(
-        userId: string,
-        email: string,
-        tenantId: string,
+        user: User,
         role: Role,
     ) {
-        const payload = { sub: userId, email, tenantId, role };
+        const payload = {
+            user: {
+                id: user.id.toString(),
+                email: user.email,
+                name: user.name,
+                role,
+                tenantId: user.tenantId,
+            },
+            role
+        };
 
         const [accessToken, refreshToken] = await Promise.all([
             this.jwtService.signAsync(payload, {

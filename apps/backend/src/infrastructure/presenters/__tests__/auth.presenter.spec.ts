@@ -16,10 +16,8 @@ const makeAuthOutput = (overrides: any = {}) => ({
 describe('AuthPresenter', () => {
     it('should construct from AuthOutput', () => {
         const presenter = new AuthPresenter(makeAuthOutput());
-        expect(presenter.user.email).toBe('a@b.com');
         expect(presenter.accessToken).toBe('access');
         expect(presenter.refreshToken).toBe('refresh');
-        expect(presenter.user.tenant.slug).toBe('acme');
     });
 });
 

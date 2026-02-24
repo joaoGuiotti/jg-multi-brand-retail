@@ -18,7 +18,6 @@ export type AuthUserOutput = {
 };
 
 export type AuthOutput = {
-    user: AuthUserOutput;
     accessToken: string;
     refreshToken: string;
 };

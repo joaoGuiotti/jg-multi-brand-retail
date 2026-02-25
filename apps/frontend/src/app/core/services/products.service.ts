@@ -42,24 +42,24 @@ export class ProductsService {
         return this.http.get<IResponse<Product[]>>(this.apiUrl, { params });
     }
 
-    getProduct(id: string): Observable<Product> {
-        return this.http.get<Product>(`${this.apiUrl}/${id}`);
+    getProduct(id: string): Observable<IResponse<Product>> {
+        return this.http.get<IResponse<Product>>(`${this.apiUrl}/${id}`);
     }
 
-    createProduct(product: ProductCreateDto): Observable<Product> {
-        return this.http.post<Product>(this.apiUrl, product);
+    createProduct(product: ProductCreateDto): Observable<IResponse<Product>> {
+        return this.http.post<IResponse<Product>>(this.apiUrl, product);
     }
 
-    updateProduct(id: string, product: ProductUpdateDto): Observable<Product> {
-        return this.http.patch<Product>(`${this.apiUrl}/${id}`, product);
+    updateProduct(id: string, product: ProductUpdateDto): Observable<IResponse<Product>> {
+        return this.http.patch<IResponse<Product>>(`${this.apiUrl}/${id}`, product);
     }
 
     deleteProduct(id: string): Observable<void> {
         return this.http.delete<void>(`${this.apiUrl}/${id}`);
     }
 
-    searchProducts(search: string): Observable<Product[]> {
+    searchProducts(search: string): Observable<IResponse<Product[]>> {
         const params = new HttpParams().set('search', search);
-        return this.http.get<Product[]>(`${this.apiUrl}/search`, { params });
+        return this.http.get<IResponse<Product[]>>(`${this.apiUrl}/search`, { params });
     }
 }

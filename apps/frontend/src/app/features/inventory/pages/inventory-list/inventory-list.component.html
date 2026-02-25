@@ -1,0 +1,125 @@
+<div class="max-w-7xl mx-auto">
+    <h1 class="text-3xl font-bold text-content mb-6">Inventory</h1>
+
+    <!-- Summary Cards -->
+    @if (summary()) {
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <ui-card [shadow]="true" padding="sm" class="text-center">
+            <p class="text-xs text-content-secondary mb-1">Total Products</p>
+            <p class="text-2xl font-bold text-content">{{ summary()!.stock.total }}</p>
+        </ui-card>
+        <ui-card [shadow]="true" padding="sm" class="text-center">
+            <p class="text-xs text-content-secondary mb-1">Low Stock</p>
+            <p class="text-2xl font-bold text-warning">{{ summary()!.stock.lowStock }}</p>
+        </ui-card>
+        <ui-card [shadow]="true" padding="sm" class="text-center">
+            <p class="text-xs text-content-secondary mb-1">Out of Stock</p>
+            <p class="text-2xl font-bold text-error">{{ summary()!.stock.outOfStock }}</p>
+        </ui-card>
+        <ui-card [shadow]="true" padding="sm" class="text-center summary-movements">
+            <p class="text-xs text-content-secondary mb-1">Last 30d Movements</p>
+            <div class="flex flex-wrap justify-center gap-1 mt-1">
+                @for (entry of getMovementEntries(); track entry.key) {
+                <ui-badge [variant]="getTypeVariant(entry.key)">
+                    {{ entry.key }}: {{ entry.value }}
+                </ui-badge>
+                }
+                @if (getMovementEntries().length === 0) {
+                <span class="text-xs text-content-secondary">—</span>
+                }
+            </div>
+        </ui-card>
+    </div>
+    }
+
+    <!-- Filters + Add Button -->
+    <ui-card [shadow]="true" padding="sm" class="mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+            <div>
+                <label class="label">Type</label>
+                <select [ngModel]="selectedType()" (ngModelChange)="selectedType.set($event); onFilterChange()"
+                    class="input-field">
+                    <option value="">All types</option>
+                    @for (t of movementTypes; track t) {
+                    <option [value]="t">{{ t }}</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label class="label">Product</label>
+                <select [ngModel]="selectedProductId()"
+                    (ngModelChange)="selectedProductId.set($event); onFilterChange()" class="input-field">
+                    <option value="">All products</option>
+                    @for (p of products(); track p.id) {
+                    <option [value]="p.id">{{ p.name }}</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label class="label">Start Date</label>
+                <input type="date" [ngModel]="startDate()" (ngModelChange)="startDate.set($event); onFilterChange()"
+                    class="input-field" />
+            </div>
+            <div>
+                <label class="label">End Date</label>
+                <input type="date" [ngModel]="endDate()" (ngModelChange)="endDate.set($event); onFilterChange()"
+                    class="input-field" />
+            </div>
+            <div class="flex justify-end">
+                <ui-button variant="primary" (clicked)="openAddMovement()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="mr-1">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    Add Movement
+                </ui-button>
+            </div>
+        </div>
+    </ui-card>
+
+    <!-- Error Message -->
+    @if (errorMessage()) {
+    <div class="mb-4 p-3 bg-error-bg border border-error rounded-lg">
+        <p class="text-sm text-error">{{ errorMessage() }}</p>
+    </div>
+    }
+
+    <!-- Movements Table -->
+    <div class="min-h-[400px]">
+        <ui-table [columns]="columns" [dataSource]="movements()" [config]="tableConfig()"
+            (pageChange)="onPageChange($event)" (sortChange)="onSortChange($event)">
+
+            <!-- Date -->
+            <div *uiTableColumn="'createdAt'; let row">
+                <div class="text-xs text-content-secondary">{{ formatDate(row.createdAt) }}</div>
+            </div>
+
+            <!-- Type -->
+            <div *uiTableColumn="'type'; let row">
+                <ui-badge [variant]="getTypeVariant(row.type)" [dot]="true">{{ row.type }}</ui-badge>
+            </div>
+
+            <!-- Product -->
+            <div *uiTableColumn="'product'; let row">
+                <div class="text-sm text-content">{{ getProduct(row.productId)?.name ?? row.productId }}</div>
+                <div class="text-xs text-content-secondary">{{ getProduct(row.productId)?.sku }}</div>
+            </div>
+
+            <!-- Quantity -->
+            <div *uiTableColumn="'quantity'; let row">
+                <span class="text-sm font-semibold" [class.text-success]="row.type === 'ENTRY' || row.type === 'RETURN'"
+                    [class.text-error]="row.type === 'EXIT'" [class.text-warning]="row.type === 'ADJUSTMENT'">
+                    {{ row.type === 'EXIT' ? '-' : '+' }}{{ row.quantity }}
+                </span>
+            </div>
+
+            <!-- Reference -->
+            <div *uiTableColumn="'reference'; let row">
+                <span class="text-xs text-content-secondary">{{ row.reference ?? '—' }}</span>
+            </div>
+
+        </ui-table>
+    </div>
+</div>

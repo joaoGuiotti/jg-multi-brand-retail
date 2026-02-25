@@ -30,6 +30,7 @@ export const routes: Routes = [
             { path: 'products/new', loadComponent: () => import('./features/products/pages/product-form/product-form.component').then(m => m.ProductFormComponent) },
             { path: 'products/:id/edit', loadComponent: () => import('./features/products/pages/product-form/product-form.component').then(m => m.ProductFormComponent) },
             { path: 'sales', loadComponent: () => import('./features/sales/pages/sales-history/sales-history.component').then(m => m.SalesHistoryComponent) },
+            { path: 'inventory', loadComponent: () => import('./features/inventory/pages/inventory-list/inventory-list.component').then(m => m.InventoryListComponent) },
         ]
     },
     { path: '**', redirectTo: '/login' }

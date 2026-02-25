@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UiButtonComponent, UiCardComponent, UiInputFieldComponent } from '@shared/ui';
-import { Product } from '../../../../core/models/product.model';
 import { ProductsService } from '../../../../core/services/products.service';
 
 @Component({
@@ -49,16 +48,16 @@ export class ProductFormComponent implements OnInit {
     loadProduct(id: string): void {
         this.isLoading = true;
         this.productsService.getProduct(id).subscribe({
-            next: (product: Product) => {
+            next: ({ data }) => {
                 this.productForm.patchValue({
-                    name: product.name,
-                    description: product.description || '',
-                    sku: product.sku,
-                    barcode: product.barcode || '',
-                    costPrice: product.costPrice,
-                    salePrice: product.salePrice,
-                    stockQuantity: product.stockQuantity,
-                    active: product.active
+                    name: data.name,
+                    description: data.description,
+                    sku: data.sku,
+                    barcode: data.barcode,
+                    costPrice: data.costPrice,
+                    salePrice: data.salePrice,
+                    stockQuantity: data.stockQuantity,
+                    active: data.active
                 });
                 this.isLoading = false;
             },

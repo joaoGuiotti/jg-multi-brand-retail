@@ -1,5 +1,5 @@
 
-import { Component } from '@angular/core';
+import { Component, isDevMode } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { UiButtonComponent, UiCardComponent, UiInputFieldComponent } from '@shared/ui';
@@ -15,6 +15,8 @@ export class LoginComponent {
     loginForm: FormGroup;
     errorMessage = '';
     isLoading = false;
+    isDevMode = isDevMode();
+    copiedField: string | null = null;
 
     constructor(
         private fb: FormBuilder,
@@ -43,6 +45,13 @@ export class LoginComponent {
                 this.isLoading = false;
             });
         }
+    }
+
+    copyToClipboard(field: string, value: string): void {
+        navigator.clipboard.writeText(value).then(() => {
+            this.copiedField = field;
+            setTimeout(() => (this.copiedField = null), 1500);
+        });
     }
 
     get email() {

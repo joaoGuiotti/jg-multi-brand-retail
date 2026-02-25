@@ -1,0 +1,52 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-5 p-1">
+
+    <!-- Product -->
+    <div>
+        <label class="label">Product <span class="text-error">*</span></label>
+        <select formControlName="productId" class="input-field"
+            [class.border-error]="form.get('productId')?.invalid && form.get('productId')?.touched">
+            <option value="" disabled>Select product...</option>
+            @for (p of products; track p.id) {
+            <option [value]="p.id">{{ p.name }} (stock: {{ p.stockQuantity }})</option>
+            }
+        </select>
+        @if (form.get('productId')?.invalid && form.get('productId')?.touched) {
+        <p class="text-xs text-error mt-1">Product is required</p>
+        }
+    </div>
+
+    <!-- Movement Type -->
+    <div>
+        <label class="label">Type <span class="text-error">*</span></label>
+        <select formControlName="type" class="input-field">
+            @for (t of movementTypes; track t.value) {
+            <option [value]="t.value">{{ t.label }}</option>
+            }
+        </select>
+    </div>
+
+    <!-- Quantity -->
+    <ui-input-field label="Quantity" type="number" formControlName="quantity" [required]="true"
+        [error]="form.get('quantity')?.invalid && form.get('quantity')?.touched ? 'Quantity must be at least 1' : null">
+    </ui-input-field>
+
+    <!-- Reference -->
+    <ui-input-field label="Reference (optional)" formControlName="reference" placeholder="e.g. PO-2024-001">
+    </ui-input-field>
+
+    <!-- Error -->
+    @if (errorMessage()) {
+    <div class="p-3 bg-error-bg border border-error rounded-lg">
+        <p class="text-sm text-error">{{ errorMessage() }}</p>
+    </div>
+    }
+
+    <!-- Actions -->
+    <div class="flex justify-end gap-3 pt-2">
+        <ui-button type="button" variant="ghost" (clicked)="dismiss()">Cancel</ui-button>
+        <ui-button type="submit" variant="primary" [loading]="isLoading()" [disabled]="form.invalid || isLoading()">
+            Save Movement
+        </ui-button>
+    </div>
+
+</form>

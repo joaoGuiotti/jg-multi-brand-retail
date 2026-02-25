@@ -2,9 +2,10 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { TableColumn, TableConfig, TableSort, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiNumberPipe, UiTableColumnDirective, UiTableComponent } from '@shared/ui';
+import { ModalService, TableColumn, TableConfig, TableSort, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiNumberPipe, UiTableColumnDirective, UiTableComponent } from '@shared/ui';
 import { Sale, SaleFilter } from '../../../../core/models/sale.model';
 import { SalesService } from '../../../../core/services/sales.service';
+import { SaleDetailModalComponent } from '../../components/sale-detail-modal/sale-detail-modal.component';
 
 @Component({
     selector: 'app-sales-history',
@@ -30,7 +31,7 @@ export class SalesHistoryComponent implements OnInit {
     currentSort = signal<TableSort | null>(null);
     columns: TableColumn[] = [
         { key: 'invoiceNumber', label: 'Invoice' },
-        { key: 'createdAt', label: 'Date', type: 'date' },
+        { key: 'createdAt', label: 'Date' },
         { key: 'items', label: 'Items', sortable: false },
         { key: 'total', label: 'Total', type: 'currency' },
         { key: 'status', label: 'Status' },
@@ -52,7 +53,8 @@ export class SalesHistoryComponent implements OnInit {
 
     constructor(
         private salesService: SalesService,
-        private router: Router
+        private router: Router,
+        private modalService: ModalService
     ) { }
 
     ngOnInit(): void {
@@ -100,7 +102,11 @@ export class SalesHistoryComponent implements OnInit {
     }
 
     viewSale(id: string): void {
-        this.router.navigate(['/sales', id]);
+        this.modalService.open(SaleDetailModalComponent, {
+            data: id,
+            title: 'Sale Details',
+            minWidth: '900px'
+        });
     }
 
     getStatusVariant(status: string): 'success' | 'warning' | 'error' | 'info' | 'default' {

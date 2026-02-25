@@ -3,6 +3,10 @@ import { Sale, SaleItem } from '../../../../domain/entities/sales/sale.entity';
 export type SaleItemOutput = {
     id: string;
     productId: string;
+    product?: {
+        name: string;
+        sku: string;
+    } | null;
     quantity: number;
     unitPrice: number;
     discount: number;
@@ -28,6 +32,7 @@ export class SaleItemOutputMapper {
         return {
             id: item.id.toString(),
             productId: item.productId,
+            product: item.product,
             quantity: item.quantity,
             unitPrice: item.unitPrice,
             discount: item.discount,

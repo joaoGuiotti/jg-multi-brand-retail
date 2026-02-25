@@ -36,8 +36,8 @@ export class SalesService {
         return this.http.get<SaleListResponse>(this.apiUrl, { params });
     }
 
-    getSale(id: string): Observable<Sale> {
-        return this.http.get<Sale>(`${this.apiUrl}/${id}`);
+    getSale(id: string): Observable<IResponse<Sale>> {
+        return this.http.get<IResponse<Sale>>(`${this.apiUrl}/${id}`);
     }
 
     createSale(sale: CreateSaleDto): Observable<IResponse<Sale>> {

@@ -6,6 +6,10 @@ export type SaleStatus = 'PENDING' | 'COMPLETED' | 'CANCELLED';
 
 export interface SaleItemProps {
     productId: string;
+    product?: {
+        name: string;
+        sku: string;
+    } | null;
     quantity: number;
     unitPrice: number;
     discount: number;
@@ -22,6 +26,7 @@ export class SaleItem extends Entity<SaleItemProps> {
     }
 
     get productId(): string { return this.props.productId; }
+    get product(): { name: string; sku: string } | undefined | null { return this.props.product; }
     get quantity(): number { return this.props.quantity; }
     get unitPrice(): number { return this.props.unitPrice; }
     get discount(): number { return this.props.discount; }

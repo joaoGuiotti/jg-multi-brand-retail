@@ -3,10 +3,11 @@ import { UniqueEntityID } from '../../../common/domain/unique-entity-id';
 import { Sale, SaleItem } from '../../../domain/entities/sales/sale.entity';
 
 export class SaleMapper {
-    static toDomain(raw: PrismaSale & { items?: PrismaSaleItem[] }): Sale {
+    static toDomain(raw: PrismaSale & { items?: (PrismaSaleItem & { product?: { name: string; sku: string } | null })[] }): Sale {
         const items = (raw.items || []).map(item => SaleItem.create(
             {
                 productId: item.productId,
+                product: item.product,
                 quantity: item.quantity,
                 unitPrice: Number(item.unitPrice),
                 discount: Number(item.discount),

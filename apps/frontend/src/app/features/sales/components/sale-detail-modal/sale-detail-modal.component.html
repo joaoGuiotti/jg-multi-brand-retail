@@ -1,0 +1,139 @@
+<div class="p-6 max-w-4xl min-w-[600px] flex justify-center items-center">
+    <div *ngIf="isLoading()" class="flex justify-center items-center py-12">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+    </div>
+
+    <div *ngIf="errorMessage()" class="p-4 bg-error-bg text-error rounded-lg mb-6">
+        {{ errorMessage() }}
+    </div>
+
+    <div *ngIf="sale() as data" class="space-y-8">
+        <!-- Header Info -->
+        <ui-card padding="sm" [shadow]="false">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                <div>
+                    <p class="text-[10px] text-content-secondary uppercase font-bold tracking-widest mb-1">Invoice</p>
+                    <p class="text-base font-semibold text-content">#{{ data.invoiceNumber }}</p>
+                </div>
+                <div>
+                    <p class="text-[10px] text-content-secondary uppercase font-bold tracking-widest mb-1">Date</p>
+                    <p class="text-base font-semibold text-content">{{ data.createdAt | date: 'dd/MM/yyyy HH:mm' }}</p>
+                </div>
+                <div>
+                    <p class="text-[10px] text-content-secondary uppercase font-bold tracking-widest mb-1">Status</p>
+                    <ui-badge [variant]="getStatusVariant(data.status)" [dot]="true" size="md">
+                        {{ data.status }}
+                    </ui-badge>
+                </div>
+                <div>
+                    <p class="text-[10px] text-content-secondary uppercase font-bold tracking-widest mb-1">Items Count
+                    </p>
+                    <p class="text-base font-semibold text-content">{{ data.items.length }}</p>
+                </div>
+            </div>
+        </ui-card>
+
+        <!-- Items Table -->
+        <div>
+            <h3 class="text-lg font-bold text-content mb-4 flex items-center gap-2">
+                <span class="w-1.5 h-6 bg-primary rounded-full"></span>
+                Sale Items
+            </h3>
+            <ui-table [columns]="columns" [dataSource]="data.items" [config]="{ stripedRow: true  }">
+                <!-- Product Name -->
+                <div *uiTableColumn="'product.name'; let row">
+                    <div class="flex flex-col">
+                        <span class="font-medium text-content">{{ row.product?.name }}</span>
+                        <span class="text-xs text-content-secondary">{{ row.product?.sku }}</span>
+                    </div>
+                </div>
+
+                <!-- Quantity -->
+                <div *uiTableColumn="'quantity'; let row">
+                    <span class="font-medium">{{ row.quantity }}</span>
+                </div>
+
+                <!-- Unit Price -->
+                <div *uiTableColumn="'unitPrice'; let row">
+                    <span class="text-content-secondary">{{ row.unitPrice | uiNumber: { decimalPlaces: 2, prefix:
+                        'R$ ' } }}</span>
+                </div>
+
+                <!-- Total -->
+                <div *uiTableColumn="'total'; let row">
+                    <span class="font-bold text-content">{{ row.total | uiNumber: { decimalPlaces: 2, prefix: 'R$ '
+                        } }}</span>
+                </div>
+            </ui-table>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-8">
+            <!-- Payments -->
+            <div class="md:col-span-3">
+                <h3 class="text-lg font-bold text-content mb-4 flex items-center gap-2">
+                    <span class="w-1.5 h-6 bg-primary rounded-full"></span>
+                    Payment Information
+                </h3>
+                <div class="grid grid-cols-1 gap-3">
+                    <ui-card *ngFor="let p of data.payments" padding="sm" [hoverable]="true" [shadow]="false"
+                        class="border-outline transition-all hover:border-primary/30">
+                        <div class="flex items-center justify-between">
+                            <div class="flex gap-4 items-center">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                    <i class="text-lg"
+                                        [class]="p.method === 'CASH' ? 'i-lucide-banknote' : 'i-lucide-credit-card'"></i>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-bold text-content">{{ p.method }}</span>
+                                    <span class="text-xs text-content-secondary">{{ p.createdAt | date: 'dd/MM/yyyy
+                                        HH:mm' }}</span>
+                                </div>
+                            </div>
+                            <div class="flex flex-col items-end gap-1">
+                                <span class="font-bold text-content">{{ p.amount | uiNumber: { decimalPlaces: 2, prefix:
+                                    'R$ ' } }}</span>
+                                <ui-badge [variant]="p.status === 'PAID' ? 'success' : 'warning'" size="sm">{{ p.status
+                                    }}</ui-badge>
+                            </div>
+                        </div>
+                    </ui-card>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="md:col-span-2">
+                <h3 class="text-lg font-bold text-content mb-4 flex items-center gap-2">
+                    <span class="w-1.5 h-6 bg-primary rounded-full"></span>
+                    Finances
+                </h3>
+                <ui-card padding="md" [shadow]="false">
+                    <div class="flex flex-col gap-4">
+                        <div class="space-y-3 pb-4 border-b border-outline/50">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-content-secondary font-medium">Subtotal</span>
+                                <span class="text-content font-bold">{{ data.subtotal | uiNumber: { decimalPlaces: 2,
+                                    prefix: 'R$ ' } }}</span>
+                            </div>
+                            <div class="flex justify-between text-sm text-error">
+                                <span class="font-medium">Discount</span>
+                                <span class="font-bold">-{{ data.discount | uiNumber: { decimalPlaces: 2, prefix: 'R$ '
+                                    } }}</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-base font-bold text-content">Grand Total</span>
+                            <span class="text-3xl font-black text-primary">{{ data.total | uiNumber: { decimalPlaces: 2,
+                                prefix: 'R$ ' } }}</span>
+                        </div>
+                    </div>
+                </ui-card>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-6 border-t border-outline">
+            <ui-button variant="secondary" (clicked)="close()">Dismiss</ui-button>
+            <ui-button variant="primary" (clicked)="close()">Print Receipt</ui-button>
+        </div>
+    </div>
+</div>

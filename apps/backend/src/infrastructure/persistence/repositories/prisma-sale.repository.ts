@@ -35,7 +35,18 @@ export class PrismaSaleRepository implements SaleRepository {
     async findById(tenantId: string, id: string): Promise<Sale | null> {
         const sale = await this.prisma.sale.findFirst({
             where: { id, tenantId },
-            include: { items: true },
+            include: {
+                items: {
+                    include: {
+                        product: {
+                            select: {
+                                name: true,
+                                sku: true,
+                            }
+                        }
+                    }
+                }
+            },
         });
 
         if (!sale) return null;
@@ -70,7 +81,18 @@ export class PrismaSaleRepository implements SaleRepository {
                 skip,
                 take: limit,
                 orderBy,
-                include: { items: true },
+                include: {
+                    items: {
+                        include: {
+                            product: {
+                                select: {
+                                    name: true,
+                                    sku: true,
+                                }
+                            }
+                        }
+                    }
+                },
             }),
             this.prisma.sale.count({ where }),
         ]);

@@ -83,10 +83,12 @@ export class UiTableComponent<T = any> {
         }
 
         return [...data].sort((a, b) => {
-            const valA = (a as any)[sort.column];
-            const valB = (b as any)[sort.column];
+            const valA = this.resolveKey(a, sort.column);
+            const valB = this.resolveKey(b, sort.column);
 
             if (valA === valB) return 0;
+            if (valA === null || valA === undefined) return 1;
+            if (valB === null || valB === undefined) return -1;
 
             const multiplier = sort.direction === 'asc' ? 1 : -1;
             return valA > valB ? multiplier : -multiplier;
@@ -182,7 +184,16 @@ export class UiTableComponent<T = any> {
     }
 
     getValue(row: T, key: string): any {
-        return (row as any)[key];
+        return this.resolveKey(row, key);
+    }
+
+    private resolveKey(obj: any, path: string): any {
+        if (!path || !obj) return undefined;
+        if (!path.includes('.')) return obj[path];
+
+        return path.split('.').reduce((acc, part) => {
+            return acc && acc[part] !== undefined ? acc[part] : undefined;
+        }, obj);
     }
 
     trackByRow(index: number, row: T): any {
@@ -197,7 +208,7 @@ export class UiTableComponent<T = any> {
         return {
             row,
             column,
-            value: (row as any)[column.key],
+            value: this.resolveKey(row, column.key),
             ...(column.cellComponentInputs || {})
         };
     }

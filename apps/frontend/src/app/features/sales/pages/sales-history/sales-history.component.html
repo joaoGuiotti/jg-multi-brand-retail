@@ -48,7 +48,7 @@
             <!-- Date -->
             <div *uiTableColumn="'createdAt'; let row">
                 <div class="text-xs text-content-secondary">
-                    {{ formatDate(row.createdAt) }}
+                    {{ row.createdAt | date: 'dd/MM/yyyy HH:mm' }}
                 </div>
             </div>
 

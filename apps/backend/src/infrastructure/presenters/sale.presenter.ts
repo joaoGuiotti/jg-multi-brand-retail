@@ -7,6 +7,10 @@ import { Transform } from 'class-transformer';
 export class SaleItemPresenter {
     id: string;
     productId: string;
+    product?: {
+        name: string;
+        sku: string;
+    } | null;
     quantity: number;
     unitPrice: number;
     discount: number;
@@ -15,6 +19,7 @@ export class SaleItemPresenter {
     constructor(output: SaleItemOutput) {
         this.id = output.id;
         this.productId = output.productId;
+        this.product = output.product;
         this.quantity = output.quantity;
         this.unitPrice = output.unitPrice;
         this.discount = output.discount;

@@ -7,6 +7,10 @@ export class QuerySaleDto {
     userId?: string;
 
     @IsOptional()
+    @IsString()
+    status?: string;
+
+    @IsOptional()
     @IsDateString()
     startDate?: string;
 

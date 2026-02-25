@@ -55,7 +55,7 @@ export class PrismaSaleRepository implements SaleRepository {
     }
 
     async findAll(tenantId: string, filters: SaleFilters): Promise<SaleSearchResult> {
-        const { userId, startDate, endDate, sortBy, sortOrder } = filters;
+        const { userId, status, startDate, endDate, sortBy, sortOrder } = filters;
 
         const page = Number(filters.page) || 1;
         const limit = Number(filters.limit) || 10;
@@ -66,11 +66,16 @@ export class PrismaSaleRepository implements SaleRepository {
         };
 
         if (userId) where.userId = userId;
+        if (status) where.status = status;
 
         if (startDate || endDate) {
             where.createdAt = {};
             if (startDate) where.createdAt.gte = new Date(startDate);
-            if (endDate) where.createdAt.lte = new Date(endDate);
+            if (endDate) {
+                const end = new Date(endDate);
+                end.setHours(23, 59, 59, 999);
+                where.createdAt.lte = end;
+            }
         }
 
         const orderBy = sortBy ? { [sortBy]: sortOrder || ('desc' as const) } : { createdAt: 'desc' as const };

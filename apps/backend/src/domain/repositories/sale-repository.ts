@@ -2,6 +2,7 @@ import { Sale } from '../entities/sales/sale.entity';
 
 export interface SaleFilters {
     userId?: string;
+    status?: string;
     startDate?: string;
     endDate?: string;
     page?: number;

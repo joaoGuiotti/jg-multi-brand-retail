@@ -104,7 +104,7 @@ export class SalesHistoryComponent implements OnInit {
     viewSale(id: string): void {
         this.modalService.open(SaleDetailModalComponent, {
             data: id,
-            title: 'Sale Details',
+            title: 'SALE DETAILS',
             minWidth: '900px'
         });
     }

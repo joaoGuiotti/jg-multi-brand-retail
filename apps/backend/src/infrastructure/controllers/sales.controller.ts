@@ -1,6 +1,7 @@
 import { CancelSaleUseCase } from '@application/use-cases/sales/cancel-sale.use-case';
 import { CompleteSaleUseCase } from '@application/use-cases/sales/complete-sale.use-case';
 import { CreateSaleUseCase } from '@application/use-cases/sales/create-sale.use-case';
+import { GetDailyRevenueUseCase } from '@application/use-cases/sales/get-daily-revenue.use-case';
 import { GetSaleUseCase } from '@application/use-cases/sales/get-sale.use-case';
 import { ListSalesUseCase } from '@application/use-cases/sales/list-sales.use-case';
 import { CreateSaleDto, QuerySaleDto } from '@infrastructure/dtos/sales';
@@ -40,6 +41,7 @@ export class SalesController {
         private getSaleUseCase: GetSaleUseCase,
         private cancelSaleUseCase: CancelSaleUseCase,
         private completeSaleUseCase: CompleteSaleUseCase,
+        private getDailyRevenueUseCase: GetDailyRevenueUseCase,
     ) { }
 
     @Post()
@@ -58,6 +60,15 @@ export class SalesController {
     async findAll(@CurrentUser() user: any, @Query() query: QuerySaleDto) {
         const output = await this.listSalesUseCase.execute({ tenantId: user.tenantId, filters: query });
         return new SaleCollectionPresenter(output);
+    }
+
+    @Get('reports/daily-revenue')
+    async getDailyRevenue(@CurrentUser() user: any, @Query('days') days?: number) {
+        const output = await this.getDailyRevenueUseCase.execute({
+            tenantId: user.tenantId,
+            days: days ? Number(days) : 7,
+        });
+        return output;
     }
 
     @Get(':id')

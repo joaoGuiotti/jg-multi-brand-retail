@@ -47,4 +47,9 @@ export class SalesService {
     cancelSale(id: string): Observable<void> {
         return this.http.patch<void>(`${this.apiUrl}/${id}/cancel`, {});
     }
+
+    getDailyRevenueReport(days = 7): Observable<IResponse<{ date: string; revenue: number }[]>> {
+        const params = new HttpParams().set('days', days.toString());
+        return this.http.get<IResponse<{ date: string; revenue: number }[]>>(`${this.apiUrl}/reports/daily-revenue`, { params });
+    }
 }

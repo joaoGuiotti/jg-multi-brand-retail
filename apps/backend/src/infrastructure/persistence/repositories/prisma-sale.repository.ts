@@ -111,6 +111,52 @@ export class PrismaSaleRepository implements SaleRepository {
         };
     }
 
+    async getDailyRevenue(tenantId: string, days: number): Promise<{ date: string; revenue: number }[]> {
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - days + 1);
+        startDate.setHours(0, 0, 0, 0);
+
+        const sales = await this.prisma.sale.findMany({
+            where: {
+                tenantId,
+                status: 'COMPLETED',
+                createdAt: {
+                    gte: startDate,
+                },
+            },
+            select: {
+                total: true,
+                createdAt: true,
+            },
+        });
+
+        const revenueMap: Record<string, number> = {};
+
+        // Initialize map with zeros for all days in range
+        for (let i = 0; i < days; i++) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            const dateStr = date.toISOString().split('T')[0];
+            revenueMap[dateStr] = 0;
+        }
+
+        // Aggregate
+        sales.forEach(sale => {
+            const dateStr = sale.createdAt.toISOString().split('T')[0];
+            if (revenueMap[dateStr] !== undefined) {
+                revenueMap[dateStr] += Number(sale.total);
+            }
+        });
+
+        // Convert to array and sort by date
+        return Object.entries(revenueMap)
+            .map(([date, revenue]) => ({
+                date,
+                revenue: Number(revenue.toFixed(2)),
+            }))
+            .sort((a, b) => a.date.localeCompare(b.date));
+    }
+
     async update(sale: Sale): Promise<Sale> {
         const data = SaleMapper.toPersistence(sale);
 

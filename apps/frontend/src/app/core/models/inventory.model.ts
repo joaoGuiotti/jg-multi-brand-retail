@@ -10,6 +10,7 @@ export interface InventoryMovement {
     type: MovementType;
     quantity: number;
     reference: string | null;
+    productName?: string;
     createdAt: string;
 }
 

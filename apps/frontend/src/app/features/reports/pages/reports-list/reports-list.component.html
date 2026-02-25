@@ -1,0 +1,31 @@
+<div class="max-w-7xl mx-auto">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-3xl font-bold text-content">Business Reports</h1>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6">
+        <!-- Revenue Chart -->
+        <ui-card [shadow]="true" padding="md">
+            <div class="mb-4">
+                <h2 class="text-xl font-semibold text-content">Revenue (Last 30 Days)</h2>
+                <p class="text-sm text-content-secondary">Daily revenue aggregation for the past month</p>
+            </div>
+
+            @if (isLoading()) {
+            <div class="h-[350px] w-full bg-surface-alt rounded animate-pulse"></div>
+            } @else if (revenueChartOptions(); as options) {
+            <div class="h-[350px]">
+                <apx-chart [series]="options.series!" [chart]="options.chart!" [xaxis]="options.xaxis!"
+                    [yaxis]="options.yaxis!" [colors]="options.colors!" [stroke]="options.stroke!"
+                    [fill]="options.fill!" [grid]="options.grid!" [plotOptions]="options.plotOptions!"
+                    [dataLabels]="options.dataLabels!" [tooltip]="options.tooltip!"
+                    [theme]="options.theme!"></apx-chart>
+            </div>
+            } @else {
+            <div class="flex items-center justify-center h-[350px] text-content-secondary">
+                No data available for the selected period.
+            </div>
+            }
+        </ui-card>
+    </div>
+</div>

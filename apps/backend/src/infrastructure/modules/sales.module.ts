@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { CancelSaleUseCase } from '../../application/use-cases/sales/cancel-sale.use-case';
 import { CompleteSaleUseCase } from '../../application/use-cases/sales/complete-sale.use-case';
 import { CreateSaleUseCase } from '../../application/use-cases/sales/create-sale.use-case';
+import { GetDailyRevenueUseCase } from '../../application/use-cases/sales/get-daily-revenue.use-case';
 import { GetSaleUseCase } from '../../application/use-cases/sales/get-sale.use-case';
 import { ListSalesUseCase } from '../../application/use-cases/sales/list-sales.use-case';
 import { SaleRepository } from '../../domain/repositories/sale-repository';
@@ -23,6 +24,7 @@ import { ProductsModule } from './products.module';
         GetSaleUseCase,
         CancelSaleUseCase,
         CompleteSaleUseCase,
+        GetDailyRevenueUseCase,
     ],
     exports: [
         SaleRepository,
@@ -31,6 +33,7 @@ import { ProductsModule } from './products.module';
         GetSaleUseCase,
         CancelSaleUseCase,
         CompleteSaleUseCase,
+        GetDailyRevenueUseCase,
     ],
 })
 export class SalesModule { }

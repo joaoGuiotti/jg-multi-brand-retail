@@ -11,6 +11,7 @@ export interface Sale {
     payments: Payment[];
     userId: string;
     tenantId: string;
+    customerName?: string;
     createdAt: string;
     updatedAt: string;
 }

@@ -128,34 +128,10 @@
     </table>
 
     <!-- Pagination -->
-    @if (config().pagination?.enabled && totalPages() > 1) {
-    <div class="bg-surface-secondary px-6 py-3 flex items-center justify-between border-t border-outline">
-        <div class="text-sm text-content-secondary">
-            @let p = config().pagination!;
-            Showing {{ (p.currentPage! - 1) * p.pageSize! + 1 }} to {{ Math.min(p.currentPage! * p.pageSize!,
-            p.totalItems!) }}
-            of {{ p.totalItems }} results
-        </div>
-        <div class="flex gap-2">
-            <button (click)="previousPage()" [disabled]="config().pagination?.currentPage === 1"
-                class="px-3 py-1 text-sm font-medium rounded-md border border-outline bg-surface hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-                Previous
-            </button>
-
-            @for (page of pageNumbers(); track page) {
-            <button (click)="goToPage(page)" [class.bg-primary]="page === config().pagination?.currentPage"
-                [class.text-white]="page === config().pagination?.currentPage"
-                [class.bg-surface]="page !== config().pagination?.currentPage"
-                class="px-3 py-1 text-sm font-medium rounded-md border border-outline hover:bg-surface-hover transition-colors">
-                {{ page }}
-            </button>
-            }
-
-            <button (click)="nextPage()" [disabled]="config().pagination?.currentPage === totalPages()"
-                class="px-3 py-1 text-sm font-medium rounded-md border border-outline bg-surface hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-                Next
-            </button>
-        </div>
-    </div>
+    @if (config().pagination?.enabled) {
+    <ui-pagination [currentPage]="config().pagination?.currentPage || 1"
+        [pageSize]="config().pagination?.pageSize || 10" [totalItems]="config().pagination?.totalItems || 0"
+        (pageChange)="pageChange.emit($event)">
+    </ui-pagination>
     }
 </div>

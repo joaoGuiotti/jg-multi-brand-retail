@@ -2,13 +2,14 @@ import { CommonModule, NgComponentOutlet, NgTemplateOutlet } from '@angular/comm
 import { Component, computed, ContentChildren, input, output, QueryList, signal } from '@angular/core';
 import { UiNumberPipe } from '../../pipes/number.pipe';
 import { UiLoadingComponent } from '../loading/loading.component';
+import { UiPaginationComponent } from '../pagination/pagination.component';
 import { UiTableColumnDirective } from './directives/table-column.directive';
 import { RowExpandConfig, SortDirection, TableColumn, TableConfig, TableSort } from './models/table.types';
 
 @Component({
     selector: 'ui-table',
     standalone: true,
-    imports: [CommonModule, NgComponentOutlet, NgTemplateOutlet, UiNumberPipe, UiLoadingComponent],
+    imports: [CommonModule, NgComponentOutlet, NgTemplateOutlet, UiNumberPipe, UiLoadingComponent, UiPaginationComponent],
     templateUrl: './table.component.html',
     styleUrl: './table.component.scss'
 })
@@ -95,49 +96,7 @@ export class UiTableComponent<T = any> {
         });
     });
 
-    // Computed Values for Pagination
-    totalPages = computed(() => {
-        const p = this.config().pagination;
-        if (!p?.enabled || !p.totalItems || !p.pageSize) return 1;
-        return Math.ceil(p.totalItems / p.pageSize);
-    });
-
-    pageNumbers = computed(() => {
-        const pages: number[] = [];
-        const maxVisible = 5;
-        const current = this.config().pagination?.currentPage || 1;
-        const total = this.totalPages();
-
-        let start = Math.max(1, current - Math.floor(maxVisible / 2));
-        let end = Math.min(total, start + maxVisible - 1);
-
-        if (end - start + 1 < maxVisible) {
-            start = Math.max(1, end - maxVisible + 1);
-        }
-
-        for (let i = start; i <= end; i++) {
-            pages.push(i);
-        }
-        return pages;
-    });
-
     isAnyRowExpanded = computed(() => this.expandedRowsSet().size > 0);
-
-    goToPage(page: number): void {
-        if (page >= 1 && page <= this.totalPages()) {
-            this.pageChange.emit(page);
-        }
-    }
-
-    nextPage(): void {
-        const current = this.config().pagination?.currentPage || 1;
-        this.goToPage(current + 1);
-    }
-
-    previousPage(): void {
-        const current = this.config().pagination?.currentPage || 1;
-        this.goToPage(current - 1);
-    }
 
     toggleRow(row: T): void {
         const currentSet = new Set(this.expandedRowsSet());

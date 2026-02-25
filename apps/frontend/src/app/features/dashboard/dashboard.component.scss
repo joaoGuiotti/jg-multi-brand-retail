@@ -1,0 +1,15 @@
+/* Dashboard Component */
+
+.kpi-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.75rem;
+
+    svg {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+}

@@ -11,15 +11,15 @@
                 @if (config().expandable) {
                 <th scope="col" class="w-10 px-6 py-3"></th>
                 }
-                @for (column of columns(); track column.key) {
+                @for (column of effectiveColumns(); track column.key) {
                 <th scope="col" [style.width]="column.width" (click)="onColumnSort(column)"
-                    [class.cursor-pointer]="config().sortable || column.sortable"
+                    [class.cursor-pointer]="column.sortable ?? config().sortable"
                     class="px-6 py-3 text-left text-xs font-semibold text-content-secondary uppercase tracking-wider group transition-colors hover:text-content"
                     [class]="column.headerClass">
                     <div class="flex items-center gap-2">
                         {{ column.label }}
 
-                        @if (config().sortable || column.sortable) {
+                        @if (column.sortable ?? config().sortable) {
                         <div class="flex flex-col text-[10px] text-content-tertiary group-hover:text-content-secondary transition-colors"
                             [class.text-primary]="currentSort()?.column === column.key">
                             @let sort = currentSort();
@@ -57,7 +57,7 @@
                     </svg>
                 </td>
                 }
-                @for (col of columns(); track col.key) {
+                @for (col of effectiveColumns(); track col.key) {
                 <td (click)="onCellClick($event, row, col)" class="px-6 py-4 whitespace-nowrap text-sm text-content"
                     [class]="col.cellClass">
 
@@ -75,7 +75,7 @@
                     @defer {
                     @if (col.cellComponent) {
                     <ng-container
-                        *ngComponentOutlet="col.cellComponent; inputs: { row: row, column: col }"></ng-container>
+                        *ngComponentOutlet="col.cellComponent; inputs: getComponentInputs(row, col)"></ng-container>
                     }
                     } @placeholder {
                     <div class="animate-pulse h-4 bg-surface-secondary rounded w-20"></div>
@@ -97,7 +97,7 @@
 
             @if (config().expandable && isRowExpanded(row)) {
             <tr class="bg-surface-secondary/30 ui-expanded-row">
-                <td [attr.colspan]="columns().length + 1" class="px-6 py-4">
+                <td [attr.colspan]="effectiveColumns().length + 1" class="px-6 py-4">
                     @defer (on idle) {
                     @if (rowExpandConfig()?.template) {
                     <ng-container
@@ -118,7 +118,7 @@
             }
             } @empty {
             <tr>
-                <td [attr.colspan]="columns().length + (config().expandable ? 1 : 0)"
+                <td [attr.colspan]="effectiveColumns().length + (config().expandable ? 1 : 0)"
                     class="px-6 py-12 text-center text-content-secondary italic">
                     No data available.
                 </td>

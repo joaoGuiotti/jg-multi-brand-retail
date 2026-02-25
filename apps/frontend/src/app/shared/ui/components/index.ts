@@ -5,8 +5,7 @@ export * from './card/card.component';
 export * from './input-field/input-field.component';
 export * from './loading/loading.component';
 export * from './modal/modal.component';
-export * from './table/models/table.types';
-export * from './table/table.component';
+export * from './table';
 export * from './theme-toggle/theme-toggle.component';
 
 // ── Types ───────────────────────────────────────────────────────────────────

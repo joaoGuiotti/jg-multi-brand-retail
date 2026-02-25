@@ -26,6 +26,12 @@ export class SalesService {
         if (filter?.endDate) {
             params = params.set('endDate', filter.endDate);
         }
+        if (filter?.sortBy) {
+            params = params.set('sortBy', filter.sortBy);
+        }
+        if (filter?.sortOrder) {
+            params = params.set('sortOrder', filter.sortOrder);
+        }
 
         return this.http.get<SaleListResponse>(this.apiUrl, { params });
     }

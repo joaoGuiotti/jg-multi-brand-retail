@@ -3,6 +3,7 @@ import { AfterViewInit, Component, computed, effect, signal, TemplateRef, ViewCh
 import {
   BadgeVariant,
   RowExpandConfig,
+  TableCellBase,
   TableColumn,
   TableConfig,
   TableSort,
@@ -16,14 +17,12 @@ import {
   standalone: true,
   imports: [UiBadgeComponent],
   template: `
-    <ui-badge [variant]="variant()">{{ row().status }}</ui-badge>
+    <ui-badge [variant]="variant()">{{ value() }}</ui-badge>
   `
 })
-export class StatusBadgeComponent {
-  row = input.required<any>();
-  column = input<any>();
+export class StatusBadgeComponent extends TableCellBase<any, string> {
   variant = computed<BadgeVariant>(() => {
-    const status = this.row()?.status;
+    const status = this.value();
     if (status === 'Active') return 'success';
     if (status === 'Inactive') return 'error';
     return 'warning';
@@ -31,7 +30,6 @@ export class StatusBadgeComponent {
 }
 
 // Stub for input since it's used decorator-style in component class
-import { input } from '@angular/core';
 
 @Component({
   selector: 'app-table-demo',

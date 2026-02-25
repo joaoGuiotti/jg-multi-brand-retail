@@ -1,15 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, computed, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { UiBadgeComponent, UiButtonComponent, UiCardComponent } from '@shared/ui';
+import { TableColumn, TableConfig, TableSort, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiNumberPipe, UiTableColumnDirective, UiTableComponent } from '@shared/ui';
 import { Sale, SaleFilter } from '../../../../core/models/sale.model';
 import { SalesService } from '../../../../core/services/sales.service';
 
 @Component({
     selector: 'app-sales-history',
     standalone: true,
-    imports: [CommonModule, RouterModule, FormsModule, UiButtonComponent, UiBadgeComponent, UiCardComponent],
+    imports: [CommonModule, RouterModule, FormsModule, UiButtonComponent, UiBadgeComponent, UiCardComponent, UiTableComponent, UiTableColumnDirective, UiNumberPipe],
     templateUrl: './sales-history.component.html',
     styleUrl: './sales-history.component.scss'
 })
@@ -20,17 +20,35 @@ export class SalesHistoryComponent implements OnInit {
 
     // Pagination
     currentPage = signal(1);
-    totalPages = signal(1);
     totalItems = signal(0);
     pageSize = 10;
 
     // Filters
-    selectedStatus: 'PENDING' | 'COMPLETED' | 'CANCELLED' | '' = '';
-    startDate = '';
-    endDate = '';
+    selectedStatus = signal<'PENDING' | 'COMPLETED' | 'CANCELLED' | ''>('');
+    startDate = signal('');
+    endDate = signal('');
+    currentSort = signal<TableSort | null>(null);
+    columns: TableColumn[] = [
+        { key: 'invoiceNumber', label: 'Invoice' },
+        { key: 'createdAt', label: 'Date', type: 'date' },
+        { key: 'items', label: 'Items', sortable: false },
+        { key: 'total', label: 'Total', type: 'currency' },
+        { key: 'status', label: 'Status' },
+        { key: 'actions', label: 'Actions', width: '150px', sortable: false }
+    ];
 
-    // Expose Math to template
-    Math = Math;
+    tableConfig = computed<TableConfig>(() => ({
+        stripedRow: true,
+        loading: this.isLoading(),
+        sortable: true,
+        pagination: {
+            enabled: true,
+            pageSize: this.pageSize,
+            totalItems: this.totalItems(),
+            currentPage: this.currentPage()
+        },
+        rowIdKey: 'id'
+    }));
 
     constructor(
         private salesService: SalesService,
@@ -46,16 +64,17 @@ export class SalesHistoryComponent implements OnInit {
         this.errorMessage.set('');
 
         const filter: SaleFilter = {
-            status: this.selectedStatus || undefined,
-            startDate: this.startDate || undefined,
-            endDate: this.endDate || undefined
+            status: (this.selectedStatus() as any) || undefined,
+            startDate: this.startDate() || undefined,
+            endDate: this.endDate() || undefined,
+            sortBy: this.currentSort()?.column as string,
+            sortOrder: this.currentSort()?.direction as 'asc' | 'desc'
         };
 
         this.salesService.getSales(this.currentPage(), this.pageSize, filter).subscribe({
             next: (response) => {
                 this.sales.set(response.data);
                 this.totalItems.set(response?.meta?.total!);
-                this.totalPages.set(Math.ceil(response?.meta?.total! / this.pageSize));
                 this.isLoading.set(false);
             },
             error: (error) => {
@@ -70,18 +89,14 @@ export class SalesHistoryComponent implements OnInit {
         this.loadSales();
     }
 
-    nextPage(): void {
-        if (this.currentPage() < this.totalPages()) {
-            this.currentPage.update(p => p + 1);
-            this.loadSales();
-        }
+    onPageChange(page: number): void {
+        this.currentPage.set(page);
+        this.loadSales();
     }
 
-    previousPage(): void {
-        if (this.currentPage() > 1) {
-            this.currentPage.update(p => p - 1);
-            this.loadSales();
-        }
+    onSortChange(sort: TableSort): void {
+        this.currentSort.set(sort.direction === 'none' ? null : sort);
+        this.loadSales();
     }
 
     viewSale(id: string): void {

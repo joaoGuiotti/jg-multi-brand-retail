@@ -1,20 +1,53 @@
-import { CommonModule } from '@angular/common';
-import { Component, computed, input, output, signal } from '@angular/core';
+import { CommonModule, NgComponentOutlet, NgTemplateOutlet } from '@angular/common';
+import { Component, computed, ContentChildren, input, output, QueryList, signal } from '@angular/core';
 import { UiNumberPipe } from '../../pipes/number.pipe';
 import { UiLoadingComponent } from '../loading/loading.component';
+import { UiTableColumnDirective } from './directives/table-column.directive';
 import { RowExpandConfig, SortDirection, TableColumn, TableConfig, TableSort } from './models/table.types';
 
 @Component({
     selector: 'ui-table',
     standalone: true,
-    imports: [CommonModule, UiNumberPipe, UiLoadingComponent],
+    imports: [CommonModule, NgComponentOutlet, NgTemplateOutlet, UiNumberPipe, UiLoadingComponent],
     templateUrl: './table.component.html',
     styleUrl: './table.component.scss'
 })
 export class UiTableComponent<T = any> {
     // Signal Inputs
-    columns = input.required<TableColumn<T>[]>();
+    columns = input<TableColumn<T>[]>([]);
     dataSource = input.required<T[]>();
+
+    // Content Children for declarative columns
+    @ContentChildren(UiTableColumnDirective) declarativeColumns!: QueryList<UiTableColumnDirective<T>>;
+
+    // Computed internal columns
+    effectiveColumns = computed<TableColumn<T>[]>(() => {
+        const inputCols = this.columns();
+        const declarativeCols = this.declarativeColumns?.toArray() || [];
+
+        // If columns are provided via input, use them as the structural definition
+        if (inputCols.length > 0) {
+            return inputCols.map(col => {
+                const declarative = declarativeCols.find(d => d.key() === col.key);
+                const template = declarative?.template || col.cellTemplate;
+                return {
+                    ...col,
+                    // Prioritize declarative template if found
+                    cellTemplate: template,
+                    // Force type to 'template' if we have a template to render
+                    type: template ? 'template' : col.type
+                };
+            });
+        }
+
+        // Fallback: if no input columns, use declarative columns as definitions
+        return declarativeCols.map(col => ({
+            key: col.key(),
+            label: '', // Label must come from input or be empty
+            cellTemplate: col.template,
+            type: 'template'
+        }));
+    });
     config = input<TableConfig>({
         stripedRow: true,
         scrollable: false,
@@ -131,7 +164,7 @@ export class UiTableComponent<T = any> {
     }
 
     onColumnSort(column: TableColumn<T>): void {
-        const isSortable = this.config().sortable || column.sortable;
+        const isSortable = column.sortable ?? this.config().sortable;
         if (!isSortable) return;
 
         const current = this.currentSort();
@@ -158,5 +191,22 @@ export class UiTableComponent<T = any> {
             return (row as any)[key];
         }
         return (row as any).id ?? row;
+    }
+
+    getComponentInputs(row: T, column: TableColumn<T>): Record<string, any> {
+        return {
+            row,
+            column,
+            value: (row as any)[column.key],
+            ...(column.cellComponentInputs || {})
+        };
+    }
+
+    onCellAction(event: any, row: T, column: TableColumn<T>): void {
+        // Handle common action output
+        if (column.cellComponentOutputs?.['action']) {
+            column.cellComponentOutputs['action'](event);
+        }
+        // Also emit a general event if needed
     }
 }

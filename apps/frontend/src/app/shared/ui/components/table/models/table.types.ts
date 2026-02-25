@@ -1,4 +1,4 @@
-import { TemplateRef, Type } from '@angular/core';
+import { Directive, input, output, TemplateRef, Type } from '@angular/core';
 
 export type ColumnType = 'text' | 'number' | 'currency' | 'date' | 'component' | 'template';
 
@@ -9,13 +9,25 @@ export interface TableSort {
     direction: SortDirection;
 }
 
+@Directive()
+export abstract class TableCellBase<T = any, V = any> {
+    row = input.required<T>();
+    column = input.required<TableColumn<T>>();
+    value = input.required<V>();
+
+    // Standard event for cell components
+    action = output<any>();
+}
+
 export interface TableColumn<T = any> {
     key: string;
     label: string;
     type?: ColumnType;
     width?: string;
     cellTemplate?: TemplateRef<any>;
-    cellComponent?: Type<any>;
+    cellComponent?: Type<TableCellBase<T, any>>;
+    cellComponentInputs?: Record<string, any>;
+    cellComponentOutputs?: Record<string, (event: any) => void>;
     sortable?: boolean;
     headerClass?: string;
     cellClass?: string;

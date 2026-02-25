@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, computed, OnInit, signal, TemplateRef, ViewChild } from '@angular/core';
+import { Component, computed, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { BadgeVariant, TableColumn, TableConfig, TableSort, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiNumberPipe, UiTableComponent } from '@shared/ui';
+import { BadgeVariant, TableColumn, TableConfig, TableSort, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiNumberPipe, UiTableColumnDirective, UiTableComponent } from '@shared/ui';
 import { IResponse } from 'src/app/core/models/response-base';
 import { Product, ProductFilter } from '../../../../core/models/product.model';
 import { ProductsService } from '../../../../core/services/products.service';
@@ -10,15 +10,11 @@ import { ProductsService } from '../../../../core/services/products.service';
 @Component({
     selector: 'app-product-list',
     standalone: true,
-    imports: [CommonModule, RouterModule, FormsModule, UiButtonComponent, UiCardComponent, UiBadgeComponent, UiNumberPipe, UiTableComponent],
+    imports: [CommonModule, RouterModule, FormsModule, UiButtonComponent, UiCardComponent, UiBadgeComponent, UiNumberPipe, UiTableComponent, UiTableColumnDirective],
     templateUrl: './product-list.component.html',
     styleUrl: './product-list.component.scss'
 })
-export class ProductListComponent implements OnInit, AfterViewInit {
-    @ViewChild('nameTemplate', { static: true }) nameTmpl!: TemplateRef<any>;
-    @ViewChild('stockQuantityTemplate', { static: true }) stockTmpl!: TemplateRef<any>;
-    @ViewChild('activeTemplate', { static: true }) activeTmpl!: TemplateRef<any>;
-    @ViewChild('actionsTemplate', { static: true }) actionsTmpl!: TemplateRef<any>;
+export class ProductListComponent implements OnInit {
 
     products = signal<Product[]>([]);
     isLoading = signal(false);
@@ -37,18 +33,19 @@ export class ProductListComponent implements OnInit, AfterViewInit {
 
 
     columns = signal<TableColumn[]>([
-        { key: 'name', label: 'Product', type: 'template', sortable: true },
-        { key: 'sku', label: 'SKU', sortable: true },
-        { key: 'salePrice', label: 'Price', type: 'currency', sortable: true },
+        { key: 'name', label: 'Product' },
+        { key: 'sku', label: 'SKU' },
+        { key: 'salePrice', label: 'Price', type: 'currency' },
         { key: 'costPrice', label: 'Cost', type: 'currency' },
-        { key: 'stockQuantity', label: 'Stock', type: 'template', sortable: true },
-        { key: 'active', label: 'Status', type: 'template' },
-        { key: 'actions', label: 'Actions', type: 'template', width: '150px' }
+        { key: 'stockQuantity', label: 'Stock' },
+        { key: 'active', label: 'Status' },
+        { key: 'actions', label: 'Actions', width: '150px', sortable: false }
     ]);
 
     tableConfig = computed<TableConfig>(() => ({
         stripedRow: true,
         loading: this.isLoading(),
+        sortable: true,
         pagination: {
             enabled: true,
             pageSize: this.pageSize,
@@ -58,15 +55,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
         rowIdKey: 'id'
     }));
 
-    ngAfterViewInit(): void {
-        this.columns.update(cols => cols.map(col => {
-            if (col.key === 'name') col.cellTemplate = this.nameTmpl;
-            if (col.key === 'stockQuantity') col.cellTemplate = this.stockTmpl;
-            if (col.key === 'active') col.cellTemplate = this.activeTmpl;
-            if (col.key === 'actions') col.cellTemplate = this.actionsTmpl;
-            return col;
-        }));
-    }
+
 
     constructor(
         private productsService: ProductsService,

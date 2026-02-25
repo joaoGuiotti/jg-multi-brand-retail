@@ -69,4 +69,6 @@ export interface SaleFilter {
     status?: 'PENDING' | 'COMPLETED' | 'CANCELLED';
     startDate?: string;
     endDate?: string;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
 }

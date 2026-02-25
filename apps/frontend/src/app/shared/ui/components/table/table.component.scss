@@ -7,8 +7,7 @@
 
 .table-striped {
     tbody tr:nth-child(even) {
-        --tw-bg-opacity: 0.03;
-        background-color: rgb(var(--surface-secondary-rgb) / var(--tw-bg-opacity));
+        background-color: var(--color-bg-secondary);
     }
 }
 

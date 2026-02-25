@@ -45,34 +45,34 @@
             (pageChange)="onPageChange($event)" (sortChange)="onSortChange($event)">
 
             <!-- Custom template for Product Name/Barcode -->
-            <ng-template #nameTemplate let-row="row">
-                <div class="text-sm font-medium text-content">{{ row?.name }}</div>
-                @if (row?.barcode) {
-                <div class="text-xs text-content-secondary mt-0.5">{{ row?.barcode }}</div>
+            <div *uiTableColumn="'name'; let row">
+                <div class="text-sm font-medium text-content">{{ row.name }}</div>
+                @if (row.barcode) {
+                <div class="text-xs text-content-secondary mt-0.5">{{ row.barcode }}</div>
                 }
-            </ng-template>
+            </div>
 
             <!-- Custom template for Stock Badge -->
-            <ng-template #stockQuantityTemplate let-row="row">
+            <div *uiTableColumn="'stockQuantity'; let row">
                 <ui-badge [variant]="getStockVariant(row)" size="sm">
-                    {{ row?.stockQuantity | uiNumber : { decimalPlaces: 0 } }}
+                    {{ row.stockQuantity | uiNumber : { decimalPlaces: 0 } }}
                 </ui-badge>
-            </ng-template>
+            </div>
 
             <!-- Custom template for Status Badge -->
-            <ng-template #activeTemplate let-row="row">
+            <div *uiTableColumn="'active'; let row">
                 <ui-badge [variant]="getStockVariant(row)" [dot]="true">
                     {{ getStockLevelText(row) }}
                 </ui-badge>
-            </ng-template>
+            </div>
 
             <!-- Custom template for Actions -->
-            <ng-template #actionsTemplate let-row="row">
+            <div *uiTableColumn="'actions'; let row">
                 <div class="flex justify-end gap-2">
                     <ui-button variant="ghost" size="sm" (clicked)="editProduct(row.id)">Edit</ui-button>
                     <ui-button variant="danger" size="sm" (clicked)="deleteProduct(row.id)">Delete</ui-button>
                 </div>
-            </ng-template>
+            </div>
 
         </ui-table>
     </div>

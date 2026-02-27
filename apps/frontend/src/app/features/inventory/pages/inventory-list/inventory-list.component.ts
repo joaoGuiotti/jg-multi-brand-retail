@@ -64,6 +64,7 @@ export class InventoryListComponent implements OnInit {
 
     tableConfig = computed<TableConfig>(() => ({
         stripedRow: true,
+        dragColumn: true,
         loading: this.isLoading(),
         sortable: true,
         pagination: {

@@ -1,5 +1,6 @@
+import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDragPlaceholder, CdkDragPreview, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CommonModule, NgComponentOutlet, NgTemplateOutlet } from '@angular/common';
-import { Component, computed, ContentChildren, input, output, QueryList, signal } from '@angular/core';
+import { Component, computed, ContentChildren, EventEmitter, input, Output, QueryList, signal } from '@angular/core';
 import { UiNumberPipe } from '../../pipes/number.pipe';
 import { UiLoadingComponent } from '../loading/loading.component';
 import { UiPaginationComponent } from '../pagination/pagination.component';
@@ -9,7 +10,7 @@ import { RowExpandConfig, SortDirection, TableColumn, TableConfig, TableSort } f
 @Component({
     selector: 'ui-table',
     standalone: true,
-    imports: [CommonModule, NgComponentOutlet, NgTemplateOutlet, UiNumberPipe, UiLoadingComponent, UiPaginationComponent],
+    imports: [CommonModule, NgComponentOutlet, NgTemplateOutlet, UiNumberPipe, UiLoadingComponent, UiPaginationComponent, CdkDropList, CdkDrag, CdkDragPreview, CdkDragPlaceholder, CdkDragHandle],
     templateUrl: './table.component.html',
     styleUrl: './table.component.scss'
 })
@@ -21,34 +22,6 @@ export class UiTableComponent<T = any> {
     // Content Children for declarative columns
     @ContentChildren(UiTableColumnDirective) declarativeColumns!: QueryList<UiTableColumnDirective<T>>;
 
-    // Computed internal columns
-    effectiveColumns = computed<TableColumn<T>[]>(() => {
-        const inputCols = this.columns();
-        const declarativeCols = this.declarativeColumns?.toArray() || [];
-
-        // If columns are provided via input, use them as the structural definition
-        if (inputCols.length > 0) {
-            return inputCols.map(col => {
-                const declarative = declarativeCols.find(d => d.key() === col.key);
-                const template = declarative?.template || col.cellTemplate;
-                return {
-                    ...col,
-                    // Prioritize declarative template if found
-                    cellTemplate: template,
-                    // Force type to 'template' if we have a template to render
-                    type: template ? 'template' : col.type
-                };
-            });
-        }
-
-        // Fallback: if no input columns, use declarative columns as definitions
-        return declarativeCols.map(col => ({
-            key: col.key(),
-            label: '', // Label must come from input or be empty
-            cellTemplate: col.template,
-            type: 'template'
-        }));
-    });
     config = input<TableConfig>({
         stripedRow: true,
         scrollable: false,
@@ -58,18 +31,65 @@ export class UiTableComponent<T = any> {
     });
     rowExpandConfig = input<RowExpandConfig<T>>();
 
+    // Internal State Signals
+    private expandedRowsSet = signal<Set<T>>(new Set());
+    private reorderedColumnKeys = signal<string[] | null>(null);
+    currentSort = signal<TableSort | null>(null);
+
+    // Computed internal columns
+    effectiveColumns = computed<TableColumn<T>[]>(() => {
+        const inputCols = this.columns();
+        const declarativeCols = this.declarativeColumns?.toArray() || [];
+
+        let baseColumns: TableColumn<T>[] = [];
+
+        // If columns are provided via input, use them as the structural definition
+        if (inputCols.length > 0) {
+            baseColumns = inputCols.map(col => {
+                const declarative = declarativeCols.find(d => d.key() === col.key);
+                const template = declarative?.template || col.cellTemplate;
+                return {
+                    ...col,
+                    draggable: col.draggable ?? true,
+                    // Prioritize declarative template if found
+                    cellTemplate: template,
+                    // Force type to 'template' if we have a template to render
+                    type: template ? 'template' : col.type
+                };
+            });
+        } else {
+            // Fallback: if no input columns, use declarative columns as definitions
+            baseColumns = declarativeCols.map(col => ({
+                key: col.key(),
+                label: '', // Label must come from input or be empty
+                cellTemplate: col.template,
+                type: 'template',
+                draggable: true
+            }));
+        }
+
+        const reorderedKeys = this.reorderedColumnKeys();
+        if (!reorderedKeys) return baseColumns;
+
+        // Map reordered keys back to column definitions, ensuring we don't lose any new columns
+        const reorderedCols = reorderedKeys
+            .map(key => baseColumns.find(c => c.key === key))
+            .filter((c): c is TableColumn<T> => !!c);
+
+        // Append any columns that weren't in the reordered list (e.g. newly added columns)
+        const missingCols = baseColumns.filter(c => !reorderedKeys.includes(c.key));
+
+        return [...reorderedCols, ...missingCols];
+    });
+
     // Outputs
-    rowClick = output<T>();
-    cellClick = output<{ row: T; column: TableColumn<T> }>();
-    pageChange = output<number>();
-    sortChange = output<TableSort>();
+    @Output() rowClick = new EventEmitter<T>();
+    @Output() cellClick = new EventEmitter<{ row: T; column: TableColumn<T> }>();
+    @Output() pageChange = new EventEmitter<number>();
+    @Output() sortChange = new EventEmitter<TableSort>();
 
     // Expose Math to template
     protected readonly Math = Math;
-
-    // Internal State Signals
-    private expandedRowsSet = signal<Set<T>>(new Set());
-    currentSort = signal<TableSort | null>(null);
 
     // Computed Values
     sortedData = computed(() => {
@@ -140,6 +160,13 @@ export class UiTableComponent<T = any> {
         const newSort = { column: column.key, direction };
         this.currentSort.set(direction === 'none' ? null : newSort);
         this.sortChange.emit(newSort);
+    }
+
+    onColumnDrop(event: CdkDragDrop<string[]>): void {
+        const columns = this.effectiveColumns();
+        const keys = columns.map(c => c.key);
+        moveItemInArray(keys, event.previousIndex, event.currentIndex);
+        this.reorderedColumnKeys.set(keys);
     }
 
     getValue(row: T, key: string): any {

@@ -32,6 +32,7 @@ export interface TableColumn<T = any> {
     headerClass?: string;
     cellClass?: string;
     resizable?: boolean;
+    draggable?: boolean;
     formatOptions?: {
         currencyCode?: string;
         dateFormat?: string;

@@ -6,6 +6,7 @@ import { Directive, input, TemplateRef } from '@angular/core';
 })
 export class UiTableColumnDirective<T = any> {
     key = input.required<string>({ alias: 'uiTableColumn' });
+    draggable = input<boolean>(true);
 
     constructor(public template: TemplateRef<{ $implicit: T; row: T }>) { }
 }

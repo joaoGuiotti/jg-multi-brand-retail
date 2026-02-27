@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsDateString, IsEnum, IsNumber, IsOptional, IsString, Min } from 'class-validator';
-import { MovementType } from './create-inventory-movement.dto';
+import { InventoryMovementTypes } from '../../../domain/entities/inventory/inventory-movement-type.vo';
 
 export class QueryInventoryMovementDto {
     @IsOptional()
@@ -8,8 +8,8 @@ export class QueryInventoryMovementDto {
     productId?: string;
 
     @IsOptional()
-    @IsEnum(MovementType)
-    type?: MovementType;
+    @IsEnum(InventoryMovementTypes)
+    type?: InventoryMovementTypes;
 
     @IsOptional()
     @IsString()

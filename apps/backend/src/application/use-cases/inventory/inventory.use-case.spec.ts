@@ -1,4 +1,5 @@
 import { NotFoundException } from '@nestjs/common';
+import { InventoryMovementType, InventoryMovementTypes } from '../../../domain/entities/inventory/inventory-movement-type.vo';
 import { InventoryMovement } from '../../../domain/entities/inventory/inventory-movement.entity';
 import { Product } from '../../../domain/entities/products/product.entity';
 import { GetProductMovementsUseCase } from './get-product-movements.use-case';
@@ -6,7 +7,13 @@ import { GetStockSummaryUseCase } from './get-stock-summary.use-case';
 import { ListMovementsUseCase } from './list-movements.use-case';
 
 const makeMovement = () =>
-    InventoryMovement.create({ tenantId: 'tenant-1', productId: 'p1', userId: 'u1', type: 'ENTRY', quantity: 5 });
+    InventoryMovement.create({
+        tenantId: 'tenant-1',
+        productId: 'p1',
+        userId: 'u1',
+        type: InventoryMovementType.create(InventoryMovementTypes.ENTRY),
+        quantity: 5
+    });
 
 const makeProduct = () =>
     Product.create({ tenantId: 'tenant-1', name: 'Widget', sku: 'WG-001', costPrice: 10, salePrice: 20, margin: 100, stockQuantity: 10, unit: 'UN', active: true });
@@ -80,8 +87,8 @@ describe('GetStockSummaryUseCase', () => {
             .mockResolvedValueOnce(1)  // outOfStock
             .mockResolvedValueOnce(20); // total
         prisma.inventoryMovement.groupBy.mockResolvedValue([
-            { type: 'ENTRY', _count: { type: 5 } },
-            { type: 'EXIT', _count: { type: 2 } },
+            { type: InventoryMovementTypes.ENTRY, _count: { type: 5 } },
+            { type: InventoryMovementTypes.EXIT, _count: { type: 2 } },
         ]);
 
         const result = await useCase.execute({ tenantId: 'tenant-1' });

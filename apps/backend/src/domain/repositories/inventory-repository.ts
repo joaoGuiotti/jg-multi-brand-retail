@@ -1,8 +1,9 @@
-import { InventoryMovement, MovementType } from '../entities/inventory/inventory-movement.entity';
+import { InventoryMovementTypes } from '../entities/inventory/inventory-movement-type.vo';
+import { InventoryMovement } from '../entities/inventory/inventory-movement.entity';
 
 export interface InventoryFilters {
     productId?: string;
-    type?: MovementType;
+    type?: InventoryMovementTypes | string;
     userId?: string;
     startDate?: string;
     endDate?: string;

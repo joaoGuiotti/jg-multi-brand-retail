@@ -42,7 +42,6 @@ export const DB_SCHEMA = Joi.object<DB_SCHEMA_TYPE>({
     DB_URL: Joi.string().required(),
 });
 
-
 @Module({})
 export class ConfigModule extends NestConfigModule {
     static forRoot(options: ConfigModuleOptions = {}) {

@@ -1,5 +1,6 @@
 import { UseCase } from '@common/application/use-case.interface';
-import { InventoryMovement, MovementType } from '@domain/entities/inventory/inventory-movement.entity';
+import { InventoryMovementType, InventoryMovementTypes } from '@domain/entities/inventory/inventory-movement-type.vo';
+import { InventoryMovement } from '@domain/entities/inventory/inventory-movement.entity';
 import { InventoryRepository } from '@domain/repositories/inventory-repository';
 import { ProductRepository } from '@domain/repositories/product-repository';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
@@ -9,7 +10,7 @@ export type CreateMovementInput = {
     tenantId: string;
     userId: string;
     productId: string;
-    type: MovementType;
+    type: InventoryMovementTypes;
     quantity: number;
     reference?: string;
 };
@@ -30,11 +31,11 @@ export class CreateMovementUseCase implements UseCase<CreateMovementInput, Movem
         }
 
         switch (type) {
-            case 'ENTRY':
-            case 'RETURN':
+            case InventoryMovementTypes.ENTRY:
+            case InventoryMovementTypes.RETURN:
                 product.adjustStock(quantity);
                 break;
-            case 'EXIT':
+            case InventoryMovementTypes.EXIT:
                 if (product.stockQuantity < quantity) {
                     throw new BadRequestException(
                         `Insufficient stock. Available: ${product.stockQuantity}, Requested: ${quantity}`,
@@ -42,7 +43,7 @@ export class CreateMovementUseCase implements UseCase<CreateMovementInput, Movem
                 }
                 product.adjustStock(-quantity);
                 break;
-            case 'ADJUSTMENT':
+            case InventoryMovementTypes.ADJUSTMENT:
                 product.updateStock(quantity);
                 break;
         }
@@ -51,7 +52,7 @@ export class CreateMovementUseCase implements UseCase<CreateMovementInput, Movem
             tenantId,
             productId,
             userId,
-            type: type as any,
+            type: InventoryMovementType.create(type as InventoryMovementTypes),
             quantity,
             reference,
         });

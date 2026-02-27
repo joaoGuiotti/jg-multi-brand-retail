@@ -27,7 +27,7 @@ export class MovementOutputMapper {
             tenantId: entity.tenantId,
             productId: entity.productId,
             userId: entity.userId,
-            type: entity.type,
+            type: entity.type.value,
             quantity: entity.quantity,
             reference: entity.reference,
             createdAt: entity.createdAt,

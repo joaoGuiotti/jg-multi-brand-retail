@@ -1,13 +1,12 @@
 import { AggregateRoot } from '../../../common/domain/aggregate-root';
 import { UniqueEntityID } from '../../../common/domain/unique-entity-id';
-
-export type MovementType = 'ENTRY' | 'EXIT' | 'ADJUSTMENT' | 'RETURN';
+import { InventoryMovementType } from './inventory-movement-type.vo';
 
 export interface InventoryMovementProps {
     tenantId: string;
     productId: string;
     userId: string;
-    type: MovementType;
+    type: InventoryMovementType;
     quantity: number;
     reference?: string | null;
     createdAt?: Date;
@@ -33,7 +32,7 @@ export class InventoryMovement extends AggregateRoot<InventoryMovementProps> {
     get tenantId(): string { return this.props.tenantId; }
     get productId(): string { return this.props.productId; }
     get userId(): string { return this.props.userId; }
-    get type(): MovementType { return this.props.type; }
+    get type(): InventoryMovementType { return this.props.type; }
     get quantity(): number { return this.props.quantity; }
     get reference(): string | undefined | null { return this.props.reference; }
     get createdAt(): Date | undefined { return this.props.createdAt; }

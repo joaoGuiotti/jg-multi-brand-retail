@@ -1,15 +1,25 @@
 import { UniqueEntityID } from '../../../common/domain/unique-entity-id';
-import { InventoryMovement } from './inventory-movement.entity';
+import { InventoryMovementType, InventoryMovementTypes } from './inventory-movement-type.vo';
+import { InventoryMovement, InventoryMovementProps } from './inventory-movement.entity';
 
-const makeMovement = (overrides?: Partial<Parameters<typeof InventoryMovement.create>[0]>) =>
-    InventoryMovement.create({
+const makeMovement = (overrides?: Partial<Omit<InventoryMovementProps, 'type'> & { type?: string | InventoryMovementType }>) => {
+    const type = overrides?.type
+        ? (typeof overrides.type === 'string' ? InventoryMovementType.create(overrides.type as InventoryMovementTypes) : overrides.type)
+        : InventoryMovementType.create(InventoryMovementTypes.ENTRY);
+
+    const { type: _, ...rest } = overrides || {};
+
+    const props: InventoryMovementProps = {
         tenantId: 'tenant-1',
         productId: 'prod-1',
         userId: 'user-1',
-        type: 'ENTRY',
+        type,
         quantity: 10,
-        ...overrides,
-    });
+        ...rest,
+    };
+
+    return InventoryMovement.create(props);
+};
 
 describe('InventoryMovement Entity', () => {
     it('should create a movement with required fields', () => {
@@ -18,7 +28,7 @@ describe('InventoryMovement Entity', () => {
         expect(m.tenantId).toBe('tenant-1');
         expect(m.productId).toBe('prod-1');
         expect(m.userId).toBe('user-1');
-        expect(m.type).toBe('ENTRY');
+        expect(m.type.value).toBe('ENTRY');
         expect(m.quantity).toBe(10);
     });
 
@@ -34,23 +44,29 @@ describe('InventoryMovement Entity', () => {
 
     it('should create movement with EXIT type', () => {
         const m = makeMovement({ type: 'EXIT', quantity: 5 });
-        expect(m.type).toBe('EXIT');
+        expect(m.type.value).toBe('EXIT');
         expect(m.quantity).toBe(5);
     });
 
     it('should create movement with ADJUSTMENT type', () => {
         const m = makeMovement({ type: 'ADJUSTMENT', quantity: 50 });
-        expect(m.type).toBe('ADJUSTMENT');
+        expect(m.type.value).toBe('ADJUSTMENT');
     });
 
     it('should create movement with RETURN type', () => {
         const m = makeMovement({ type: 'RETURN' });
-        expect(m.type).toBe('RETURN');
+        expect(m.type.value).toBe('RETURN');
     });
 
     it('should accept a custom id', () => {
         const id = new UniqueEntityID('550e8400-e29b-41d4-a716-446655440000');
-        const m = InventoryMovement.create({ tenantId: 't', productId: 'p', userId: 'u', type: 'ENTRY', quantity: 1 }, id);
+        const m = InventoryMovement.create({
+            tenantId: 't',
+            productId: 'p',
+            userId: 'u',
+            type: InventoryMovementType.create(InventoryMovementTypes.ENTRY),
+            quantity: 1
+        }, id);
         expect(m.id.toString()).toBe('550e8400-e29b-41d4-a716-446655440000');
     });
 });

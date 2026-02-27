@@ -1,3 +1,4 @@
+import { InventoryMovementType, InventoryMovementTypes } from '../../../../domain/entities/inventory/inventory-movement-type.vo';
 import { InventoryMovement } from '../../../../domain/entities/inventory/inventory-movement.entity';
 import { Payment } from '../../../../domain/entities/payments/payment.entity';
 import { Sale, SaleItem } from '../../../../domain/entities/sales/sale.entity';
@@ -106,7 +107,7 @@ const makeRawMovement = (overrides: any = {}) => ({
     tenantId: 'tenant-1',
     productId: 'p1',
     userId: 'u1',
-    type: 'ENTRY',
+    type: InventoryMovementTypes.ENTRY,
     quantity: 5,
     reference: null,
     createdAt: new Date(),
@@ -119,11 +120,17 @@ describe('InventoryMapper', () => {
         const movement = InventoryMapper.toDomain(raw);
         expect(movement).toBeInstanceOf(InventoryMovement);
         expect(movement.id.toString()).toBe(raw.id);
-        expect(movement.type).toBe('ENTRY');
+        expect(movement.type.value).toBe(InventoryMovementTypes.ENTRY);
     });
 
     it('toPersistence should convert an InventoryMovement to a plain object', () => {
-        const movement = InventoryMovement.create({ tenantId: 'tenant-1', productId: 'p1', userId: 'u1', type: 'ENTRY', quantity: 5 });
+        const movement = InventoryMovement.create({
+            tenantId: 'tenant-1',
+            productId: 'p1',
+            userId: 'u1',
+            type: InventoryMovementType.create(InventoryMovementTypes.ENTRY),
+            quantity: 5
+        });
         const raw = InventoryMapper.toPersistence(movement);
         expect(raw.id).toBe(movement.id.toString());
         expect(raw.type).toBe('ENTRY');

@@ -1,4 +1,5 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { InventoryMovementType, InventoryMovementTypes } from '../../../domain/entities/inventory/inventory-movement-type.vo';
 import { InventoryMovement } from '../../../domain/entities/inventory/inventory-movement.entity';
 import { Product } from '../../../domain/entities/products/product.entity';
 import { CreateMovementUseCase } from './create-movement.use-case';
@@ -22,7 +23,7 @@ const makeMovement = (overrides: any = {}) =>
         tenantId: 'tenant-1',
         productId: 'prod-1',
         userId: 'user-1',
-        type: 'ENTRY',
+        type: InventoryMovementType.create(InventoryMovementTypes.ENTRY),
         quantity: 5,
         ...overrides,
     });
@@ -42,7 +43,7 @@ describe('CreateMovementUseCase', () => {
         tenantId: 'tenant-1',
         userId: 'user-1',
         productId: 'prod-1',
-        type: 'ENTRY' as const,
+        type: InventoryMovementTypes.ENTRY,
         quantity: 5,
     };
 
@@ -57,7 +58,7 @@ describe('CreateMovementUseCase', () => {
         productRepository.findById.mockResolvedValue(product);
         inventoryRepository.create.mockResolvedValue(movement);
 
-        await useCase.execute({ ...baseInput, type: 'ENTRY', quantity: 5 });
+        await useCase.execute({ ...baseInput, type: InventoryMovementTypes.ENTRY, quantity: 5 });
         expect(product.stockQuantity).toBe(15);
     });
 
@@ -67,7 +68,7 @@ describe('CreateMovementUseCase', () => {
         productRepository.findById.mockResolvedValue(product);
         inventoryRepository.create.mockResolvedValue(movement);
 
-        await useCase.execute({ ...baseInput, type: 'RETURN', quantity: 3 });
+        await useCase.execute({ ...baseInput, type: InventoryMovementTypes.RETURN, quantity: 3 });
         expect(product.stockQuantity).toBe(13);
     });
 
@@ -77,7 +78,7 @@ describe('CreateMovementUseCase', () => {
         productRepository.findById.mockResolvedValue(product);
         inventoryRepository.create.mockResolvedValue(movement);
 
-        await useCase.execute({ ...baseInput, type: 'EXIT', quantity: 5 });
+        await useCase.execute({ ...baseInput, type: InventoryMovementTypes.EXIT, quantity: 5 });
         expect(product.stockQuantity).toBe(15);
     });
 
@@ -85,7 +86,7 @@ describe('CreateMovementUseCase', () => {
         const product = makeProduct({ stockQuantity: 2 });
         productRepository.findById.mockResolvedValue(product);
 
-        await expect(useCase.execute({ ...baseInput, type: 'EXIT', quantity: 10 }))
+        await expect(useCase.execute({ ...baseInput, type: InventoryMovementTypes.EXIT, quantity: 10 }))
             .rejects.toThrow(BadRequestException);
     });
 
@@ -95,7 +96,7 @@ describe('CreateMovementUseCase', () => {
         productRepository.findById.mockResolvedValue(product);
         inventoryRepository.create.mockResolvedValue(movement);
 
-        await useCase.execute({ ...baseInput, type: 'ADJUSTMENT', quantity: 50 });
+        await useCase.execute({ ...baseInput, type: InventoryMovementTypes.ADJUSTMENT, quantity: 50 });
         expect(product.stockQuantity).toBe(50);
     });
 

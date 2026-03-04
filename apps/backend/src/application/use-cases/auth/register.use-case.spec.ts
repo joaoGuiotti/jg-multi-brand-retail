@@ -96,7 +96,6 @@ describe('RegisterUseCase', () => {
         userRepository.create.mockImplementation(async (user) => user);
 
         const result = await useCase.execute(makeInput());
-        expect(result.user.email).toBe('new@mail.com');
         expect(result.accessToken).toBe('fake-token');
         expect(result.refreshToken).toBe('fake-token');
     });

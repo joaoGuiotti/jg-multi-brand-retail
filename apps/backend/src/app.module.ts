@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { provideTransformInterceptor } from './infrastructure/interceptors/transform/transform-interceptor.provider';
 import { AuthModule } from './infrastructure/modules/auth.module';
 import { ConfigModule } from './infrastructure/modules/config.module';
+import { CustomersModule } from './infrastructure/modules/customers.module';
 import { InventoryModule } from './infrastructure/modules/inventory.module';
 import { PaymentsModule } from './infrastructure/modules/payments.module';
 import { PrismaModule } from './infrastructure/modules/prisma.module';
@@ -17,6 +18,7 @@ import { SalesModule } from './infrastructure/modules/sales.module';
     SalesModule,
     PaymentsModule,
     InventoryModule,
+    CustomersModule,
   ],
   controllers: [],
   providers: [
@@ -24,3 +26,4 @@ import { SalesModule } from './infrastructure/modules/sales.module';
   ],
 })
 export class AppModule { }
+

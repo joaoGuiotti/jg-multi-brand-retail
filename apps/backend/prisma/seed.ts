@@ -26,6 +26,7 @@ async function main() {
   await prisma.payment.deleteMany();
   await prisma.saleItem.deleteMany();
   await prisma.sale.deleteMany();
+  await prisma.customer.deleteMany();
   await prisma.product.deleteMany();
   await prisma.supplier.deleteMany();
   await prisma.brand.deleteMany();
@@ -272,6 +273,71 @@ async function main() {
   });
 
   console.log('✅ Estoque atualizado');
+
+  // ─── Customers ────────────────────────────────────────────────────
+  await prisma.customer.createMany({
+    data: [
+      {
+        tenantId: tenant1.id,
+        firstName: 'Ana',
+        lastName: 'Oliveira',
+        email: 'ana.oliveira@email.com',
+        phone: '(11) 99123-4567',
+        isActive: true,
+        street: 'Rua das Flores',
+        number: '123',
+        complement: 'Apto 4B',
+        city: 'São Paulo',
+        state: 'SP',
+        zipCode: '01310-100',
+      },
+      {
+        tenantId: tenant1.id,
+        firstName: 'Carlos',
+        lastName: 'Mendes',
+        email: 'carlos.mendes@email.com',
+        phone: '(21) 98765-1234',
+        isActive: true,
+        street: 'Av. Atlântica',
+        number: '500',
+        complement: null,
+        city: 'Rio de Janeiro',
+        state: 'RJ',
+        zipCode: '22010-000',
+      },
+      {
+        tenantId: tenant1.id,
+        firstName: 'Mariana',
+        lastName: 'Santos',
+        email: 'mariana.santos@email.com',
+        phone: '(31) 97654-3210',
+        isActive: true,
+        street: 'Rua da Bahia',
+        number: '800',
+        complement: 'Sala 3',
+        city: 'Belo Horizonte',
+        state: 'MG',
+        zipCode: '30160-011',
+      },
+      {
+        tenantId: tenant1.id,
+        firstName: 'Roberto',
+        lastName: 'Lima',
+        email: 'roberto.lima@email.com',
+        phone: '(41) 96543-2109',
+        isActive: false,
+        street: 'Rua XV de Novembro',
+        number: '42',
+        complement: null,
+        city: 'Curitiba',
+        state: 'PR',
+        zipCode: '80020-310',
+      },
+    ],
+  });
+
+  console.log('✅ Customers criados (4)');
+  // ──────────────────────────────────────────────────────────────────
 
   console.log('\n🎉 Seed concluído com sucesso!\n');
   console.log('📝 Credenciais criadas:');

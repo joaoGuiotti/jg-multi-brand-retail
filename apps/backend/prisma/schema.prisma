@@ -30,6 +30,7 @@ model Tenant {
   conditionals Conditional[]
   inventory    InventoryMovement[]
   auditLogs    AuditLog[]
+  customers    Customer[]
 
   @@map("tenants")
 }
@@ -254,9 +255,10 @@ model Conditional {
   convertedAt     DateTime?         @map("converted_at")
   convertedSaleId String?           @map("converted_sale_id")
 
-  tenant Tenant            @relation(fields: [tenantId], references: [id])
-  user   User              @relation(fields: [userId], references: [id])
-  items  ConditionalItem[]
+  tenant   Tenant            @relation(fields: [tenantId], references: [id])
+  user     User              @relation(fields: [userId], references: [id])
+  customer Customer?         @relation(fields: [customerId], references: [id])
+  items    ConditionalItem[]
 
   @@index([tenantId])
   @@index([status])
@@ -333,4 +335,36 @@ model AuditLog {
   @@index([tenantId])
   @@index([entityType, entityId])
   @@map("audit_logs")
+}
+
+// =====================
+// CUSTOMERS
+// =====================
+
+model Customer {
+  id        String  @id @default(uuid())
+  tenantId  String  @map("tenant_id")
+  firstName String  @map("first_name")
+  lastName  String  @map("last_name")
+  email     String
+  phone     String
+  isActive  Boolean @default(true) @map("is_active")
+
+  // Address (flattened from Address VO)
+  street     String
+  number     String
+  complement String?
+  city       String
+  state      String
+  zipCode    String  @map("zip_code")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  tenant       Tenant        @relation(fields: [tenantId], references: [id])
+  conditionals Conditional[]
+
+  @@index([tenantId])
+  @@index([email])
+  @@map("customers")
 }

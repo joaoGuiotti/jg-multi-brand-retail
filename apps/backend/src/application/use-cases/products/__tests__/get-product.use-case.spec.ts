@@ -3,7 +3,7 @@ import { Product } from '../../../../domain/entities/products/product.entity';
 import { GetProductUseCase } from '../get-product.use-case';
 
 const makeProduct = (overrides: any = {}) =>
-    Product.create({ tenantId: 'tenant-1', name: 'Widget', sku: 'WG-001', costPrice: 10, salePrice: 20, margin: 100, stockQuantity: 5, unit: 'UN', active: true, ...overrides });
+    Product.create({ name: 'Widget', sku: 'WG-001', costPrice: 10, salePrice: 20, margin: 100, stockQuantity: 5, unit: 'UN', active: true, ...overrides });
 
 describe('GetProductUseCase', () => {
     let useCase: GetProductUseCase;

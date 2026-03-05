@@ -8,26 +8,36 @@ import { PrismaService } from '../prisma/prisma.service';
 export class PrismaUserRepository implements UserRepository {
     constructor(private prisma: PrismaService) { }
 
-    async create(user: User): Promise<User> {
+    async create(tenantId: string, user: User): Promise<User> {
         const data = UserMapper.toPersistence(user);
-        const created = await this.prisma.user.create({ data });
+        const created = await this.prisma.user.create({
+            data: {
+                ...data,
+                tenantId,
+            },
+        });
         return UserMapper.toDomain(created);
     }
 
-    async findById(id: string): Promise<User | null> {
-        const user = await this.prisma.user.findUnique({ where: { id } });
+    async findById(tenantId: string, id: string): Promise<User | null> {
+        const user = await this.prisma.user.findFirst({
+            where: { id, tenantId },
+        });
         return user ? UserMapper.toDomain(user) : null;
     }
 
-    async findByEmail(email: string): Promise<User | null> {
+    async findByEmail(email: string): Promise<{ user: User, tenantId: string } | null> {
         const user = await this.prisma.user.findUnique({ where: { email } });
-        return user ? UserMapper.toDomain(user) : null;
+        return user ? { user: UserMapper.toDomain(user), tenantId: user.tenantId } : null;
     }
 
-    async update(user: User): Promise<User> {
+    async update(tenantId: string, user: User): Promise<User> {
         const data = UserMapper.toPersistence(user);
         const updated = await this.prisma.user.update({
-            where: { id: user.id.toString() },
+            where: {
+                id: user.id.toString(),
+                tenantId,
+            },
             data,
         });
         return UserMapper.toDomain(updated);

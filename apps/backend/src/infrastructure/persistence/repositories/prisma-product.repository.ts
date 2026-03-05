@@ -8,10 +8,13 @@ import { PrismaService } from '../prisma/prisma.service';
 export class PrismaProductRepository implements ProductRepository {
     constructor(private prisma: PrismaService) { }
 
-    async create(product: Product): Promise<Product> {
+    async create(tenantId: string, product: Product): Promise<Product> {
         const data = ProductMapper.toPersistence(product);
         const created = await this.prisma.product.create({
-            data,
+            data: {
+                ...data,
+                tenantId,
+            },
         });
         return ProductMapper.toDomain(created);
     }
@@ -96,10 +99,13 @@ export class PrismaProductRepository implements ProductRepository {
         };
     }
 
-    async update(product: Product): Promise<Product> {
+    async update(tenantId: string, product: Product): Promise<Product> {
         const data = ProductMapper.toPersistence(product);
         const updated = await this.prisma.product.update({
-            where: { id: product.id.toString() },
+            where: {
+                id: product.id.toString(),
+                tenantId,
+            },
             data,
         });
         return ProductMapper.toDomain(updated);

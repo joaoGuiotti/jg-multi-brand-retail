@@ -45,14 +45,14 @@ describe('RegisterUseCase', () => {
     });
 
     it('should throw ConflictException if email already exists', async () => {
-        userRepository.findByEmail.mockResolvedValue({});
+        userRepository.findByEmail.mockResolvedValue({ user: {}, tenantId: 't1' });
         await expect(useCase.execute(makeInput())).rejects.toThrow(ConflictException);
     });
 
     it('should create a new tenant if slug does not exist', async () => {
         userRepository.findByEmail.mockResolvedValue(null);
         tenantRepository.findBySlug.mockResolvedValue(null);
-        userRepository.create.mockImplementation(async (user) => user);
+        userRepository.create.mockImplementation(async (tenantId, user) => user);
 
         await useCase.execute(makeInput());
         expect(tenantRepository.create).toHaveBeenCalledTimes(1);
@@ -73,7 +73,7 @@ describe('RegisterUseCase', () => {
         tenantRepository.findBySlug.mockResolvedValue(makeTenant());
         userRepository.countByTenant.mockResolvedValue(0);
         let createdUser: any;
-        userRepository.create.mockImplementation(async (user) => { createdUser = user; return user; });
+        userRepository.create.mockImplementation(async (tenantId, user) => { createdUser = user; return user; });
 
         await useCase.execute(makeInput());
         expect(createdUser.role).toBe('ADMIN');
@@ -84,7 +84,7 @@ describe('RegisterUseCase', () => {
         tenantRepository.findBySlug.mockResolvedValue(makeTenant());
         userRepository.countByTenant.mockResolvedValue(5);
         let createdUser: any;
-        userRepository.create.mockImplementation(async (user) => { createdUser = user; return user; });
+        userRepository.create.mockImplementation(async (tenantId, user) => { createdUser = user; return user; });
 
         await useCase.execute(makeInput());
         expect(createdUser.role).toBe('USER');

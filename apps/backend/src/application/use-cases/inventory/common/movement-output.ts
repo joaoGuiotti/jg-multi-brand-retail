@@ -21,10 +21,10 @@ export type StockSummaryOutput = {
 };
 
 export class MovementOutputMapper {
-    static toOutput(entity: InventoryMovement): MovementOutput {
+    static toOutput(entity: InventoryMovement, tenantId: string): MovementOutput {
         return {
             id: entity.id.toString(),
-            tenantId: entity.tenantId,
+            tenantId: tenantId,
             productId: entity.productId,
             userId: entity.userId,
             type: entity.type.value,

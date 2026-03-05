@@ -4,10 +4,10 @@ import { Sale, SaleItem } from '../../../../domain/entities/sales/sale.entity';
 import { CreateSaleUseCase } from '../create-sale.use-case';
 
 const makeProduct = (overrides: any = {}) =>
-    Product.create({ tenantId: 'tenant-1', name: 'Widget', sku: 'WG-001', costPrice: 10, salePrice: 20, margin: 100, stockQuantity: 20, unit: 'UN', active: true, ...overrides });
+    Product.create({ name: 'Widget', sku: 'WG-001', costPrice: 10, salePrice: 20, margin: 100, stockQuantity: 20, unit: 'UN', active: true, ...overrides });
 
 const makeSale = (overrides: any = {}) =>
-    Sale.create({ tenantId: 'tenant-1', userId: 'user-1', subtotal: 40, discount: 0, total: 40, status: 'PENDING', items: [SaleItem.create({ productId: 'p1', quantity: 2, unitPrice: 20, discount: 0, total: 40 })], ...overrides });
+    Sale.create({ userId: 'user-1', subtotal: 40, discount: 0, total: 40, status: 'PENDING', items: [SaleItem.create({ productId: 'p1', quantity: 2, unitPrice: 20, discount: 0, total: 40 })], ...overrides });
 
 describe('CreateSaleUseCase', () => {
     let useCase: CreateSaleUseCase;
@@ -53,7 +53,7 @@ describe('CreateSaleUseCase', () => {
         const result = await useCase.execute(baseInput);
         expect(result).toBeDefined();
         expect(result.status).toBe('PENDING');
-        expect(productRepository.update).toHaveBeenCalledWith(product);
+        expect(productRepository.update).toHaveBeenCalledWith('tenant-1', product);
     });
 
     it('should apply sale-level discount', async () => {
@@ -64,7 +64,7 @@ describe('CreateSaleUseCase', () => {
 
         const saleArg: any = await useCase.execute({ ...baseInput, discount: 5 });
         expect(saleRepository.create).toHaveBeenCalled();
-        const createdSale = saleRepository.create.mock.calls[0][0];
+        const createdSale = saleRepository.create.mock.calls[0][1];
         expect(createdSale.discount).toBe(5);
     });
 
@@ -75,7 +75,7 @@ describe('CreateSaleUseCase', () => {
         saleRepository.create.mockResolvedValue(sale);
 
         await useCase.execute({ ...baseInput, items: [{ productId: 'p1', quantity: 2, unitPrice: 20, discount: 5 }] });
-        const createdSale = saleRepository.create.mock.calls[0][0];
+        const createdSale = saleRepository.create.mock.calls[0][1];
         expect(createdSale.subtotal).toBe(35); // (20*2)-5
     });
 });

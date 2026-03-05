@@ -36,18 +36,16 @@ describe('ProductMapper', () => {
         expect(product).toBeInstanceOf(Product);
         expect(product.id.toString()).toBe(raw.id);
         expect(product.sku).toBe('WG-001');
-        expect(product.tenantId).toBe('tenant-1');
     });
 
     it('toPersistence should convert a Product entity to a plain Prisma-compatible object', () => {
         const product = Product.create({
-            tenantId: 'tenant-1', name: 'Widget', sku: 'WG-001', costPrice: 10, salePrice: 20,
+            name: 'Widget', sku: 'WG-001', costPrice: 10, salePrice: 20,
             margin: 100, stockQuantity: 5, unit: 'UN', active: true,
         });
         const raw = ProductMapper.toPersistence(product);
         expect(raw.id).toBe(product.id.toString());
         expect(raw.sku).toBe('WG-001');
-        expect(raw.tenantId).toBe('tenant-1');
     });
 });
 
@@ -77,7 +75,7 @@ describe('UserMapper', () => {
     });
 
     it('toPersistence should convert a User entity to a plain object', () => {
-        const user = User.create({ tenantId: 'tenant-1', email: 'a@b.com', passwordHash: 'h', role: 'USER', name: 'Alice', active: true });
+        const user = User.create({ email: 'a@b.com', passwordHash: 'h', role: 'USER', name: 'Alice', active: true });
         const raw = UserMapper.toPersistence(user);
         expect(raw.id).toBe(user.id.toString());
         expect(raw.email).toBe('a@b.com');

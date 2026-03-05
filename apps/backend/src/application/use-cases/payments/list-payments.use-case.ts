@@ -12,12 +12,12 @@ export class ListPaymentsUseCase implements UseCase<ListPaymentsInput, ListPayme
     constructor(private paymentRepository: PaymentRepository) { }
 
     async execute(input: ListPaymentsInput): Promise<ListPaymentsOutput> {
-        const result = await this.paymentRepository.findAllByTenant(input.tenantId, input.filters);
-        return this.toOutput(result);
+        const result = await this.paymentRepository.findAll(input.tenantId, input.filters);
+        return this.toOutput(result, input.tenantId);
     }
 
-    private toOutput(result: PaymentSearchResult): ListPaymentsOutput {
-        const payments = result.data.map(PaymentOutputMapper.toOutput);
+    private toOutput(result: PaymentSearchResult, tenantId: string): ListPaymentsOutput {
+        const payments = result.data.map(p => PaymentOutputMapper.toOutput(p, tenantId));
         return PaginationOutputMapper.toOutput(payments, {
             meta: {
                 total: result.total,

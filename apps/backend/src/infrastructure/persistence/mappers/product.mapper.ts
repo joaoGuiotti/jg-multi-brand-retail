@@ -6,7 +6,6 @@ export class ProductMapper {
     static toDomain(raw: PrismaProduct): Product {
         return Product.create(
             {
-                tenantId: raw.tenantId,
                 name: raw.name,
                 description: raw.description,
                 sku: raw.sku,
@@ -31,7 +30,6 @@ export class ProductMapper {
     static toPersistence(product: Product) {
         return {
             id: product.id.toString(),
-            tenantId: product.tenantId,
             name: product.name,
             description: product.description,
             sku: product.sku,

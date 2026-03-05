@@ -21,11 +21,11 @@ export interface ProductSearchResult {
 }
 
 export abstract class ProductRepository {
-    abstract create(product: Product): Promise<Product>;
+    abstract create(tenantId: string, product: Product): Promise<Product>;
     abstract findById(tenantId: string, id: string): Promise<Product | null>;
     abstract findBySku(tenantId: string, sku: string): Promise<Product | null>;
     abstract findByBarcode(tenantId: string, barcode: string): Promise<Product | null>;
     abstract findAll(tenantId: string, filters: ProductFilters): Promise<ProductSearchResult>;
-    abstract update(product: Product): Promise<Product>;
+    abstract update(tenantId: string, product: Product): Promise<Product>;
     abstract delete(tenantId: string, id: string): Promise<void>;
 }

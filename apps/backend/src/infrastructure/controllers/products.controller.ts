@@ -63,13 +63,15 @@ export class ProductsController {
     }
 
     @Get('sku/:sku')
-    findBySku(@CurrentUser() user: any, @Param('sku') sku: string) {
-        return this.getProductUseCase.executeBySku(user.tenantId, sku);
+    async findBySku(@CurrentUser() user: any, @Param('sku') sku: string) {
+        const output = await this.getProductUseCase.executeBySku(user.tenantId, sku);
+        return ProductsController.serialize(output);
     }
 
     @Get('barcode/:barcode')
-    findByBarcode(@CurrentUser() user: any, @Param('barcode') barcode: string) {
-        return this.getProductUseCase.executeByBarcode(user.tenantId, barcode);
+    async findByBarcode(@CurrentUser() user: any, @Param('barcode') barcode: string) {
+        const output = await this.getProductUseCase.executeByBarcode(user.tenantId, barcode);
+        return ProductsController.serialize(output);
     }
 
     @Get(':id')

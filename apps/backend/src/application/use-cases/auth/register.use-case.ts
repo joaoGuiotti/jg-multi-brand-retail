@@ -29,9 +29,9 @@ export class RegisterUseCase implements UseCase<RegisterInput, AuthOutput> {
 
     async execute(input: RegisterInput): Promise<AuthOutput> {
         // Check if user already exists
-        const existingUser = await this.userRepository.findByEmail(input.email);
+        const result = await this.userRepository.findByEmail(input.email);
 
-        if (existingUser) {
+        if (result) {
             throw new ConflictException('User with this email already exists');
         }
 
@@ -71,14 +71,13 @@ export class RegisterUseCase implements UseCase<RegisterInput, AuthOutput> {
             passwordHash,
             name: input.name,
             role,
-            tenantId: tenant.id.toString(),
             active: true,
         });
 
-        await this.userRepository.create(user);
+        await this.userRepository.create(tenant.id.toString(), user);
 
         // Generate tokens
-        const tokens = await this.generateTokens(user, role);
+        const tokens = await this.generateTokens(user, role, tenant.id.toString());
 
         return {
             ...tokens,
@@ -88,6 +87,7 @@ export class RegisterUseCase implements UseCase<RegisterInput, AuthOutput> {
     private async generateTokens(
         user: User,
         role: Role,
+        tenantId: string,
     ) {
         const payload = {
             user: {
@@ -95,7 +95,7 @@ export class RegisterUseCase implements UseCase<RegisterInput, AuthOutput> {
                 email: user.email,
                 name: user.name,
                 role,
-                tenantId: user.tenantId,
+                tenantId: tenantId,
             },
             role
         };

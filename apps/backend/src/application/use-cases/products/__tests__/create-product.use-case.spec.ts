@@ -13,7 +13,6 @@ const makeInput = (overrides: any = {}) => ({
 
 const makeProduct = (overrides: any = {}) =>
     Product.create({
-        tenantId: 'tenant-1',
         name: 'Widget',
         sku: 'WG-001',
         costPrice: 10,
@@ -59,7 +58,7 @@ describe('CreateProductUseCase', () => {
         productRepository.create.mockResolvedValue(product);
 
         await useCase.execute(makeInput({ costPrice: 10, salePrice: 20 }));
-        const createdArg = productRepository.create.mock.calls[0][0];
+        const createdArg = productRepository.create.mock.calls[0][1];
         expect(createdArg.margin).toBe(100);
     });
 
@@ -69,7 +68,7 @@ describe('CreateProductUseCase', () => {
         productRepository.create.mockResolvedValue(product);
 
         await useCase.execute(makeInput({ costPrice: 0, salePrice: 20 }));
-        const createdArg = productRepository.create.mock.calls[0][0];
+        const createdArg = productRepository.create.mock.calls[0][1];
         expect(createdArg.margin).toBe(0);
     });
 
@@ -79,7 +78,7 @@ describe('CreateProductUseCase', () => {
         productRepository.create.mockResolvedValue(product);
 
         await useCase.execute(makeInput());
-        const createdArg = productRepository.create.mock.calls[0][0];
+        const createdArg = productRepository.create.mock.calls[0][1];
         expect(createdArg.unit).toBe('UN');
         expect(createdArg.stockQuantity).toBe(0);
         expect(createdArg.active).toBe(true);

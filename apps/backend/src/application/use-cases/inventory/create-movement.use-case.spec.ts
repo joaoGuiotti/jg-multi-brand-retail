@@ -6,7 +6,6 @@ import { CreateMovementUseCase } from './create-movement.use-case';
 
 const makeProduct = (overrides: any = {}) =>
     Product.create({
-        tenantId: 'tenant-1',
         name: 'Widget',
         sku: 'WG-001',
         costPrice: 10,
@@ -20,7 +19,6 @@ const makeProduct = (overrides: any = {}) =>
 
 const makeMovement = (overrides: any = {}) =>
     InventoryMovement.create({
-        tenantId: 'tenant-1',
         productId: 'prod-1',
         userId: 'user-1',
         type: InventoryMovementType.create(InventoryMovementTypes.ENTRY),
@@ -107,7 +105,7 @@ describe('CreateMovementUseCase', () => {
         inventoryRepository.create.mockResolvedValue(movement);
 
         await useCase.execute(baseInput);
-        expect(productRepository.update).toHaveBeenCalledWith(product);
-        expect(inventoryRepository.create).toHaveBeenCalledTimes(1);
+        expect(productRepository.update).toHaveBeenCalledWith('tenant-1', product);
+        expect(inventoryRepository.create).toHaveBeenCalledWith('tenant-1', expect.any(Object));
     });
 });

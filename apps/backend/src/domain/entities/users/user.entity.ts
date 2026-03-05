@@ -3,7 +3,6 @@ import { AggregateRoot } from '../../../common/domain/aggregate-root';
 import { UniqueEntityID } from '../../../common/domain/unique-entity-id';
 
 export interface UserProps {
-    tenantId: string;
     email: string;
     passwordHash: string;
     role: Role;
@@ -33,7 +32,6 @@ export class User extends AggregateRoot<UserProps> {
         return user;
     }
 
-    get tenantId(): string { return this.props.tenantId; }
     get email(): string { return this.props.email; }
     get passwordHash(): string { return this.props.passwordHash; }
     get role(): Role { return this.props.role; }
@@ -66,7 +64,6 @@ export class User extends AggregateRoot<UserProps> {
     toJson() {
         return {
             id: this.id.toString(),
-            tenantId: this.props.tenantId,
             email: this.props.email,
             passwordHash: this.props.passwordHash,
             role: this.props.role,

@@ -22,7 +22,7 @@ export interface InventorySearchResult {
 }
 
 export abstract class InventoryRepository {
-    abstract create(movement: InventoryMovement): Promise<InventoryMovement>;
+    abstract create(tenantId: string, movement: InventoryMovement): Promise<InventoryMovement>;
     abstract findById(tenantId: string, id: string): Promise<InventoryMovement | null>;
     abstract findAll(tenantId: string, filters: InventoryFilters): Promise<InventorySearchResult>;
 }

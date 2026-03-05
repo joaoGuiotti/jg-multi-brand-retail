@@ -27,13 +27,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     async validate(payload: JwtPayload) {
-        const user = await this.userRepository.findById(payload.sub);
+        const user = await this.userRepository.findById(payload.tenantId, payload.sub);
 
         if (!user || !user.active) {
             throw new UnauthorizedException('User not found or inactive');
         }
 
-        const tenant = await this.tenantRepository.findById(user.tenantId);
+        const tenant = await this.tenantRepository.findById(payload.tenantId);
 
         if (!tenant || !tenant.active) {
             throw new UnauthorizedException('Tenant is inactive');
@@ -44,7 +44,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             email: user.email,
             name: user.name,
             role: user.role,
-            tenantId: user.tenantId,
+            tenantId: payload.tenantId,
             tenant: {
                 id: tenant.id.toString(),
                 name: tenant.name,

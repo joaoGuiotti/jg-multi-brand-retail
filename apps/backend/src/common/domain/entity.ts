@@ -3,7 +3,6 @@ import { Notification } from './validators/notification';
 
 export abstract class Entity<T = any> {
     protected readonly _id: UniqueEntityID;
-    protected readonly _tenantId: string;
     public readonly props: T;
     public notification: Notification = new Notification();
 

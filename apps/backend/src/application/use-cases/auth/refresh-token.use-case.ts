@@ -28,7 +28,7 @@ export class RefreshTokenUseCase implements UseCase<RefreshTokenInput, RefreshTo
                 secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
             });
 
-            const user = await this.userRepository.findById(payload.sub);
+            const user = await this.userRepository.findById(payload.tenantId, payload.sub);
 
             if (!user || !user.active) {
                 throw new UnauthorizedException('Invalid refresh token');
@@ -37,7 +37,7 @@ export class RefreshTokenUseCase implements UseCase<RefreshTokenInput, RefreshTo
             const tokens = await this.generateTokens(
                 user.id.toString(),
                 user.email,
-                user.tenantId,
+                payload.tenantId,
                 user.role,
             );
 

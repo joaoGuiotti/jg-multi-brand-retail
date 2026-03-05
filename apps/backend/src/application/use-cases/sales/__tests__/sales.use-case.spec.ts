@@ -7,7 +7,7 @@ const makeItem = () =>
     SaleItem.create({ productId: 'p1', quantity: 1, unitPrice: 20, discount: 0, total: 20 });
 
 const makeSale = (overrides: any = {}) =>
-    Sale.create({ tenantId: 'tenant-1', userId: 'user-1', subtotal: 20, discount: 0, total: 20, status: 'PENDING', items: [makeItem()], ...overrides });
+    Sale.create({ userId: 'user-1', subtotal: 20, discount: 0, total: 20, status: 'PENDING', items: [makeItem()], ...overrides });
 
 describe('GetSaleUseCase', () => {
     let useCase: GetSaleUseCase;

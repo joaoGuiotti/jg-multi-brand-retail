@@ -7,10 +7,10 @@ const makeItem = (overrides: any = {}) =>
     SaleItem.create({ productId: 'p1', quantity: 2, unitPrice: 10, discount: 0, total: 20, ...overrides });
 
 const makeSale = (overrides: any = {}) =>
-    Sale.create({ tenantId: 'tenant-1', userId: 'user-1', subtotal: 20, discount: 0, total: 20, status: 'PENDING', items: [makeItem()], ...overrides });
+    Sale.create({ userId: 'user-1', subtotal: 20, discount: 0, total: 20, status: 'PENDING', items: [makeItem()], ...overrides });
 
 const makeProduct = (overrides: any = {}) =>
-    Product.create({ tenantId: 'tenant-1', name: 'Widget', sku: 'WG-001', costPrice: 10, salePrice: 20, margin: 100, stockQuantity: 5, unit: 'UN', active: true, ...overrides });
+    Product.create({ name: 'Widget', sku: 'WG-001', costPrice: 10, salePrice: 20, margin: 100, stockQuantity: 5, unit: 'UN', active: true, ...overrides });
 
 describe('CancelSaleUseCase', () => {
     let useCase: CancelSaleUseCase;

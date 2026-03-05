@@ -8,11 +8,14 @@ import { PrismaService } from '../prisma/prisma.service';
 export class PrismaInventoryRepository implements InventoryRepository {
     constructor(private prisma: PrismaService) { }
 
-    async create(movement: InventoryMovement): Promise<InventoryMovement> {
+    async create(tenantId: string, movement: InventoryMovement): Promise<InventoryMovement> {
         const data = InventoryMapper.toPersistence(movement);
 
         const created = await this.prisma.inventoryMovement.create({
-            data,
+            data: {
+                ...data,
+                tenantId,
+            },
         });
 
         return InventoryMapper.toDomain(created);

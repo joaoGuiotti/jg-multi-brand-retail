@@ -23,6 +23,6 @@ export class UpdateStockUseCase implements UseCase<UpdateStockInput, Product> {
 
         product.updateStock(quantity);
 
-        return this.productRepository.update(product);
+        return this.productRepository.update(tenantId, product);
     }
 }

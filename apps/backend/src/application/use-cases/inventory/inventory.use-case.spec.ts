@@ -8,7 +8,6 @@ import { ListMovementsUseCase } from './list-movements.use-case';
 
 const makeMovement = () =>
     InventoryMovement.create({
-        tenantId: 'tenant-1',
         productId: 'p1',
         userId: 'u1',
         type: InventoryMovementType.create(InventoryMovementTypes.ENTRY),
@@ -16,7 +15,7 @@ const makeMovement = () =>
     });
 
 const makeProduct = () =>
-    Product.create({ tenantId: 'tenant-1', name: 'Widget', sku: 'WG-001', costPrice: 10, salePrice: 20, margin: 100, stockQuantity: 10, unit: 'UN', active: true });
+    Product.create({ name: 'Widget', sku: 'WG-001', costPrice: 10, salePrice: 20, margin: 100, stockQuantity: 10, unit: 'UN', active: true });
 
 describe('ListMovementsUseCase', () => {
     let useCase: ListMovementsUseCase;

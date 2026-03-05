@@ -3,7 +3,7 @@ import { Payment } from '../../../../domain/entities/payments/payment.entity';
 import { CancelPaymentUseCase } from '../cancel-payment.use-case';
 
 const makePayment = (overrides: any = {}) =>
-    Payment.create({ tenantId: 'tenant-1', saleId: 'sale-1', method: 'CASH', amount: 40, status: 'PAID', installments: 1, fee: 0, ...overrides });
+    Payment.create({ saleId: 'sale-1', method: 'CASH', amount: 40, status: 'PAID', installments: 1, fee: 0, ...overrides });
 
 describe('CancelPaymentUseCase', () => {
     let useCase: CancelPaymentUseCase;
@@ -21,9 +21,9 @@ describe('CancelPaymentUseCase', () => {
         await expect(useCase.execute({ tenantId: 't', id: 'p' })).rejects.toThrow(NotFoundException);
     });
 
-    it('should throw NotFoundException if tenantId does not match', async () => {
-        paymentRepository.findById.mockResolvedValue(makePayment({ tenantId: 'other-tenant' }));
-        await expect(useCase.execute({ tenantId: 'tenant-1', id: 'p' })).rejects.toThrow(NotFoundException);
+    it('should throw NotFoundException if tenantId does not match (repository returns null)', async () => {
+        paymentRepository.findById.mockResolvedValue(null);
+        await expect(useCase.execute({ tenantId: 'other-tenant', id: 'p' })).rejects.toThrow(NotFoundException);
     });
 
     it('should throw BadRequestException if payment is already cancelled', async () => {
@@ -41,7 +41,7 @@ describe('CancelPaymentUseCase', () => {
         const payment = makePayment();
         paymentRepository.findById.mockResolvedValue(payment);
         prisma.sale.findUnique.mockResolvedValue({ status: 'PENDING' });
-        paymentRepository.update.mockImplementation(async (p) => p);
+        paymentRepository.update.mockImplementation(async (tid, p) => p);
 
         const result = await useCase.execute({ tenantId: 'tenant-1', id: 'p1' });
         expect(result.status).toBe('CANCELLED');

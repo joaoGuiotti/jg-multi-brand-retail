@@ -10,11 +10,11 @@ export class ListProductsUseCase implements UseCase<ListProductsInput, ListProdu
 
     async execute(input: ListProductsInput): Promise<ListProductsOutput> {
         const result = await this.productRepository.findAll(input.tenantId, input.filters);
-        return this.toOutput(result);
+        return this.toOutput(result, input.tenantId);
     }
 
-    private toOutput(result: ProductSearchResult): ListProductsOutput {
-        const products = result.data.map(ProductOutputMapper.toOutput);
+    private toOutput(result: ProductSearchResult, tenantId: string): ListProductsOutput {
+        const products = result.data.map(p => ProductOutputMapper.toOutput(p, tenantId));
         return PaginationOutputMapper.toOutput(products, {
             meta: {
                 total: result.total,

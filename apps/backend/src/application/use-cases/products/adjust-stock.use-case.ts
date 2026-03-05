@@ -23,6 +23,6 @@ export class AdjustStockUseCase implements UseCase<AdjustStockInput, Product> {
 
         product.adjustStock(adjustment);
 
-        return this.productRepository.update(product);
+        return this.productRepository.update(tenantId, product);
     }
 }

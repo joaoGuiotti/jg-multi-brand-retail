@@ -12,7 +12,6 @@ jest.mock('bcrypt', () => ({
 
 const makeUser = (overrides: any = {}) =>
     User.create({
-        tenantId: 'tenant-1',
         email: 'test@mail.com',
         passwordHash: 'hashed-password',
         role: 'USER',
@@ -52,27 +51,27 @@ describe('LoginUseCase', () => {
     });
 
     it('should throw UnauthorizedException if user is inactive', async () => {
-        userRepository.findByEmail.mockResolvedValue(makeUser({ active: false }));
+        userRepository.findByEmail.mockResolvedValue({ user: makeUser({ active: false }), tenantId: 'tenant-1' });
         await expect(useCase.execute({ email: 'x@mail.com', password: '123' }))
             .rejects.toThrow(UnauthorizedException);
     });
 
     it('should throw UnauthorizedException if tenant is not found', async () => {
-        userRepository.findByEmail.mockResolvedValue(makeUser());
+        userRepository.findByEmail.mockResolvedValue({ user: makeUser(), tenantId: 'tenant-1' });
         tenantRepository.findById.mockResolvedValue(null);
         await expect(useCase.execute({ email: 'test@mail.com', password: '123' }))
             .rejects.toThrow(UnauthorizedException);
     });
 
     it('should throw UnauthorizedException if tenant is inactive', async () => {
-        userRepository.findByEmail.mockResolvedValue(makeUser());
+        userRepository.findByEmail.mockResolvedValue({ user: makeUser(), tenantId: 'tenant-1' });
         tenantRepository.findById.mockResolvedValue(makeTenant({ active: false }));
         await expect(useCase.execute({ email: 'test@mail.com', password: '123' }))
             .rejects.toThrow(UnauthorizedException);
     });
 
     it('should throw UnauthorizedException if password is invalid', async () => {
-        userRepository.findByEmail.mockResolvedValue(makeUser());
+        userRepository.findByEmail.mockResolvedValue({ user: makeUser(), tenantId: 'tenant-1' });
         tenantRepository.findById.mockResolvedValue(makeTenant());
         (bcrypt.compare as jest.Mock).mockResolvedValue(false);
         await expect(useCase.execute({ email: 'test@mail.com', password: 'wrong' }))
@@ -82,7 +81,7 @@ describe('LoginUseCase', () => {
     it('should return user and tokens on successful login', async () => {
         const user = makeUser();
         const tenant = makeTenant();
-        userRepository.findByEmail.mockResolvedValue(user);
+        userRepository.findByEmail.mockResolvedValue({ user, tenantId: 'tenant-1' });
         tenantRepository.findById.mockResolvedValue(tenant);
         (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 

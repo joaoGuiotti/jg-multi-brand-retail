@@ -6,7 +6,6 @@ export class UserMapper {
     static toDomain(raw: PrismaUser): User {
         return User.create(
             {
-                tenantId: raw.tenantId,
                 email: raw.email,
                 passwordHash: raw.passwordHash,
                 role: raw.role,
@@ -23,7 +22,6 @@ export class UserMapper {
     static toPersistence(user: User) {
         return {
             id: user.id.toString(),
-            tenantId: user.tenantId,
             email: user.email,
             passwordHash: user.passwordHash,
             role: user.role,

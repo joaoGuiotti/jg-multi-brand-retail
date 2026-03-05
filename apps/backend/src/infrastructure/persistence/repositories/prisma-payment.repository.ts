@@ -8,18 +8,25 @@ import { PrismaService } from '../prisma/prisma.service';
 export class PrismaPaymentRepository implements PaymentRepository {
     constructor(private prisma: PrismaService) { }
 
-    async create(payment: Payment): Promise<void> {
+    async create(tenantId: string, payment: Payment): Promise<void> {
         const data = PaymentMapper.toPersistence(payment);
-        await this.prisma.payment.create({ data });
+        await this.prisma.payment.create({
+            data: {
+                ...data,
+                tenantId,
+            },
+        });
     }
 
-    async findById(id: string): Promise<Payment | null> {
-        const payment = await this.prisma.payment.findUnique({ where: { id } });
+    async findById(tenantId: string, id: string): Promise<Payment | null> {
+        const payment = await this.prisma.payment.findFirst({
+            where: { id, tenantId },
+        });
         if (!payment) return null;
         return PaymentMapper.toDomain(payment);
     }
 
-    async findAllByTenant(tenantId: string, filters: PaymentFilters): Promise<PaymentSearchResult> {
+    async findAll(tenantId: string, filters: PaymentFilters): Promise<PaymentSearchResult> {
         const { saleId, status, method, sortBy, sortOrder } = filters;
 
         const page = Number(filters.page) || 1;
@@ -49,15 +56,20 @@ export class PrismaPaymentRepository implements PaymentRepository {
         };
     }
 
-    async findBySale(saleId: string): Promise<Payment[]> {
-        const payments = await this.prisma.payment.findMany({ where: { saleId } });
+    async findBySale(tenantId: string, saleId: string): Promise<Payment[]> {
+        const payments = await this.prisma.payment.findMany({
+            where: { saleId, tenantId },
+        });
         return payments.map(PaymentMapper.toDomain);
     }
 
-    async update(payment: Payment): Promise<void> {
+    async update(tenantId: string, payment: Payment): Promise<void> {
         const data = PaymentMapper.toPersistence(payment);
         await this.prisma.payment.update({
-            where: { id: payment.id.toString() },
+            where: {
+                id: payment.id.toString(),
+                tenantId,
+            },
             data,
         });
     }

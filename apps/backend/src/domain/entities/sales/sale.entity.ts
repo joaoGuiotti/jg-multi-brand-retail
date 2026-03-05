@@ -34,7 +34,6 @@ export class SaleItem extends Entity<SaleItemProps> {
 }
 
 export interface SaleProps {
-    tenantId: string;
     userId: string;
     invoiceNumber?: string | null;
     subtotal: number;
@@ -65,7 +64,6 @@ export class Sale extends AggregateRoot<SaleProps> {
         return sale;
     }
 
-    get tenantId(): string { return this.props.tenantId; }
     get userId(): string { return this.props.userId; }
     get invoiceNumber(): string | undefined | null { return this.props.invoiceNumber; }
     get subtotal(): number { return this.props.subtotal; }

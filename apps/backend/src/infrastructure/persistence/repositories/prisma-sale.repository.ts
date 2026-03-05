@@ -8,7 +8,7 @@ import { PrismaService } from '../prisma/prisma.service';
 export class PrismaSaleRepository implements SaleRepository {
     constructor(private prisma: PrismaService) { }
 
-    async create(sale: Sale): Promise<Sale> {
+    async create(tenantId: string, sale: Sale): Promise<Sale> {
         const data = SaleMapper.toPersistence(sale);
         const items = sale.items.map(item => SaleMapper.toPersistenceItem(item, sale.id.toString()));
 
@@ -16,6 +16,7 @@ export class PrismaSaleRepository implements SaleRepository {
             const newSale = await tx.sale.create({
                 data: {
                     ...data,
+                    tenantId,
                 },
             });
 
@@ -24,7 +25,7 @@ export class PrismaSaleRepository implements SaleRepository {
             });
 
             return tx.sale.findUnique({
-                where: { id: newSale.id },
+                where: { id: newSale.id, tenantId },
                 include: { items: true },
             });
         });
@@ -157,11 +158,14 @@ export class PrismaSaleRepository implements SaleRepository {
             .sort((a, b) => a.date.localeCompare(b.date));
     }
 
-    async update(sale: Sale): Promise<Sale> {
+    async update(tenantId: string, sale: Sale): Promise<Sale> {
         const data = SaleMapper.toPersistence(sale);
 
         const updated = await this.prisma.sale.update({
-            where: { id: sale.id.toString() },
+            where: {
+                id: sale.id.toString(),
+                tenantId,
+            },
             data,
             include: { items: true },
         });

@@ -4,7 +4,7 @@ import { AdjustStockUseCase } from '../adjust-stock.use-case';
 import { UpdateStockUseCase } from '../update-stock.use-case';
 
 const makeProduct = (overrides: any = {}) =>
-    Product.create({ tenantId: 'tenant-1', name: 'Widget', sku: 'WG-001', costPrice: 10, salePrice: 20, margin: 100, stockQuantity: 10, unit: 'UN', active: true, ...overrides });
+    Product.create({ name: 'Widget', sku: 'WG-001', costPrice: 10, salePrice: 20, margin: 100, stockQuantity: 10, unit: 'UN', active: true, ...overrides });
 
 describe('UpdateStockUseCase', () => {
     let useCase: UpdateStockUseCase;
@@ -27,7 +27,7 @@ describe('UpdateStockUseCase', () => {
 
         await useCase.execute({ tenantId: 'tenant-1', id: 'p1', quantity: 50 });
         expect(product.stockQuantity).toBe(50);
-        expect(productRepository.update).toHaveBeenCalledWith(product);
+        expect(productRepository.update).toHaveBeenCalledWith('tenant-1', product);
     });
 });
 
@@ -52,6 +52,7 @@ describe('AdjustStockUseCase', () => {
 
         await useCase.execute({ tenantId: 'tenant-1', id: 'p1', adjustment: 5 });
         expect(product.stockQuantity).toBe(15);
+        expect(productRepository.update).toHaveBeenCalledWith('tenant-1', product);
     });
 
     it('should decrease stock with negative adjustment', async () => {

@@ -2,7 +2,6 @@ import { AggregateRoot } from '../../../common/domain/aggregate-root';
 import { UniqueEntityID } from '../../../common/domain/unique-entity-id';
 
 export interface ProductProps {
-    tenantId: string;
     name: string;
     description?: string | null;
     sku: string;
@@ -42,7 +41,6 @@ export class Product extends AggregateRoot<ProductProps> {
         return product;
     }
 
-    get tenantId(): string { return this.props.tenantId; }
     get name(): string { return this.props.name; }
     get description(): string | undefined | null { return this.props.description; }
     get sku(): string { return this.props.sku; }

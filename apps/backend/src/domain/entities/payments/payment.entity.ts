@@ -5,7 +5,6 @@ export type PaymentMethod = 'PIX' | 'CREDIT_CARD' | 'DEBIT_CARD' | 'CASH' | 'BOL
 export type PaymentStatus = 'PENDING' | 'PAID' | 'CANCELLED';
 
 export interface PaymentProps {
-    tenantId: string;
     saleId: string;
     method: PaymentMethod;
     amount: number;
@@ -33,10 +32,6 @@ export class Payment extends AggregateRoot<PaymentProps> {
         );
 
         return payment;
-    }
-
-    get tenantId(): string {
-        return this.props.tenantId;
     }
 
     get saleId(): string {

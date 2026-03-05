@@ -2,7 +2,7 @@ import { Product } from '../../../../domain/entities/products/product.entity';
 import { ListProductsUseCase } from '../list-products.use-case';
 
 const makeProduct = (sku: string) =>
-    Product.create({ tenantId: 'tenant-1', name: 'Widget', sku, costPrice: 10, salePrice: 20, margin: 100, stockQuantity: 5, unit: 'UN', active: true });
+    Product.create({ name: 'Widget', sku, costPrice: 10, salePrice: 20, margin: 100, stockQuantity: 5, unit: 'UN', active: true });
 
 describe('ListProductsUseCase', () => {
     let useCase: ListProductsUseCase;

@@ -45,7 +45,7 @@ export class GetProductMovementsUseCase implements UseCase<GetProductMovementsIn
                 sku: product.sku,
                 currentStock: product.stockQuantity,
             },
-            movements: result.data.map(MovementOutputMapper.toOutput),
+            movements: result.data.map(m => MovementOutputMapper.toOutput(m, tenantId)),
         };
     }
 }

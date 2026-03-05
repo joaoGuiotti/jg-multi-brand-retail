@@ -4,7 +4,7 @@ import { GetPaymentUseCase } from './get-payment.use-case';
 import { ListPaymentsUseCase } from './list-payments.use-case';
 
 const makePayment = (overrides: any = {}) =>
-    Payment.create({ tenantId: 'tenant-1', saleId: 'sale-1', method: 'CASH', amount: 40, status: 'PAID', installments: 1, fee: 0, ...overrides });
+    Payment.create({ saleId: 'sale-1', method: 'CASH', amount: 40, status: 'PAID', installments: 1, fee: 0, ...overrides });
 
 describe('GetPaymentUseCase', () => {
     let useCase: GetPaymentUseCase;
@@ -20,8 +20,8 @@ describe('GetPaymentUseCase', () => {
         await expect(useCase.execute({ tenantId: 't', id: 'p' })).rejects.toThrow(NotFoundException);
     });
 
-    it('should throw NotFoundException if tenantId does not match', async () => {
-        paymentRepository.findById.mockResolvedValue(makePayment({ tenantId: 'other' }));
+    it('should throw NotFoundException if tenantId does not match (repository returns null)', async () => {
+        paymentRepository.findById.mockResolvedValue(null);
         await expect(useCase.execute({ tenantId: 'tenant-1', id: 'p' })).rejects.toThrow(NotFoundException);
     });
 
@@ -37,19 +37,19 @@ describe('ListPaymentsUseCase', () => {
     let paymentRepository: any;
 
     beforeEach(() => {
-        paymentRepository = { findAllByTenant: jest.fn() };
+        paymentRepository = { findAll: jest.fn() };
         useCase = new ListPaymentsUseCase(paymentRepository);
     });
 
     it('should return a paginated list of payments', async () => {
-        paymentRepository.findAllByTenant.mockResolvedValue({ data: [makePayment()], total: 1, page: 1, limit: 10, totalPages: 1 });
+        paymentRepository.findAll.mockResolvedValue({ data: [makePayment()], total: 1, page: 1, limit: 10, totalPages: 1 });
         const result = await useCase.execute({ tenantId: 'tenant-1', filters: {} });
         expect(result.data).toHaveLength(1);
         expect(result.meta.total).toBe(1);
     });
 
     it('should return empty list when no payments', async () => {
-        paymentRepository.findAllByTenant.mockResolvedValue({ data: [], total: 0, page: 1, limit: 10, totalPages: 0 });
+        paymentRepository.findAll.mockResolvedValue({ data: [], total: 0, page: 1, limit: 10, totalPages: 0 });
         const result = await useCase.execute({ tenantId: 'tenant-1', filters: {} });
         expect(result.data).toHaveLength(0);
     });

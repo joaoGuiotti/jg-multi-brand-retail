@@ -22,10 +22,11 @@ export type ProductOutput = {
 };
 
 export class ProductOutputMapper {
-    static toOutput(entity: Product): ProductOutput {
+    static toOutput(entity: Product, tenantId: string): ProductOutput {
         const props = entity.toJson();
         return {
             ...props,
+            tenantId,
         };
     }
 }

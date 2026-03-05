@@ -20,9 +20,9 @@ export interface SaleSearchResult {
 }
 
 export abstract class SaleRepository {
-    abstract create(sale: Sale): Promise<Sale>;
+    abstract create(tenantId: string, sale: Sale): Promise<Sale>;
     abstract findById(tenantId: string, id: string): Promise<Sale | null>;
     abstract findAll(tenantId: string, filters: SaleFilters): Promise<SaleSearchResult>;
-    abstract update(sale: Sale): Promise<Sale>;
+    abstract update(tenantId: string, sale: Sale): Promise<Sale>;
     abstract getDailyRevenue(tenantId: string, days: number): Promise<{ date: string; revenue: number }[]>;
 }

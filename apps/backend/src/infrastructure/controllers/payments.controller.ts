@@ -64,7 +64,7 @@ export class PaymentsController {
 
     @Get('sale/:saleId')
     async findBySale(@CurrentUser() user: any, @Param('saleId') saleId: string) {
-        const output = await this.getSalePaymentsUseCase.execute({ saleId });
+        const output = await this.getSalePaymentsUseCase.execute({ tenantId: user.tenantId, saleId });
         return output.map((p) => new PaymentPresenter(p));
     }
 

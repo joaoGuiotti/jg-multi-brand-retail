@@ -4,7 +4,9 @@ import { User } from '../../../domain/entities/users/user.entity';
 import { GetProfileUseCase } from './get-profile.use-case';
 
 const makeUser = (overrides: any = {}) =>
-    User.create({ tenantId: 'tenant-1', email: 'a@b.com', passwordHash: 'h', role: 'USER', name: 'Alice', active: true, ...overrides });
+    User.create({
+        email: 'test@mail.com', passwordHash: 'h', role: 'USER', name: 'Alice', active: true, ...overrides
+    });
 
 const makeTenant = (overrides: any = {}) =>
     Tenant.create({ name: 'Acme', slug: 'acme', active: true, ...overrides });
@@ -22,7 +24,7 @@ describe('GetProfileUseCase', () => {
 
     it('should throw NotFoundException if user not found', async () => {
         userRepository.findById.mockResolvedValue(null);
-        await expect(useCase.execute({ userId: 'u1' })).rejects.toThrow(NotFoundException);
+        await expect(useCase.execute({ userId: 'u1', tenantId: 'tenant-1' })).rejects.toThrow(NotFoundException);
     });
 
     it('should return profile with tenant when tenant exists', async () => {
@@ -31,8 +33,8 @@ describe('GetProfileUseCase', () => {
         userRepository.findById.mockResolvedValue(user);
         tenantRepository.findById.mockResolvedValue(tenant);
 
-        const result = await useCase.execute({ userId: user.id.toString() });
-        expect(result.email).toBe('a@b.com');
+        const result = await useCase.execute({ userId: 'u1', tenantId: 'tenant-1' });
+        expect(result.email).toBe('test@mail.com');
         expect(result.tenant).not.toBeNull();
         expect(result.tenant?.name).toBe('Acme');
     });
@@ -42,7 +44,7 @@ describe('GetProfileUseCase', () => {
         userRepository.findById.mockResolvedValue(user);
         tenantRepository.findById.mockResolvedValue(null);
 
-        const result = await useCase.execute({ userId: user.id.toString() });
+        const result = await useCase.execute({ userId: user.id.toString(), tenantId: 'tenant-1' });
         expect(result.tenant).toBeNull();
     });
 });

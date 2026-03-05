@@ -1,5 +1,4 @@
 import { UseCase } from '@common/application/use-case.interface';
-import { Product } from '@domain/entities/products/product.entity';
 import { ProductRepository } from '@domain/repositories/product-repository';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ProductOutput, ProductOutputMapper } from './common/product-output';
@@ -16,27 +15,27 @@ export class GetProductUseCase implements UseCase<GetProductInput, ProductOutput
             throw new NotFoundException('Product not found');
         }
 
-        return ProductOutputMapper.toOutput(product);
+        return ProductOutputMapper.toOutput(product, tenantId);
     }
 
-    async executeBySku(tenantId: string, sku: string): Promise<Product> {
+    async executeBySku(tenantId: string, sku: string): Promise<ProductOutput> {
         const product = await this.productRepository.findBySku(tenantId, sku);
 
         if (!product) {
             throw new NotFoundException('Product not found');
         }
 
-        return product;
+        return ProductOutputMapper.toOutput(product, tenantId);
     }
 
-    async executeByBarcode(tenantId: string, barcode: string): Promise<Product> {
+    async executeByBarcode(tenantId: string, barcode: string): Promise<ProductOutput> {
         const product = await this.productRepository.findByBarcode(tenantId, barcode);
 
         if (!product) {
             throw new NotFoundException('Product not found');
         }
 
-        return product;
+        return ProductOutputMapper.toOutput(product, tenantId);
     }
 }
 

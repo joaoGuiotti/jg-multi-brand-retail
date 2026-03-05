@@ -49,7 +49,6 @@ export class CreateMovementUseCase implements UseCase<CreateMovementInput, Movem
         }
 
         const movement = InventoryMovement.create({
-            tenantId,
             productId,
             userId,
             type: InventoryMovementType.create(type as InventoryMovementTypes),
@@ -57,8 +56,8 @@ export class CreateMovementUseCase implements UseCase<CreateMovementInput, Movem
             reference,
         });
 
-        await this.productRepository.update(product);
-        const created = await this.inventoryRepository.create(movement);
-        return MovementOutputMapper.toOutput(created);
+        await this.productRepository.update(tenantId, product);
+        const created = await this.inventoryRepository.create(tenantId, movement);
+        return MovementOutputMapper.toOutput(created, tenantId);
     }
 }

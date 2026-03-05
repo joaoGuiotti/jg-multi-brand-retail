@@ -6,6 +6,7 @@ import { UserProfileOutput } from './common/auth-output';
 
 export type GetProfileInput = {
     userId: string;
+    tenantId: string;
 }
 
 @Injectable()
@@ -16,13 +17,14 @@ export class GetProfileUseCase implements UseCase<GetProfileInput, UserProfileOu
     ) { }
 
     async execute(input: GetProfileInput): Promise<UserProfileOutput> {
-        const user = await this.userRepository.findById(input.userId);
+        const { userId, tenantId } = input;
+        const user = await this.userRepository.findById(tenantId, userId);
 
         if (!user) {
             throw new NotFoundException('User not found');
         }
 
-        const tenant = await this.tenantRepository.findById(user.tenantId);
+        const tenant = await this.tenantRepository.findById(tenantId);
 
         return {
             id: user.id.toString(),

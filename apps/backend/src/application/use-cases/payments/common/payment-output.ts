@@ -15,10 +15,10 @@ export type PaymentOutput = {
 };
 
 export class PaymentOutputMapper {
-    static toOutput(entity: Payment): PaymentOutput {
+    static toOutput(entity: Payment, tenantId: string): PaymentOutput {
         return {
             id: entity.id.toString(),
-            tenantId: entity.tenantId,
+            tenantId: tenantId,
             saleId: entity.saleId,
             method: entity.method,
             amount: entity.amount,

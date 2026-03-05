@@ -34,7 +34,7 @@ describe('PaymentMapper', () => {
     });
 
     it('toPersistence should convert a Payment entity to a plain object', () => {
-        const payment = Payment.create({ tenantId: 'tenant-1', saleId: 'sale-1', method: 'CASH', amount: 40, status: 'PAID', installments: 1, fee: 0 });
+        const payment = Payment.create({ saleId: 'sale-1', method: 'CASH', amount: 40, status: 'PAID', installments: 1, fee: 0 });
         const raw = PaymentMapper.toPersistence(payment);
         expect(raw.id).toBe(payment.id.toString());
         expect(raw.method).toBe('CASH');
@@ -86,7 +86,7 @@ describe('SaleMapper', () => {
     });
 
     it('toPersistence should convert a Sale to a plain object', () => {
-        const sale = Sale.create({ tenantId: 'tenant-1', userId: 'user-1', subtotal: 20, discount: 0, total: 20, status: 'PENDING', items: [] });
+        const sale = Sale.create({ userId: 'user-1', subtotal: 20, discount: 0, total: 20, status: 'PENDING', items: [] });
         const raw = SaleMapper.toPersistence(sale);
         expect(raw.id).toBe(sale.id.toString());
         expect(raw.status).toBe('PENDING');
@@ -125,7 +125,6 @@ describe('InventoryMapper', () => {
 
     it('toPersistence should convert an InventoryMovement to a plain object', () => {
         const movement = InventoryMovement.create({
-            tenantId: 'tenant-1',
             productId: 'p1',
             userId: 'u1',
             type: InventoryMovementType.create(InventoryMovementTypes.ENTRY),

@@ -16,6 +16,6 @@ export class GetSaleUseCase implements UseCase<GetSaleInput, SaleOutput> {
             throw new NotFoundException('Sale not found');
         }
 
-        return SaleOutputMapper.toOutput(sale);
+        return SaleOutputMapper.toOutput(sale, input.tenantId);
     }
 }

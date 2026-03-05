@@ -18,7 +18,6 @@ export class SaleMapper {
 
         return Sale.create(
             {
-                tenantId: raw.tenantId,
                 userId: raw.userId,
                 invoiceNumber: raw.invoiceNumber,
                 subtotal: Number(raw.subtotal),
@@ -36,7 +35,6 @@ export class SaleMapper {
     static toPersistence(sale: Sale) {
         return {
             id: sale.id.toString(),
-            tenantId: sale.tenantId,
             userId: sale.userId,
             invoiceNumber: sale.invoiceNumber,
             subtotal: sale.subtotal,

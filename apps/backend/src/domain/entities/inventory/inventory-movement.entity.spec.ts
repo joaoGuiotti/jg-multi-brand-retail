@@ -10,7 +10,6 @@ const makeMovement = (overrides?: Partial<Omit<InventoryMovementProps, 'type'> &
     const { type: _, ...rest } = overrides || {};
 
     const props: InventoryMovementProps = {
-        tenantId: 'tenant-1',
         productId: 'prod-1',
         userId: 'user-1',
         type,
@@ -25,7 +24,6 @@ describe('InventoryMovement Entity', () => {
     it('should create a movement with required fields', () => {
         const m = makeMovement();
         expect(m).toBeDefined();
-        expect(m.tenantId).toBe('tenant-1');
         expect(m.productId).toBe('prod-1');
         expect(m.userId).toBe('user-1');
         expect(m.type.value).toBe('ENTRY');
@@ -61,7 +59,6 @@ describe('InventoryMovement Entity', () => {
     it('should accept a custom id', () => {
         const id = new UniqueEntityID('550e8400-e29b-41d4-a716-446655440000');
         const m = InventoryMovement.create({
-            tenantId: 't',
             productId: 'p',
             userId: 'u',
             type: InventoryMovementType.create(InventoryMovementTypes.ENTRY),

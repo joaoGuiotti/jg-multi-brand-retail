@@ -42,10 +42,10 @@ export class SaleItemOutputMapper {
 }
 
 export class SaleOutputMapper {
-    static toOutput(entity: Sale): SaleOutput {
+    static toOutput(entity: Sale, tenantId: string): SaleOutput {
         return {
             id: entity.id.toString(),
-            tenantId: entity.tenantId,
+            tenantId: tenantId,
             userId: entity.userId,
             invoiceNumber: entity.invoiceNumber,
             subtotal: entity.subtotal,

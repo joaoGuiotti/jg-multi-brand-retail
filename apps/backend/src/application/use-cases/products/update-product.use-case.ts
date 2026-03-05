@@ -40,9 +40,9 @@ export class UpdateProductUseCase implements UseCase<UpdateProductInput, Product
         if (otherProps.active !== undefined) (product as any).props.active = otherProps.active;
         if (otherProps.metadata !== undefined) (product as any).props.metadata = otherProps.metadata;
 
-        const productUpdated = await this.productRepository.update(product);
+        const productUpdated = await this.productRepository.update(tenantId, product);
 
-        return ProductOutputMapper.toOutput(productUpdated);
+        return ProductOutputMapper.toOutput(productUpdated, tenantId);
     }
 }
 

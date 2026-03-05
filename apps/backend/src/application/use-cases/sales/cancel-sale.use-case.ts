@@ -32,11 +32,11 @@ export class CancelSaleUseCase implements UseCase<CancelSaleInput, SaleOutput> {
             const product = await this.productRepository.findById(tenantId, item.productId);
             if (product) {
                 product.adjustStock(item.quantity);
-                await this.productRepository.update(product);
+                await this.productRepository.update(tenantId, product);
             }
         }
 
-        const updated = await this.saleRepository.update(sale);
-        return SaleOutputMapper.toOutput(updated);
+        const updated = await this.saleRepository.update(tenantId, sale);
+        return SaleOutputMapper.toOutput(updated, tenantId);
     }
 }

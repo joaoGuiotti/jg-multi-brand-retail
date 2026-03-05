@@ -2,7 +2,6 @@ import { UniqueEntityID } from '../../../common/domain/unique-entity-id';
 import { Product, ProductProps } from './product.entity';
 
 const baseProps: ProductProps = {
-    tenantId: 'tenant-01',
     name: 'Test Product',
     sku: 'SKU-001',
     costPrice: 10,
@@ -22,7 +21,6 @@ describe('Product Entity', () => {
         expect(p).toBeDefined();
         expect(p.name).toBe('Test Product');
         expect(p.sku).toBe('SKU-001');
-        expect(p.tenantId).toBe('tenant-01');
     });
 
     it('should generate a UUID id if not provided', () => {

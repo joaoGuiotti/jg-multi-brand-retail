@@ -3,7 +3,6 @@ import { UniqueEntityID } from '../../../common/domain/unique-entity-id';
 import { InventoryMovementType } from './inventory-movement-type.vo';
 
 export interface InventoryMovementProps {
-    tenantId: string;
     productId: string;
     userId: string;
     type: InventoryMovementType;
@@ -29,7 +28,6 @@ export class InventoryMovement extends AggregateRoot<InventoryMovementProps> {
         return movement;
     }
 
-    get tenantId(): string { return this.props.tenantId; }
     get productId(): string { return this.props.productId; }
     get userId(): string { return this.props.userId; }
     get type(): InventoryMovementType { return this.props.type; }

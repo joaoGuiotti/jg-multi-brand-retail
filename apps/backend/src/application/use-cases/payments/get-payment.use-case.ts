@@ -10,12 +10,12 @@ export class GetPaymentUseCase implements UseCase<GetPaymentInput, PaymentOutput
     constructor(private paymentRepository: PaymentRepository) { }
 
     async execute(input: GetPaymentInput): Promise<PaymentOutput> {
-        const payment = await this.paymentRepository.findById(input.id);
+        const payment = await this.paymentRepository.findById(input.tenantId, input.id);
 
-        if (!payment || payment.tenantId !== input.tenantId) {
+        if (!payment) {
             throw new NotFoundException('Payment not found');
         }
 
-        return PaymentOutputMapper.toOutput(payment);
+        return PaymentOutputMapper.toOutput(payment, input.tenantId);
     }
 }

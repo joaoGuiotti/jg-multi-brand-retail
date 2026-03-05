@@ -13,11 +13,11 @@ export class ListMovementsUseCase implements UseCase<ListMovementsInput, ListMov
 
     async execute(input: ListMovementsInput): Promise<ListMovementsOutput> {
         const result = await this.inventoryRepository.findAll(input.tenantId, input.filters);
-        return this.toOutput(result);
+        return this.toOutput(result, input.tenantId);
     }
 
-    private toOutput(result: InventorySearchResult): ListMovementsOutput {
-        const movements = result.data.map(MovementOutputMapper.toOutput);
+    private toOutput(result: InventorySearchResult, tenantId: string): ListMovementsOutput {
+        const movements = result.data.map(m => MovementOutputMapper.toOutput(m, tenantId));
         return PaginationOutputMapper.toOutput(movements, {
             meta: {
                 total: result.total,

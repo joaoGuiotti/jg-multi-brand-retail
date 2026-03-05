@@ -7,7 +7,6 @@ export class InventoryMapper {
     static toDomain(raw: PrismaMovement): InventoryMovement {
         return InventoryMovement.create(
             {
-                tenantId: raw.tenantId,
                 productId: raw.productId,
                 userId: raw.userId,
                 type: InventoryMovementType.create(raw.type as InventoryMovementTypes),
@@ -22,7 +21,6 @@ export class InventoryMapper {
     static toPersistence(movement: InventoryMovement) {
         return {
             id: movement.id.toString(),
-            tenantId: movement.tenantId,
             productId: movement.productId,
             userId: movement.userId,
             type: movement.type.value,

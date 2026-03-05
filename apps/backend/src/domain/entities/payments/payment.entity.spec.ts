@@ -3,7 +3,6 @@ import { Payment } from './payment.entity';
 
 const makePayment = (overrides?: Partial<Parameters<typeof Payment.create>[0]>) =>
     Payment.create({
-        tenantId: 'tenant-1',
         saleId: 'sale-1',
         method: 'PIX',
         amount: 100,
@@ -17,7 +16,6 @@ describe('Payment Entity', () => {
     it('should create a payment with all required fields', () => {
         const p = makePayment();
         expect(p).toBeDefined();
-        expect(p.tenantId).toBe('tenant-1');
         expect(p.saleId).toBe('sale-1');
         expect(p.method).toBe('PIX');
         expect(p.amount).toBe(100);
@@ -27,7 +25,7 @@ describe('Payment Entity', () => {
     });
 
     it('should default status to PAID', () => {
-        const p = Payment.create({ tenantId: 't', saleId: 's', method: 'CASH', amount: 50, installments: 1, fee: 0, status: 'PAID' });
+        const p = Payment.create({ saleId: 's', method: 'CASH', amount: 50, installments: 1, fee: 0, status: 'PAID' });
         expect(p.status).toBe('PAID');
     });
 
@@ -46,7 +44,7 @@ describe('Payment Entity', () => {
     it('should accept a custom id', () => {
         const id = new UniqueEntityID('550e8400-e29b-41d4-a716-446655440000');
         const p = makePayment();
-        const p2 = Payment.create({ tenantId: 't', saleId: 's', method: 'PIX', amount: 1, installments: 1, fee: 0, status: 'PAID' }, id);
+        const p2 = Payment.create({ saleId: 's', method: 'PIX', amount: 1, installments: 1, fee: 0, status: 'PAID' }, id);
         expect(p2.id.toString()).toBe('550e8400-e29b-41d4-a716-446655440000');
     });
 

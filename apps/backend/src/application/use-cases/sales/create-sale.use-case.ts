@@ -64,14 +64,13 @@ export class CreateSaleUseCase implements UseCase<CreateSaleInput, SaleOutput> {
             }));
 
             product.adjustStock(-itemDto.quantity);
-            await this.productRepository.update(product);
+            await this.productRepository.update(tenantId, product);
         }
 
         const discount = saleDiscount || 0;
         const total = subtotal - discount;
 
         const sale = Sale.create({
-            tenantId,
             userId,
             subtotal,
             discount,
@@ -80,7 +79,7 @@ export class CreateSaleUseCase implements UseCase<CreateSaleInput, SaleOutput> {
             items,
         });
 
-        const created = await this.saleRepository.create(sale);
-        return SaleOutputMapper.toOutput(created);
+        const created = await this.saleRepository.create(tenantId, sale);
+        return SaleOutputMapper.toOutput(created, tenantId);
     }
 }

@@ -33,7 +33,7 @@ export class CompleteSaleUseCase implements UseCase<CompleteSaleInput, SaleOutpu
             throw new BadRequestException(error.message);
         }
 
-        const updated = await this.saleRepository.update(sale);
-        return SaleOutputMapper.toOutput(updated);
+        const updated = await this.saleRepository.update(tenantId, sale);
+        return SaleOutputMapper.toOutput(updated, tenantId);
     }
 }

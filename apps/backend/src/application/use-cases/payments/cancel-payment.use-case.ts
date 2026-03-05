@@ -19,9 +19,9 @@ export class CancelPaymentUseCase implements UseCase<CancelPaymentInput, Payment
     async execute(input: CancelPaymentInput): Promise<PaymentOutput> {
         const { tenantId, id } = input;
 
-        const payment = await this.paymentRepository.findById(id);
+        const payment = await this.paymentRepository.findById(tenantId, id);
 
-        if (!payment || payment.tenantId !== tenantId) {
+        if (!payment) {
             throw new NotFoundException('Payment not found');
         }
 
@@ -40,8 +40,8 @@ export class CancelPaymentUseCase implements UseCase<CancelPaymentInput, Payment
         }
 
         payment.cancel();
-        await this.paymentRepository.update(payment);
+        await this.paymentRepository.update(tenantId, payment);
 
-        return PaymentOutputMapper.toOutput(payment);
+        return PaymentOutputMapper.toOutput(payment, tenantId);
     }
 }

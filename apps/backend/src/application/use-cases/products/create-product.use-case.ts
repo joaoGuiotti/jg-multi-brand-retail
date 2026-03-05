@@ -20,15 +20,14 @@ export class CreateProductUseCase implements UseCase<CreateProductInput, Product
 
         const product = Product.create({
             ...otherProps,
-            tenantId,
             margin,
             stockQuantity: otherProps.stockQuantity ?? 0,
             unit: otherProps.unit ?? 'UN',
             active: otherProps.active ?? true,
         });
 
-        const createdProduct = await this.productRepository.create(product);
-        return ProductOutputMapper.toOutput(createdProduct);
+        const createdProduct = await this.productRepository.create(tenantId, product);
+        return ProductOutputMapper.toOutput(createdProduct, tenantId);
     }
 
     private calculateMargin(costPrice: number, salePrice: number): number {

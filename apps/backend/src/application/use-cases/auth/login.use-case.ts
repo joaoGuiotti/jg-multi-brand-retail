@@ -39,11 +39,13 @@ export class LoginUseCase implements UseCase<LoginInput, LoginOutput> {
     ) { }
 
     async execute(input: LoginInput): Promise<LoginOutput> {
-        const user = await this.userRepository.findByEmail(input.email);
+        const result = await this.userRepository.findByEmail(input.email);
 
-        if (!user) {
+        if (!result) {
             throw new UnauthorizedException('Invalid credentials');
         }
+
+        const { user, tenantId } = result;
 
         // Check if user is active
         if (!user.active) {
@@ -51,7 +53,7 @@ export class LoginUseCase implements UseCase<LoginInput, LoginOutput> {
         }
 
         // Check if tenant is active
-        const tenant = await this.tenantRepository.findById(user.tenantId);
+        const tenant = await this.tenantRepository.findById(tenantId);
 
         if (!tenant || !tenant.active) {
             throw new UnauthorizedException('Tenant is inactive');
@@ -65,7 +67,7 @@ export class LoginUseCase implements UseCase<LoginInput, LoginOutput> {
         }
 
         // Generate tokens
-        const tokens = await this.generateTokens(user);
+        const tokens = await this.generateTokens(user, tenantId);
 
         return {
             user: {
@@ -83,13 +85,13 @@ export class LoginUseCase implements UseCase<LoginInput, LoginOutput> {
         };
     }
 
-    private async generateTokens(user: User) {
+    private async generateTokens(user: User, tenantId: string) {
         const payload = {
             sub: user.id.toString(),
             email: user.email,
             name: user.name,
             role: user.role,
-            tenantId: user.tenantId,
+            tenantId: tenantId,
         };
 
         const [accessToken, refreshToken] = await Promise.all([

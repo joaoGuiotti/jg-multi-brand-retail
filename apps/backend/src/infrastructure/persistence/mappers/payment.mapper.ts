@@ -6,7 +6,6 @@ export class PaymentMapper {
     static toDomain(raw: PrismaPayment): Payment {
         return Payment.create(
             {
-                tenantId: raw.tenantId,
                 saleId: raw.saleId,
                 method: raw.method as any,
                 amount: raw.amount.toNumber(),
@@ -24,7 +23,6 @@ export class PaymentMapper {
     static toPersistence(payment: Payment) {
         return {
             id: payment.id.toString(),
-            tenantId: payment.tenantId,
             saleId: payment.saleId,
             method: payment.method,
             amount: payment.amount,

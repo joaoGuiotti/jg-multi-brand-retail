@@ -4,7 +4,6 @@ import { User } from './user.entity';
 
 const makeUser = (overrides: Partial<Parameters<typeof User.create>[0]> = {}) =>
     User.create({
-        tenantId: '1',
         email: 'test@example.com',
         passwordHash: 'hash',
         role: 'USER',
@@ -33,7 +32,6 @@ describe('User Entity', () => {
 
     it('Should expose all properties', () => {
         const user = makeUser();
-        expect(user.tenantId).toBe('1');
         expect(user.email).toBe('test@example.com');
         expect(user.passwordHash).toBe('hash');
         expect(user.role).toBe('USER');

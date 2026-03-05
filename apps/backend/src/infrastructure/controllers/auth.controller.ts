@@ -41,7 +41,10 @@ export class AuthController {
     @Get('me')
     @UseGuards(JwtAuthGuard)
     async getProfile(@CurrentUser() user: any) {
-        const output = await this.getProfileUseCase.execute({ userId: user.sub });
+        const output = await this.getProfileUseCase.execute({
+            userId: user.id,
+            tenantId: user.tenantId,
+        });
         return new UserProfilePresenter(output);
     }
 }

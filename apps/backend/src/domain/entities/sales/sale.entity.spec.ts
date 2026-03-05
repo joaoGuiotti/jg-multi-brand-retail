@@ -5,7 +5,6 @@ const makeSaleItem = () =>
 
 const makeSale = (overrides?: Partial<Parameters<typeof Sale.create>[0]>) =>
     Sale.create({
-        tenantId: 'tenant-1',
         userId: 'user-1',
         subtotal: 20,
         discount: 0,
@@ -30,7 +29,6 @@ describe('Sale Entity', () => {
     it('should create a sale with required fields', () => {
         const sale = makeSale();
         expect(sale).toBeDefined();
-        expect(sale.tenantId).toBe('tenant-1');
         expect(sale.userId).toBe('user-1');
         expect(sale.status).toBe('PENDING');
         expect(sale.items).toHaveLength(1);

@@ -48,7 +48,6 @@ export class CreatePaymentUseCase implements UseCase<CreatePaymentInput, Payment
         }
 
         const payment = Payment.create({
-            tenantId,
             saleId,
             method,
             amount,
@@ -57,7 +56,7 @@ export class CreatePaymentUseCase implements UseCase<CreatePaymentInput, Payment
             status: 'PAID',
         });
 
-        await this.paymentRepository.create(payment);
+        await this.paymentRepository.create(tenantId, payment);
 
         const newTotalPaid = totalPaid + amount;
         if (newTotalPaid >= saleTotal && sale.status === 'PENDING') {
@@ -67,6 +66,6 @@ export class CreatePaymentUseCase implements UseCase<CreatePaymentInput, Payment
             });
         }
 
-        return PaymentOutputMapper.toOutput(payment);
+        return PaymentOutputMapper.toOutput(payment, tenantId);
     }
 }

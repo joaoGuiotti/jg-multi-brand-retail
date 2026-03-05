@@ -8,6 +8,7 @@ export interface Customer {
     email: string;
     phone: string;
     isActive: boolean;
+    document: string;
     street: string;
     number: string;
     complement?: string;

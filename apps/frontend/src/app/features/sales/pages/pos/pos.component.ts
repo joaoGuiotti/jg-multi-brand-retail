@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ModalService, UiBadgeComponent, UiButtonComponent, UiNumberPipe } from '@shared/ui';
+import { ModalService, UiBadgeComponent, UiButtonComponent, UiDocumentPipe, UiNumberPipe } from '@shared/ui';
 import { Customer } from '../../../../core/models/customer.model';
 import { Product } from '../../../../core/models/product.model';
 import { CustomersService } from '../../../../core/services/customers.service';
@@ -13,7 +13,7 @@ import { PaymentModalComponent, PaymentModalResult } from './payment-modal.compo
 @Component({
     selector: 'app-pos',
     standalone: true,
-    imports: [CommonModule, FormsModule, UiBadgeComponent, UiButtonComponent, UiNumberPipe],
+    imports: [CommonModule, FormsModule, UiBadgeComponent, UiButtonComponent, UiNumberPipe, UiDocumentPipe],
     templateUrl: './pos.component.html',
     styleUrl: './pos.component.scss'
 })

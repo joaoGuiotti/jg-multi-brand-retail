@@ -1,7 +1,5 @@
 import { Directive, ElementRef, HostListener, input } from "@angular/core";
 
-
-
 @Directive({
     selector: '[uiNumber]',
     standalone: true

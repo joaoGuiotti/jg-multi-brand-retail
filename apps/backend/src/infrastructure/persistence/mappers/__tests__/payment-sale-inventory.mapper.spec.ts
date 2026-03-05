@@ -55,6 +55,7 @@ const makeRawSale = (overrides: any = {}) => ({
     items: [],
     createdAt: new Date(),
     updatedAt: new Date(),
+    customer: null,
     ...overrides,
 });
 
@@ -85,11 +86,22 @@ describe('SaleMapper', () => {
         expect(sale.items[0].productId).toBe('p1');
     });
 
+    it('toDomain should map customer data to customerName', () => {
+        const raw = makeRawSale({
+            customerId: 'cust-1',
+            customer: { firstName: 'John', lastName: 'Doe' }
+        });
+        const sale = SaleMapper.toDomain(raw);
+        expect(sale.customerId).toBe('cust-1');
+        expect(sale.customerName).toBe('John Doe');
+    });
+
     it('toPersistence should convert a Sale to a plain object', () => {
-        const sale = Sale.create({ userId: 'user-1', subtotal: 20, discount: 0, total: 20, status: 'PENDING', items: [] });
+        const sale = Sale.create({ userId: 'user-1', subtotal: 20, discount: 0, total: 20, status: 'PENDING', items: [], customerId: 'cust-1' });
         const raw = SaleMapper.toPersistence(sale);
         expect(raw.id).toBe(sale.id.toString());
         expect(raw.status).toBe('PENDING');
+        expect(raw.customerId).toBe('cust-1');
     });
 
     it('toPersistenceItem should convert a SaleItem to a plain object', () => {

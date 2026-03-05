@@ -11,6 +11,8 @@ const makeSaleOutput = (overrides: any = {}) => ({
     id: 'sale-1', tenantId: 'tenant-1', userId: 'user-1', invoiceNumber: null,
     subtotal: 20, discount: 0, total: 20, status: 'PENDING',
     items: [makeSaleItemOutput()],
+    customerId: null,
+    customerName: null,
     createdAt: new Date(), updatedAt: new Date(),
     ...overrides,
 });
@@ -26,11 +28,12 @@ describe('SaleItemPresenter', () => {
 
 describe('SalePresenter', () => {
     it('should construct from SaleOutput with items', () => {
-        const presenter = new SalePresenter(makeSaleOutput());
+        const presenter = new SalePresenter(makeSaleOutput({ customerName: 'John Doe' }));
         expect(presenter.id).toBe('sale-1');
         expect(presenter.status).toBe('PENDING');
         expect(presenter.items).toHaveLength(1);
         expect(presenter.invoiceNumber).toBeNull();
+        expect(presenter.customerName).toBe('John Doe');
     });
 });
 

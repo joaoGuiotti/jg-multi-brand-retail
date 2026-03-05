@@ -10,9 +10,10 @@ export interface CustomerProps {
     email: string;
     address: Address;
     isActive: boolean;
+    document: string;
 }
 
-export class Customer extends AggregateRoot {
+export class Customer extends AggregateRoot<CustomerProps> {
     constructor(props: CustomerProps, id?: UniqueEntityID) {
         super(props, id ?? UniqueEntityID.create());
     }
@@ -29,6 +30,8 @@ export class Customer extends AggregateRoot {
     public get email(): string { return this.props.email; }
     public get address(): Address { return this.props.address; }
     public get isActive(): boolean { return this.props.isActive; }
+    public get document(): string { return this.props.document; }
+
 
     public updateFirstName(firstName: string): void { this.props.firstName = firstName; }
 
@@ -42,6 +45,8 @@ export class Customer extends AggregateRoot {
 
     public updateIsActive(isActive: boolean): void { this.props.isActive = isActive; }
 
+    public updateDocument(document: string): void { this.props.document = document; }
+
     public validate(fields?: string[]): void {
         const validator = CustomerValidatorFactory.create();
         validator.validate(this.notification, this, fields);
@@ -54,6 +59,7 @@ export class Customer extends AggregateRoot {
             lastName: this.lastName,
             phone: this.phone,
             email: this.email,
+            document: this.document,
             address: this.address,
             isActive: this.isActive,
         };

@@ -11,6 +11,7 @@ export type UpdateCustomerInput = {
     lastName?: string;
     email?: string;
     phone?: string;
+    document?: string;
     isActive?: boolean;
     address?: {
         street: string;
@@ -38,6 +39,7 @@ export class UpdateCustomerUseCase implements UseCase<UpdateCustomerInput, Custo
         if (rest.lastName !== undefined) customer.updateLastName(rest.lastName);
         if (rest.email !== undefined) customer.updateEmail(rest.email);
         if (rest.phone !== undefined) customer.updatePhone(rest.phone);
+        if (rest.document !== undefined) customer.updateDocument(rest.document);
         if (rest.isActive !== undefined) customer.updateIsActive(rest.isActive);
         if (address !== undefined) customer.updateAddress(Address.create(address));
 

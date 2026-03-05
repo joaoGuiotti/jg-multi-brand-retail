@@ -15,6 +15,7 @@ export type CustomerOutput = {
     lastName: string;
     email: string;
     phone: string;
+    document: string;
     isActive: boolean;
     address: AddressOutput;
 };
@@ -27,6 +28,7 @@ export class CustomerOutputMapper {
             lastName: entity.lastName,
             email: entity.email,
             phone: entity.phone,
+            document: entity.document,
             isActive: entity.isActive,
             address: {
                 street: entity.address.street,

@@ -16,6 +16,7 @@ export class CustomerMapper {
                 email: raw.email,
                 phone: raw.phone,
                 isActive: raw.isActive,
+                document: raw.document,
                 address: Address.create({
                     street: raw.street,
                     number: raw.number,
@@ -40,6 +41,7 @@ export class CustomerMapper {
             lastName: customer.lastName,
             email: customer.email,
             phone: customer.phone,
+            document: customer.document,
             isActive: customer.isActive,
             street: customer.address.street,
             number: customer.address.number,

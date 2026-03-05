@@ -11,6 +11,7 @@ export type CreateCustomerInput = {
     lastName: string;
     email: string;
     phone: string;
+    document: string;
     isActive?: boolean;
     address: {
         street: string;

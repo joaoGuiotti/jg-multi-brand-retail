@@ -47,6 +47,7 @@ export class PrismaCustomerRepository implements CustomerRepository {
                 { lastName: { contains: search, mode: 'insensitive' } },
                 { email: { contains: search, mode: 'insensitive' } },
                 { phone: { contains: search, mode: 'insensitive' } },
+                { document: { contains: search, mode: 'insensitive' } },
             ];
         }
 

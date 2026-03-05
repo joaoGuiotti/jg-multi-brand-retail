@@ -351,6 +351,7 @@ model Customer {
   email     String
   phone     String
   isActive  Boolean @default(true) @map("is_active")
+  document  String  @default("") @map("document")
 
   // Address (flattened from Address VO)
   street     String

@@ -44,6 +44,10 @@ export class CreateCustomerDto {
     @IsNotEmpty()
     phone: string;
 
+    @IsString()
+    @IsNotEmpty()
+    document: string;
+
     @Type(() => AddressDto)
     address: AddressDto;
 }

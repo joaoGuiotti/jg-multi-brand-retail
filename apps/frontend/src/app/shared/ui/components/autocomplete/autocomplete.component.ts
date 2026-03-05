@@ -100,9 +100,10 @@ export class UiAutocompleteComponent implements ControlValueAccessor {
     }
 
     onFocus(): void {
-        if (this.inputValue() || this.suggestions().length > 0) {
-            this.openOverlay();
+        if (!this.inputValue()) {
+            this.completeMethod.emit({ query: '' });
         }
+        this.openOverlay();
     }
 
     selectItem(item: any): void {
@@ -142,19 +143,28 @@ export class UiAutocompleteComponent implements ControlValueAccessor {
         this.focusedIndex.set(-1);
     }
 
+    reset(): void {
+        this.value.set(null);
+        this.inputValue.set('');
+        this.closeOverlay();
+    }
+
     toggleOverlay(event: Event): void {
         event.stopPropagation();
         if (this.overlay.isOpen()) {
             this.closeOverlay();
         } else {
+            if (!this.inputValue()) {
+                this.completeMethod.emit({ query: '' });
+            }
             this.openOverlay();
         }
     }
 
     writeValue(val: any): void {
         this.value.set(val);
-        if (!this.multiple() && val) {
-            this.inputValue.set(this.field() ? val[this.field()!] : val);
+        if (!this.multiple()) {
+            this.inputValue.set(val && this.field() ? val[this.field()!] : (val ?? ''));
         }
     }
 

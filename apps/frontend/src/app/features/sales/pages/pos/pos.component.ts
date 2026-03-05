@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ModalService, UiBadgeComponent, UiButtonComponent, UiDocumentPipe, UiNumberPipe } from '@shared/ui';
+import { ModalService, UiAutocompleteComponent, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiDocumentPipe, UiNumberPipe } from '@shared/ui';
 import { Customer } from '../../../../core/models/customer.model';
 import { Product } from '../../../../core/models/product.model';
 import { CustomersService } from '../../../../core/services/customers.service';
@@ -13,7 +13,7 @@ import { PaymentModalComponent, PaymentModalResult } from './payment-modal.compo
 @Component({
     selector: 'app-pos',
     standalone: true,
-    imports: [CommonModule, FormsModule, UiBadgeComponent, UiButtonComponent, UiNumberPipe, UiDocumentPipe],
+    imports: [CommonModule, FormsModule, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiNumberPipe, UiDocumentPipe, UiAutocompleteComponent],
     templateUrl: './pos.component.html',
     styleUrl: './pos.component.scss'
 })
@@ -33,14 +33,12 @@ export class PosComponent {
     searchResults = signal<Product[]>([]);
     isSearching = signal(false);
 
-    searchProducts(): void {
-        if (!this.searchTerm || this.searchTerm.length < 2) {
-            this.searchResults.set([]);
-            return;
-        }
+    searchProducts(event?: { query: string }): void {
+        const query = event ? event.query : this.searchTerm;
+        const search = query && query.length >= 2 ? query : '';
 
         this.isSearching.set(true);
-        this.productsService.getProducts(1, 20, { search: this.searchTerm, isActive: true }).subscribe({
+        this.productsService.getProducts(1, 20, { search, isActive: true }).subscribe({
             next: (response) => {
                 this.searchResults.set(response.data);
                 this.isSearching.set(false);
@@ -51,14 +49,12 @@ export class PosComponent {
         });
     }
 
-    searchCustomers(): void {
-        if (!this.customerSearchTerm || this.customerSearchTerm.length < 2) {
-            this.customerSearchResults.set([]);
-            return;
-        }
+    searchCustomers(event?: { query: string }): void {
+        const query = event ? event.query : this.customerSearchTerm;
+        const search = query && query.length >= 2 ? query : '';
 
         this.isSearchingCustomer.set(true);
-        this.customersService.getCustomers(1, 10, { search: this.customerSearchTerm, isActive: true }).subscribe({
+        this.customersService.getCustomers(1, 20, { search, isActive: true }).subscribe({
             next: (response) => {
                 this.customerSearchResults.set(response.data);
                 this.isSearchingCustomer.set(false);

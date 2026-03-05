@@ -4,148 +4,156 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Main POS Area -->
         <div class="lg:col-span-2">
-            <!-- Customer Selection -->
+            <!-- Search & Selection Area -->
             <div class="bg-surface rounded-lg shadow p-6 mb-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-semibold text-content">Customer</h2>
-                    <ui-button *ngIf="selectedCustomer()" (click)="removeCustomer()" variant="ghost" size="sm"
-                        class="text-red-600">
-                        Remove
-                    </ui-button>
-                </div>
-
-                <div *ngIf="!selectedCustomer()">
-                    <label class="label">Search Customer (Optional)</label>
-                    <input type="text" [(ngModel)]="customerSearchTerm" (input)="searchCustomers()" class="input-field"
-                        placeholder="Search by name, email or phone" />
-
-                    <!-- Customer Search Results -->
-                    <div *ngIf="customerSearchResults().length > 0"
-                        class="mt-4 border border-outline rounded-lg divide-y divide-outline max-h-48 overflow-y-auto">
-                        <div *ngFor="let customer of customerSearchResults()" (click)="selectCustomer(customer)"
-                            class="p-3 hover:bg-surface-hover cursor-pointer transition-colors flex justify-between items-center text-sm">
-                            <div>
-                                <p class="font-medium text-content">{{ customer.firstName }} {{ customer.lastName }}</p>
-                                <p class="text-content-secondary text-xs">{{ customer.email }} | {{ customer.document |
-                                    uiDocument }}
-                                    | {{ customer.phone }}</p>
-                            </div>
-                            <ui-button size="sm" variant="secondary">Select</ui-button>
-                        </div>
-                    </div>
-
-                    <div *ngIf="isSearchingCustomer()" class="mt-2 text-center text-xs text-content-secondary">
-                        Searching customers...
-                    </div>
-                </div>
-
-                <!-- Selected Customer -->
-                <div *ngIf="selectedCustomer()"
-                    class="flex items-center gap-4 p-4 bg-blue-50 border border-blue-100 rounded-lg">
-                    <div
-                        class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
-                        {{ selectedCustomer()?.firstName?.substring(0, 1) }}{{
-                        selectedCustomer()?.lastName?.substring(0, 1) }}
-                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Customer Selection -->
                     <div>
-                        <h3 class="font-semibold text-blue-900">{{ selectedCustomer()?.firstName }} {{
-                            selectedCustomer()?.lastName }}</h3>
-                        <p class="text-sm text-blue-700">{{ selectedCustomer()?.email }} | {{
-                            selectedCustomer()?.document | uiDocument }} | {{ selectedCustomer()?.phone
-                            }}</p>
-                    </div>
-                </div>
-            </div>
+                        <div class="flex justify-between items-center mb-2">
+                            <h2 class="text-sm font-semibold text-content-secondary uppercase tracking-wider">Customer
+                            </h2>
+                        </div>
 
-            <!-- Product Search -->
-            <div class="bg-surface rounded-lg shadow p-6 mb-6">
-                <label class="label">Search Products</label>
-                <input type="text" [(ngModel)]="searchTerm" (input)="searchProducts()" class="input-field"
-                    placeholder="Search by name, SKU, or barcode" autofocus />
+                        <div *ngIf="!selectedCustomer()">
+                            <ui-autocomplete [suggestions]="customerSearchResults()"
+                                (completeMethod)="searchCustomers($event)" (onSelect)="selectCustomer($event)"
+                                placeholder="Find customer..." [loading]="isSearchingCustomer()" field="firstName"
+                                [dropdown]="true">
+                                <ng-template #itemTemplate let-customer>
+                                    <div class="flex justify-between items-center w-full">
+                                        <div>
+                                            <p class="font-medium text-content text-sm">{{ customer.firstName }} {{
+                                                customer.lastName }}
+                                            </p>
+                                            <p class="text-content-secondary text-xs">{{ customer.email }} | {{
+                                                customer.document | uiDocument }}</p>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                            </ui-autocomplete>
+                        </div>
 
-                <!-- Search Results -->
-                <div *ngIf="searchResults().length > 0" class="mt-4 max-h-96 overflow-y-auto">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div *ngFor="let product of searchResults()" (click)="addToCart(product)"
-                            class="p-4 border border-outline rounded-lg hover:border-blue-500 hover:bg-surface-hover cursor-pointer transition-colors">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="font-medium text-content">{{ product.name }}</h3>
-                                    <p class="text-sm text-content-secondary flex items-center gap-1">
-                                        <svg class="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                                            <path
-                                                d="M2 4h2v16H2V4zm3 0h1v16H5V4zm2 0h2v16H7V4zm3 0h1v16h-1V4zm2 0h2v16h-2V4zm3 0h1v16h-1V4zm2 0h3v16h-3V4z" />
-                                        </svg>
-                                        {{ product.sku }}
-                                    </p>
+                        <!-- Selected Customer Compact -->
+                        <div *ngIf="selectedCustomer()"
+                            class="flex items-center justify-between p-3 bg-blue-50 border border-blue-100 rounded-lg">
+                            <div class="flex items-center gap-3 overflow-hidden">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                                    {{ selectedCustomer()?.firstName?.substring(0, 1) }}{{
+                                    selectedCustomer()?.lastName?.substring(0, 1) }}
                                 </div>
-                                <span class="text-lg font-bold text-blue-600">{{ product.salePrice | uiNumber :{ prefix:
-                                    'R$ ' } }}</span>
+                                <div class="overflow-hidden">
+                                    <h3 class="font-semibold text-sm text-blue-900 truncate">{{
+                                        selectedCustomer()?.firstName }} {{
+                                        selectedCustomer()?.lastName }}</h3>
+                                    <p class="text-xs text-blue-700 truncate">{{ selectedCustomer()?.document |
+                                        uiDocument }}</p>
+                                </div>
                             </div>
-                            <div class="mt-2 flex justify-between items-center">
-                                <ui-badge size="sm"
-                                    [variant]="product.stockQuantity <= 0 ? 'error' : product.stockQuantity < 10 ? 'warning' : 'success'">
-                                    @if (product.stockQuantity <= 0) { Out of Stock } @else { {{ product.stockQuantity |
-                                        uiNumber: { decimalPlaces: 0 } }} in stock } </ui-badge>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div *ngIf="isSearching()" class="mt-4 text-center text-content-secondary">
-                    Searching...
-                </div>
-            </div>
-
-            <!-- Cart Items -->
-            <div class="bg-surface rounded-lg shadow p-6">
-                <h2 class="text-xl font-semibold text-content mb-4">Cart Items</h2>
-
-                <div *ngIf="cartStore.itemCount() === 0" class="text-center py-12 text-content-secondary">
-                    Cart is empty. Search and add products to start a sale.
-                </div>
-
-                <div *ngIf="cartStore.itemCount() > 0" class="space-y-3">
-                    <div *ngFor="let item of cartStore.cartItems()"
-                        class="flex items-center justify-between p-4 border border-outline rounded-lg">
-                        <div class="flex-1">
-                            <h3 class="font-medium text-content">{{ item.product.name }}</h3>
-                            <p class="text-sm text-content-secondary"> {{ item.unitPrice | uiNumber: { prefix: 'R$ ' }
-                                }} each</p>
-                        </div>
-
-                        <div class="flex items-center gap-3">
-                            <div class="flex items-center gap-2">
-                                <ui-button (click)="incrementQuantity(item.product.id)" variant="secondary">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 4v16m8-8H4"></path>
-                                    </svg>
-                                </ui-button>
-                                <span class="w-12 text-center font-medium">{{ item.quantity }}</span>
-                                <ui-button (click)="decrementQuantity(item.product.id)" variant="secondary">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M20 12H4"></path>
-                                    </svg>
-                                </ui-button>
-                            </div>
-
-                            <span class="w-24 text-right font-bold text-content">
-                                {{ (item.unitPrice * item.quantity) | uiNumber: { prefix: 'R$ ' } }}
-                            </span>
-
-                            <ui-button (click)="removeFromCart(item.product.id)" variant="danger">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <ui-button (click)="removeCustomer()" variant="ghost" size="sm"
+                                class="text-red-600 hover:bg-red-50 p-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                    </path>
+                                        d="M6 18L18 6M6 6l12 12"></path>
                                 </svg>
                             </ui-button>
                         </div>
                     </div>
+
+                    <!-- Product Search -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <h2 class="text-sm font-semibold text-content-secondary uppercase tracking-wider">Add
+                                Products</h2>
+                        </div>
+                        <ui-autocomplete #productAuto [suggestions]="searchResults()"
+                            (completeMethod)="searchProducts($event)"
+                            (onSelect)="addToCart($event); productAuto.reset()" placeholder="Search name or SKU..."
+                            [loading]="isSearching()" field="name" [dropdown]="true">
+                            <ng-template #itemTemplate let-product>
+                                <div class="flex justify-between items-center w-full">
+                                    <div class="flex-1 overflow-hidden">
+                                        <h3 class="font-medium text-content text-sm truncate">{{ product.name }}</h3>
+                                        <div class="flex items-center gap-2 mt-0.5">
+                                            <p class="text-[10px] text-content-secondary flex items-center gap-1">
+                                                {{ product.sku }}
+                                            </p>
+                                            <ui-badge size="sm"
+                                                [variant]="product.stockQuantity <= 0 ? 'error' : product.stockQuantity < 10 ? 'warning' : 'success'">
+                                                {{ product.stockQuantity <= 0 ? 'Out of Stock' : product.stockQuantity
+                                                    + ' in stock' }} </ui-badge>
+                                        </div>
+                                    </div>
+                                    <div class="text-right ml-2 shrink-0">
+                                        <span class="text-xs font-bold text-blue-600">{{ product.salePrice | uiNumber :{
+                                            prefix: 'R$ ' } }}</span>
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </ui-autocomplete>
+                    </div>
                 </div>
             </div>
+
+            <!-- Cart Items -->
+            <ui-card title="Cart Items" class="block mb-6" padding="none">
+                <div cardHeader class="p-2 bg-primary text-white rounded-lg shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="8" cy="21" r="1" />
+                        <circle cx="19" cy="21" r="1" />
+                        <path d="M2.05 2.05h1.95L6.68 14.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                    </svg>
+                </div>
+
+                <div class="p-6">
+                    <div *ngIf="cartStore.itemCount() === 0" class="text-center py-12 text-content-secondary">
+                        Cart is empty. Search and add products to start a sale.
+                    </div>
+
+                    <div *ngIf="cartStore.itemCount() > 0" class="space-y-3">
+                        <div *ngFor="let item of cartStore.cartItems()"
+                            class="flex items-center justify-between p-4 border border-outline rounded-lg">
+                            <div class="flex-1">
+                                <h3 class="font-medium text-content">{{ item.product.name }}</h3>
+                                <p class="text-sm text-content-secondary"> {{ item.unitPrice | uiNumber: { prefix: 'R$ '
+                                    }
+                                    }} each</p>
+                            </div>
+
+                            <div class="flex items-center gap-3">
+                                <div class="flex items-center gap-2">
+                                    <ui-button (click)="incrementQuantity(item.product.id)" variant="secondary">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 4v16m8-8H4"></path>
+                                        </svg>
+                                    </ui-button>
+                                    <span class="w-12 text-center font-medium">{{ item.quantity }}</span>
+                                    <ui-button (click)="decrementQuantity(item.product.id)" variant="secondary">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M20 12H4"></path>
+                                        </svg>
+                                    </ui-button>
+                                </div>
+
+                                <span class="w-24 text-right font-bold text-content">
+                                    {{ (item.unitPrice * item.quantity) | uiNumber: { prefix: 'R$ ' } }}
+                                </span>
+
+                                <ui-button (click)="removeFromCart(item.product.id)" variant="danger">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                        </path>
+                                    </svg>
+                                </ui-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ui-card>
         </div>
 
         <!-- Cart Summary -->

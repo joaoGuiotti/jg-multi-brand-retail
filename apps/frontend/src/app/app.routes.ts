@@ -10,6 +10,7 @@ const DemosRoutes: Routes = [
         path: 'demo',
         children: [
             { path: 'table', loadComponent: () => import('./features/demo/table-demo/table-demo.component').then(m => m.TableDemoComponent) },
+            { path: 'autocomplete', loadComponent: () => import('./features/demo/autocomplete/autocomplete-demo.component').then(m => m.UiAutocompleteDemoComponent) },
         ]
     }
 ];

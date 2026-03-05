@@ -1,0 +1,202 @@
+.ui-autocomplete-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    width: 100%;
+}
+
+.ui-autocomplete-label {
+    display: block;
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-1);
+}
+
+.ui-autocomplete-input-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-2);
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-base);
+    min-height: 2.75rem;
+    cursor: text;
+
+    &:hover {
+        border-color: var(--color-border-hover);
+    }
+
+    &:focus-within {
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 2px var(--color-primary-light);
+        outline: none;
+    }
+}
+
+.ui-autocomplete-input {
+    flex: 1;
+    min-width: 100px;
+    height: 2rem;
+    padding: 0 var(--space-1);
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--color-text-primary);
+    font-size: var(--font-size-base);
+
+    &::placeholder {
+        color: var(--color-text-tertiary);
+    }
+}
+
+.ui-autocomplete-suffix {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding-left: var(--space-1);
+    color: var(--color-text-secondary);
+}
+
+.ui-autocomplete-loader,
+.ui-autocomplete-dropdown-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    cursor: default;
+
+    svg {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+.ui-autocomplete-dropdown-icon {
+    cursor: pointer;
+    color: var(--color-text-tertiary);
+    transition: color var(--transition-fast);
+
+    &:hover {
+        color: var(--color-primary);
+    }
+}
+
+.ui-autocomplete-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+}
+
+.ui-autocomplete-chip {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: 2px 8px;
+    background-color: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    color: var(--color-text-primary);
+    animation: chip-in 0.2s ease-out;
+}
+
+.ui-autocomplete-chip-remove {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    color: var(--color-text-tertiary);
+    cursor: pointer;
+    transition: color var(--transition-fast);
+
+    &:hover {
+        color: var(--color-error);
+    }
+
+    svg {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+
+.ui-autocomplete-list {
+    list-style: none;
+    margin: 0;
+    padding: var(--space-1);
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.ui-autocomplete-item {
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+
+    &:hover,
+    &-focused {
+        background-color: var(--color-bg-hover);
+        color: var(--color-primary);
+    }
+}
+
+.ui-autocomplete-group-label {
+    display: block;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-tertiary);
+    background-color: var(--color-bg-secondary);
+}
+
+.ui-autocomplete-group-children {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.ui-autocomplete-empty {
+    padding: var(--space-4);
+    text-align: center;
+    color: var(--color-text-tertiary);
+    font-size: var(--font-size-sm);
+}
+
+@keyframes chip-in {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes panel-in {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

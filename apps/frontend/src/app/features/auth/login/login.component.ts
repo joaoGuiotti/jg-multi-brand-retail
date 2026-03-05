@@ -47,6 +47,16 @@ export class LoginComponent {
         }
     }
 
+    autoLogin(): void {
+        if (isDevMode()) {
+            this.loginForm.patchValue({
+                email: 'admin@lojademo.com',
+                password: 'loja123'
+            });
+            this.onSubmit();
+        }
+    }
+
     copyToClipboard(field: string, value: string): void {
         navigator.clipboard.writeText(value).then(() => {
             this.copiedField = field;

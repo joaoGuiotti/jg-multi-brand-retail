@@ -71,7 +71,7 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <p class="text-xs text-info">Password: loja123</p>
+        <p class="text-xs text-info">Password: *********</p>
         <button type="button" title="Copy password" (click)="copyToClipboard('password', 'loja123')" class="copy-btn">
           @if (copiedField === 'password') {
           <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
@@ -86,7 +86,11 @@
           </svg>
           }
         </button>
+
       </div>
+      <ui-button class="mt-4" variant="secondary" [outline]="true" (click)="autoLogin()" [fullWidth]="true">
+        Auto Login(Dev Only)
+      </ui-button>
     </div>
     }
   </div>

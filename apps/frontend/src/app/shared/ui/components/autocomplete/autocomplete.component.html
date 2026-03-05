@@ -1,0 +1,88 @@
+<div class="ui-autocomplete-container">
+    @if (label()) {
+    <label [for]="id()" class="ui-autocomplete-label">{{ label() }}</label>
+    }
+
+    <div #containerEl class="ui-autocomplete-input-wrapper" (click)="inputEl.focus()">
+        @if (multiple()) {
+        <div class="ui-autocomplete-chips">
+            @for (item of selectedItems(); track item) {
+            <span class="ui-autocomplete-chip">
+                {{ field() ? item[field()!] : item }}
+                <button type="button" class="ui-autocomplete-chip-remove" (click)="removeItem(item, $event)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </span>
+            }
+        </div>
+        }
+
+        <input #inputEl [id]="id()" type="text" [placeholder]="selectedItems().length === 0 ? placeholder() : ''"
+            [value]="inputValue() || (!multiple() ? displayValue() : '')" (input)="onInput($event)" (focus)="onFocus()"
+            [disabled]="disabled()" class="ui-autocomplete-input" autocomplete="off">
+
+        <div class="ui-autocomplete-suffix">
+            @if (loading()) {
+            <div class="ui-autocomplete-loader">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="animate-spin">
+                    <path
+                        d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83" />
+                </svg>
+            </div>
+            } @else if (dropdown()) {
+            <div class="ui-autocomplete-dropdown-icon" (click)="toggleOverlay($event)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9l6 6 6-6" />
+                </svg>
+            </div>
+            }
+        </div>
+    </div>
+</div>
+
+<ui-overlay #overlay [target]="containerEl" [dismissable]="dismissable()">
+    <ul class="ui-autocomplete-list">
+        @if (group()) {
+        @for (g of suggestions(); track g) {
+        <li class="ui-autocomplete-group">
+            <ng-container *ngTemplateOutlet="groupTemplate || defaultGroupTemplate; context: { $implicit: g }">
+            </ng-container>
+
+            <ul class="ui-autocomplete-group-children">
+                @for (item of g[groupChildren()!]; track item; let i = $index) {
+                <li class="ui-autocomplete-item" [class.ui-autocomplete-item-focused]="focusedIndex() === i"
+                    (click)="selectItem(item)">
+                    <ng-container
+                        *ngTemplateOutlet="itemTemplate || defaultItemTemplate; context: { $implicit: item, index: i }">
+                    </ng-container>
+                </li>
+                }
+            </ul>
+        </li>
+        }
+        } @else {
+        @for (item of suggestions(); track item; let i = $index) {
+        <li class="ui-autocomplete-item" [class.ui-autocomplete-item-focused]="focusedIndex() === i"
+            (click)="selectItem(item)">
+            <ng-container
+                *ngTemplateOutlet="itemTemplate || defaultItemTemplate; context: { $implicit: item, index: i }">
+            </ng-container>
+        </li>
+        }
+        }
+
+        @if (suggestions().length === 0) {
+        <li class="ui-autocomplete-empty">No results found</li>
+        }
+    </ul>
+</ui-overlay>
+
+<ng-template #defaultItemTemplate let-item>
+    {{ field() ? item[field()!] : item }}
+</ng-template>
+
+<ng-template #defaultGroupTemplate let-group>
+    <span class="ui-autocomplete-group-label">{{ group[groupLabel()!] }}</span>
+</ng-template>

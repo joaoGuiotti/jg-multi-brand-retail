@@ -19,6 +19,7 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UiButtonComponent {
+    @Input() outline = false;
     @Input() variant: ButtonVariant = 'primary';
     @Input() size: ButtonSize = 'md';
     @Input() loading = false;
@@ -45,20 +46,11 @@ export class UiButtonComponent {
             lg: 'px-6 py-3 text-base',
         };
 
-        const variants: Record<ButtonVariant, string> = {
-            primary:
-                'bg-primary hover:bg-primary-hover text-white focus:ring-primary',
-            secondary:
-                'bg-surface-tertiary hover:bg-surface-hover text-content border border-outline focus:ring-primary',
-            ghost:
-                'bg-transparent hover:bg-surface-tertiary text-content focus:ring-primary',
-            danger:
-                'bg-danger hover:bg-red-700 text-white focus:ring-error',
-        };
+        const variants = this.getStyleVariant(this.variant, this.outline);
 
         const width = this.fullWidth ? 'w-full' : '';
 
-        return [base, sizes[this.size], variants[this.variant], width]
+        return [base, sizes[this.size], variants, width]
             .filter(Boolean)
             .join(' ');
     }
@@ -71,5 +63,25 @@ export class UiButtonComponent {
         if (!this.isDisabled) {
             this.clicked.emit(event);
         }
+    }
+
+    private getStyleVariant(variant: ButtonVariant, outline: boolean): string {
+        const variants: Record<ButtonVariant, string> = {
+            primary:
+                outline ?
+                    'bg-transparent hover:bg-primary/5 text-primary border border-primary focus:ring-primary'
+                    : 'bg-primary hover:bg-primary-hover text-white focus:ring-primary',
+            secondary:
+                outline ? 'bg-transparent hover:bg-surface-tertiary text-content-secondary border border-secondary focus:ring-primary'
+                    : 'bg-surface-tertiary hover:bg-surface-hover text-content border border-outline focus:ring-primary',
+            ghost:
+                outline ? 'bg-transparent hover:bg-surface-tertiary text-content-tertiary border border-outline/50 focus:ring-primary'
+                    : 'bg-transparent hover:bg-surface-tertiary text-content focus:ring-primary',
+            danger:
+                outline ? 'bg-transparent hover:bg-danger/5 text-danger border border-danger focus:ring-error'
+                    : 'bg-danger hover:bg-red-700 text-white focus:ring-error',
+        };
+
+        return variants[variant];
     }
 }

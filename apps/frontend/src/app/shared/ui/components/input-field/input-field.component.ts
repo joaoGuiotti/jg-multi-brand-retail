@@ -17,6 +17,7 @@ import {
     Validators
 } from '@angular/forms';
 import { MaskitoDirective } from '@maskito/angular';
+import { MaskitoOptions, maskitoTransform } from '@maskito/core';
 import { maskitoNumberOptionsGenerator, maskitoParseNumber, maskitoStringifyNumber } from '@maskito/kit';
 export type InputType = 'text' | 'email' | 'password' | 'number' | 'search' | 'tel' | 'url';
 
@@ -35,6 +36,7 @@ export class UiInputFieldComponent implements ControlValueAccessor {
     decimalSeparator = input<string | null>(',');
     decimalPlaces = input<number | null>(2);
     prefix = input<string | null>(null);
+    maskito = input<MaskitoOptions | null>(null, { alias: 'uiDocumentMask' });
 
     hint = input<string | null>(null);
     error = input<string | null>(null);
@@ -57,6 +59,9 @@ export class UiInputFieldComponent implements ControlValueAccessor {
     });
 
     mask = computed(() => {
+        const externalMask = this.maskito();
+        if (externalMask) return externalMask;
+
         if (this.type() === 'number') {
             return maskitoNumberOptionsGenerator(this.maskitoOptions());
         }
@@ -130,8 +135,12 @@ export class UiInputFieldComponent implements ControlValueAccessor {
     }
 
     writeValue(val: any): void {
+        const mask = this.mask();
         if (this.type() === 'number' && val != null && !isNaN(Number(val))) {
             const formatted = maskitoStringifyNumber(Number(val), this.maskitoOptions());
+            this.value.set(formatted);
+        } else if (mask && val != null) {
+            const formatted = maskitoTransform(val.toString(), mask);
             this.value.set(formatted);
         } else {
             this.value.set(val ?? '');

@@ -16,25 +16,15 @@ export class UiDocumentPipe implements PipeTransform {
     transform(value: string | null | undefined): string {
         if (!value) return '';
 
-        const cleanValue = value.replace(/\D/g, '');
-
-        if (cleanValue.length === 11) {
-            return cleanValue.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-        }
-
-        if (cleanValue.length === 14) {
-            return cleanValue.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
-        }
-
-        // For Alphanumeric CNPJ, we might have letters, so we shouldn't just replace digits.
-        // If the user wants "CNPJ Alfa", we should handle alphanumeric characters too.
         const alphanumeric = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
 
         if (alphanumeric.length === 11) {
+            // CPF: 000.000.000-00
             return alphanumeric.replace(/([A-Z0-9]{3})([A-Z0-9]{3})([A-Z0-9]{3})([A-Z0-9]{2})/, '$1.$2.$3-$4');
         }
 
         if (alphanumeric.length === 14) {
+            // CNPJ: AA.AAA.AAA/AAAA-AA
             return alphanumeric.replace(/([A-Z0-9]{2})([A-Z0-9]{3})([A-Z0-9]{3})([A-Z0-9]{4})([A-Z0-9]{2})/, '$1.$2.$3/$4-$5');
         }
 

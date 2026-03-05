@@ -1,45 +1,51 @@
-
 import {
     ChangeDetectionStrategy,
     Component,
-    Input,
+    computed,
+    input,
 } from '@angular/core';
 
 export type CardPadding = 'none' | 'sm' | 'md' | 'lg';
 
 @Component({
     selector: 'ui-card',
+    standalone: true,
     imports: [],
     templateUrl: './card.component.html',
     styleUrl: './card.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UiCardComponent {
-    @Input() padding: CardPadding = 'md';
-    @Input() shadow = true;
-    @Input() hoverable = false;
-    @Input() bordered = true;
-    @Input() rounded = true;
+    padding = input<CardPadding>('md');
+    shadow = input(true);
+    hoverable = input(false);
+    bordered = input(true);
+    rounded = input(true);
+    title = input<string | null>(null);
+    subTitle = input<string | null>(null);
 
-    get classes(): string {
-        const base = 'bg-surface';
+    classes = computed(() => {
+        const base = 'bg-surface overflow-hidden';
 
+        const shadow = this.shadow() ? 'shadow-md' : '';
+        const border = this.bordered() ? 'border border-outline' : '';
+        const hover = this.hoverable()
+            ? 'hover:shadow-lg hover:border-primary transition-all cursor-pointer'
+            : '';
+        const rounded = this.rounded() ? 'rounded-lg' : '';
+
+        return [base, shadow, border, hover, rounded]
+            .filter(Boolean)
+            .join(' ');
+    });
+
+    contentClasses = computed(() => {
         const paddings: Record<CardPadding, string> = {
             none: '',
             sm: 'p-3',
             md: 'p-6',
             lg: 'p-8',
         };
-
-        const shadow = this.shadow ? 'shadow-md' : '';
-        const border = this.bordered ? 'border border-outline' : '';
-        const hover = this.hoverable
-            ? 'hover:shadow-lg hover:border-primary transition-all cursor-pointer'
-            : '';
-        const rounded = this.rounded ? 'rounded-lg' : '';
-
-        return [base, paddings[this.padding], shadow, border, hover, rounded]
-            .filter(Boolean)
-            .join(' ');
-    }
+        return paddings[this.padding()];
+    });
 }

@@ -4,8 +4,8 @@ export const UI_DOCUMENT_MASK: MaskitoOptions = {
     mask: ({ value }) => {
         const cleanValue = value.replace(/[^A-Z0-9]/gi, '');
 
-        if (cleanValue.length <= 11) {
-            // CPF: 000.000.000-00
+        if (cleanValue.length <= 11 && !(/[A-Z]/i.test(cleanValue))) {
+            // CPF: 000.000.000-00 (Only numeric)
             return [
                 /[0-9]/, /[0-9]/, /[0-9]/, '.',
                 /[0-9]/, /[0-9]/, /[0-9]/, '.',
@@ -14,8 +14,7 @@ export const UI_DOCUMENT_MASK: MaskitoOptions = {
             ];
         } else {
             // CNPJ (Alfa): AA.AAA.AAA/AAAA-AA
-            // Alphanumeric parts are the first 8 and the next 4. 
-            // The check digits are always numeric.
+            // Or CPF Alphanumeric (if ever needed, but here focusing on CNPJ standards)
             return [
                 /[a-zA-Z0-9]/, /[a-zA-Z0-9]/, '.',
                 /[a-zA-Z0-9]/, /[a-zA-Z0-9]/, /[a-zA-Z0-9]/, '.',

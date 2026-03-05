@@ -36,4 +36,16 @@ export class CustomersService {
     getCustomer(id: string): Observable<IResponse<Customer>> {
         return this.http.get<IResponse<Customer>>(`${this.apiUrl}/${id}`);
     }
+
+    createCustomer(customer: Partial<Customer>): Observable<IResponse<Customer>> {
+        return this.http.post<IResponse<Customer>>(this.apiUrl, customer);
+    }
+
+    updateCustomer(id: string, customer: Partial<Customer>): Observable<IResponse<Customer>> {
+        return this.http.patch<IResponse<Customer>>(`${this.apiUrl}/${id}`, customer);
+    }
+
+    deleteCustomer(id: string): Observable<void> {
+        return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    }
 }

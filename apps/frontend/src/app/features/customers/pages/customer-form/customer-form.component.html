@@ -1,0 +1,152 @@
+<div class="max-w-4xl mx-auto pb-12">
+    <div class="flex items-center gap-4 mb-8">
+        <ui-button variant="ghost" size="sm" (clicked)="cancel()" class="p-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m15 18-6-6 6-6" />
+            </svg>
+        </ui-button>
+        <h1 class="text-3xl font-bold text-content-primary tracking-tight">
+            {{ isEditMode ? 'Edit' : 'Create' }} <span class="text-primary">Customer</span>
+        </h1>
+    </div>
+
+    <form [formGroup]="customerForm" (ngSubmit)="onSubmit()">
+        <div class="flex flex-col gap-6">
+
+            @if (errorMessage) {
+            <ui-card padding="sm" class="bg-red-50 border-red-200">
+                <div class="flex gap-3 text-red-700 items-start">
+                    <svg class="h-5 w-5 mt-0.5 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <p class="text-sm font-medium">{{ errorMessage }}</p>
+                </div>
+            </ui-card>
+            }
+
+            @if (isLoading) {
+            <ui-card [shadow]="true">
+                <div class="flex flex-col items-center justify-center py-12 gap-4">
+                    <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+                    <p class="text-content-tertiary animate-pulse font-medium">Loading customer data...</p>
+                </div>
+            </ui-card>
+            } @else {
+            <!-- Personal Information Section -->
+            <ui-card [shadow]="true" padding="none" title="Personal Information"
+                subTitle="Basic details about the customer">
+                <div cardHeader class="p-2 bg-primary text-white rounded-lg shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                    </svg>
+                </div>
+
+                <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                    <ui-input-field label="First Name" placeholder="Enter first name" formControlName="firstName"
+                        [required]="true"
+                        [error]="firstName?.touched && firstName?.invalid ? 'First name is required' : ''"></ui-input-field>
+
+                    <ui-input-field label="Last Name" placeholder="Enter last name" formControlName="lastName"
+                        [required]="true"
+                        [error]="lastName?.touched && lastName?.invalid ? 'Last name is required' : ''"></ui-input-field>
+
+                    <ui-input-field label="Document (CPF/CNPJ)" placeholder="000.000.000-00" formControlName="document"
+                        [uiDocumentMask]="docMask"
+                        [error]="document?.touched && document?.invalid ? 'Document is required' : ''"></ui-input-field>
+
+                    <ui-input-field label="Email" type="email" placeholder="customer@example.com"
+                        formControlName="email" [required]="true"
+                        [error]="email?.touched && email?.invalid ? 'Valid email is required' : ''"></ui-input-field>
+
+                    <ui-input-field label="Phone" placeholder="(00) 00000-0000" formControlName="phone"
+                        [required]="true"
+                        [error]="phone?.touched && phone?.invalid ? 'Phone is required' : ''"></ui-input-field>
+
+                    <div class="flex flex-col gap-2">
+                        <label class="text-sm font-medium text-content-secondary">Status</label>
+                        <div class="flex items-center h-[42px]">
+                            <label class="relative inline-flex items-center cursor-pointer group">
+                                <input type="checkbox" id="isActive" formControlName="isActive" class="sr-only peer">
+                                <div
+                                    class="w-11 h-6 bg-surface-tertiary peer-focus:outline-none focus:ring-2 focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary transition-colors">
+                                </div>
+                                <span
+                                    class="ms-3 text-sm font-medium text-content-secondary group-hover:text-content-primary transition-colors">
+                                    {{ customerForm.get('isActive')?.value ? 'Active' : 'Inactive' }}
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </ui-card>
+
+            <!-- Address Information Section -->
+            <ui-card [shadow]="true" padding="none" title="Address Information"
+                subTitle="Billing and shipping location">
+                <div cardHeader class="p-2 bg-primary text-white rounded-lg shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                        <circle cx="12" cy="10" r="3" />
+                    </svg>
+                </div>
+
+                <div class="p-6 flex flex-col gap-6" formGroupName="address">
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                        <div class="md:col-span-9">
+                            <ui-input-field label="Street" placeholder="Street name" formControlName="street"
+                                [required]="true"></ui-input-field>
+                        </div>
+                        <div class="md:col-span-3">
+                            <ui-input-field label="Number" placeholder="123" formControlName="number" [required]="true">
+                            </ui-input-field>
+                        </div>
+                    </div>
+
+                    <ui-input-field label="Complement" placeholder="Apartment, suite, etc."
+                        formControlName="complement"></ui-input-field>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <ui-input-field label="City" placeholder="City" formControlName="city" [required]="true">
+                        </ui-input-field>
+                        <ui-input-field label="State" placeholder="State/Province" formControlName="state"
+                            [required]="true"></ui-input-field>
+                        <ui-input-field label="Zip Code" placeholder="00000-000" formControlName="zipCode"
+                            [required]="true"></ui-input-field>
+                    </div>
+                </div>
+            </ui-card>
+
+            <!-- Actions -->
+            <div class="flex items-center justify-between pt-4">
+                <p class="text-sm text-content-tertiary">* Required fields</p>
+                <div class="flex gap-4">
+                    <ui-button variant="ghost" type="button" (clicked)="cancel()" [disabled]="isSubmitting">
+                        Cancel
+                    </ui-button>
+                    <ui-button variant="primary" type="submit" [loading]="isSubmitting"
+                        [disabled]="customerForm.invalid">
+                        <div class="flex items-center gap-2">
+                            @if (!isSubmitting) {
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                                <polyline points="17 21 17 13 7 13 7 21" />
+                                <polyline points="7 3 7 8 15 8" />
+                            </svg>
+                            }
+                            {{ isEditMode ? 'Update' : 'Create' }} Customer
+                        </div>
+                    </ui-button>
+                </div>
+            </div>
+            }
+        </div>
+    </form>
+</div>

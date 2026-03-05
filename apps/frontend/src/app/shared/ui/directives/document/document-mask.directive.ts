@@ -5,7 +5,7 @@ import { MaskitoOptions } from '@maskito/core';
 import { UI_DOCUMENT_MASK } from './document-mask.options';
 
 @Directive({
-    selector: '[uiDocumentMask]',
+    selector: 'input[uiDocumentMask]',
     standalone: true,
     hostDirectives: [
         {

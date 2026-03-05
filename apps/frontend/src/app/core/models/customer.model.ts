@@ -1,5 +1,14 @@
 import { IResponse } from "./response-base";
 
+export interface Address {
+    street: string;
+    number: string;
+    complement?: string;
+    city: string;
+    state: string;
+    zipCode: string;
+}
+
 export interface Customer {
     id: string;
     tenantId: string;
@@ -9,14 +18,9 @@ export interface Customer {
     phone: string;
     isActive: boolean;
     document: string;
-    street: string;
-    number: string;
-    complement?: string;
-    city: string;
-    state: string;
-    zipCode: string;
-    createdAt: string;
-    updatedAt: string;
+    address: Address;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 export interface CustomerListResponse extends IResponse<Customer[]> {

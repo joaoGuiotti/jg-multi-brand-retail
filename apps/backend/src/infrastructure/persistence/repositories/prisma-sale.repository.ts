@@ -26,7 +26,15 @@ export class PrismaSaleRepository implements SaleRepository {
 
             return tx.sale.findUnique({
                 where: { id: newSale.id, tenantId },
-                include: { items: true },
+                include: {
+                    items: true,
+                    customer: {
+                        select: {
+                            firstName: true,
+                            lastName: true,
+                        }
+                    }
+                },
             });
         });
 
@@ -37,6 +45,12 @@ export class PrismaSaleRepository implements SaleRepository {
         const sale = await this.prisma.sale.findFirst({
             where: { id, tenantId },
             include: {
+                customer: {
+                    select: {
+                        firstName: true,
+                        lastName: true,
+                    }
+                },
                 items: {
                     include: {
                         product: {
@@ -56,7 +70,7 @@ export class PrismaSaleRepository implements SaleRepository {
     }
 
     async findAll(tenantId: string, filters: SaleFilters): Promise<SaleSearchResult> {
-        const { userId, status, startDate, endDate, sortBy, sortOrder } = filters;
+        const { userId, customerId, status, startDate, endDate, sortBy, sortOrder } = filters;
 
         const page = Number(filters.page) || 1;
         const limit = Number(filters.limit) || 10;
@@ -67,6 +81,7 @@ export class PrismaSaleRepository implements SaleRepository {
         };
 
         if (userId) where.userId = userId;
+        if (customerId) where.customerId = customerId;
         if (status) where.status = status;
 
         if (startDate || endDate) {
@@ -88,6 +103,12 @@ export class PrismaSaleRepository implements SaleRepository {
                 take: limit,
                 orderBy,
                 include: {
+                    customer: {
+                        select: {
+                            firstName: true,
+                            lastName: true,
+                        }
+                    },
                     items: {
                         include: {
                             product: {
@@ -167,7 +188,15 @@ export class PrismaSaleRepository implements SaleRepository {
                 tenantId,
             },
             data,
-            include: { items: true },
+            include: {
+                customer: {
+                    select: {
+                        firstName: true,
+                        lastName: true,
+                    }
+                },
+                items: true,
+            },
         });
 
         return SaleMapper.toDomain(updated);

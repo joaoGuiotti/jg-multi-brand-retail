@@ -44,16 +44,27 @@ describe('CreateSaleUseCase', () => {
             .rejects.toThrow(BadRequestException);
     });
 
-    it('should create a sale and return output', async () => {
+    it('should create a sale with customerId and return output', async () => {
         const product = makeProduct();
-        const sale = makeSale();
+        const sale = makeSale({ customerId: 'cust-1' });
         productRepository.findById.mockResolvedValue(product);
         saleRepository.create.mockResolvedValue(sale);
+        prisma.customer = { findFirst: jest.fn().mockResolvedValue({ id: 'cust-1' }) };
 
-        const result = await useCase.execute(baseInput);
+        const result = await useCase.execute({ ...baseInput, customerId: 'cust-1' });
         expect(result).toBeDefined();
-        expect(result.status).toBe('PENDING');
-        expect(productRepository.update).toHaveBeenCalledWith('tenant-1', product);
+        expect(result.customerId).toBe('cust-1');
+        expect(prisma.customer.findFirst).toHaveBeenCalledWith({
+            where: { id: 'cust-1', tenantId: 'tenant-1' }
+        });
+    });
+
+    it('should throw NotFoundException if customer not found', async () => {
+        productRepository.findById.mockResolvedValue(makeProduct());
+        prisma.customer = { findFirst: jest.fn().mockResolvedValue(null) };
+
+        await expect(useCase.execute({ ...baseInput, customerId: 'non-existent' }))
+            .rejects.toThrow(NotFoundException);
     });
 
     it('should apply sale-level discount', async () => {

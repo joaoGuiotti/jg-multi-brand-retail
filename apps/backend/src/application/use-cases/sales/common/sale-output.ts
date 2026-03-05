@@ -17,6 +17,8 @@ export type SaleOutput = {
     id: string;
     tenantId: string;
     userId: string;
+    customerId?: string | null;
+    customerName?: string | null;
     invoiceNumber?: string | null;
     subtotal: number;
     discount: number;
@@ -47,6 +49,8 @@ export class SaleOutputMapper {
             id: entity.id.toString(),
             tenantId: tenantId,
             userId: entity.userId,
+            customerId: entity.customerId,
+            customerName: entity.customerName,
             invoiceNumber: entity.invoiceNumber,
             subtotal: entity.subtotal,
             discount: entity.discount,

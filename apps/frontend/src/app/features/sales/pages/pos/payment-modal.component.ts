@@ -55,7 +55,12 @@ export class PaymentModalComponent {
         };
 
         this.salesService
-            .createSale({ items: cartData.items, discount: cartData.discount, payments: [payment] })
+            .createSale({
+                items: cartData.items,
+                discount: cartData.discount,
+                payments: [payment],
+                customerId: cartData.customerId
+            })
             .subscribe({
                 next: (response) => {
                     this.cartStore.clearCart();

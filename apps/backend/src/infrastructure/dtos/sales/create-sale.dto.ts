@@ -25,6 +25,10 @@ export class CreateSaleDto {
     @Type(() => SaleItemDto)
     items: SaleItemDto[];
 
+    @IsString()
+    @IsOptional()
+    customerId?: string;
+
     @IsNumber()
     @Min(0)
     @IsOptional()

@@ -11,6 +11,10 @@ export class QuerySaleDto {
     status?: string;
 
     @IsOptional()
+    @IsString()
+    customerId?: string;
+
+    @IsOptional()
     @IsDateString()
     startDate?: string;
 

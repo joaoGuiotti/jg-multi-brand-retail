@@ -3,7 +3,10 @@ import { UniqueEntityID } from '../../../common/domain/unique-entity-id';
 import { Sale, SaleItem } from '../../../domain/entities/sales/sale.entity';
 
 export class SaleMapper {
-    static toDomain(raw: PrismaSale & { items?: (PrismaSaleItem & { product?: { name: string; sku: string } | null })[] }): Sale {
+    static toDomain(raw: PrismaSale & {
+        items?: (PrismaSaleItem & { product?: { name: string; sku: string } | null })[],
+        customer?: { firstName: string; lastName: string } | null
+    }): Sale {
         const items = (raw.items || []).map(item => SaleItem.create(
             {
                 productId: item.productId,
@@ -19,6 +22,8 @@ export class SaleMapper {
         return Sale.create(
             {
                 userId: raw.userId,
+                customerId: raw.customerId,
+                customerName: raw.customer ? `${raw.customer.firstName} ${raw.customer.lastName}`.trim() : null,
                 invoiceNumber: raw.invoiceNumber,
                 subtotal: Number(raw.subtotal),
                 discount: Number(raw.discount),
@@ -36,6 +41,7 @@ export class SaleMapper {
         return {
             id: sale.id.toString(),
             userId: sale.userId,
+            customerId: sale.customerId,
             invoiceNumber: sale.invoiceNumber,
             subtotal: sale.subtotal,
             discount: sale.discount,

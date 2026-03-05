@@ -159,6 +159,7 @@ model Sale {
   id            String     @id @default(uuid())
   tenantId      String     @map("tenant_id")
   userId        String     @map("user_id")
+  customerId    String?    @map("customer_id")
   invoiceNumber String?    @map("invoice_number")
   subtotal      Decimal    @db.Decimal(10, 2)
   discount      Decimal    @default(0) @db.Decimal(10, 2)
@@ -169,6 +170,7 @@ model Sale {
 
   tenant   Tenant     @relation(fields: [tenantId], references: [id])
   user     User       @relation(fields: [userId], references: [id])
+  customer Customer?  @relation(fields: [customerId], references: [id])
   items    SaleItem[]
   payments Payment[]
 
@@ -363,6 +365,7 @@ model Customer {
 
   tenant       Tenant        @relation(fields: [tenantId], references: [id])
   conditionals Conditional[]
+  sales        Sale[]
 
   @@index([tenantId])
   @@index([email])

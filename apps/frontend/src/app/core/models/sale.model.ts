@@ -11,6 +11,7 @@ export interface Sale {
     payments: Payment[];
     userId: string;
     tenantId: string;
+    customerId?: string;
     customerName?: string;
     createdAt: string;
     updatedAt: string;
@@ -43,6 +44,7 @@ export interface Payment {
 }
 
 export interface CreateSaleDto {
+    customerId?: string;
     items: CreateSaleItemDto[];
     discount?: number;
     payments: CreatePaymentDto[];

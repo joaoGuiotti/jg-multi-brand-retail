@@ -2,8 +2,52 @@
     <h1 class="text-3xl font-bold text-content mb-6">Point of Sale</h1>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Product Search -->
+        <!-- Main POS Area -->
         <div class="lg:col-span-2">
+            <!-- Customer Selection -->
+            <div class="bg-surface rounded-lg shadow p-6 mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-content">Customer</h2>
+                    <ui-button *ngIf="selectedCustomer()" (click)="removeCustomer()" variant="ghost" size="sm" class="text-red-600">
+                        Remove
+                    </ui-button>
+                </div>
+
+                <div *ngIf="!selectedCustomer()">
+                    <label class="label">Search Customer (Optional)</label>
+                    <input type="text" [(ngModel)]="customerSearchTerm" (input)="searchCustomers()" class="input-field"
+                        placeholder="Search by name, email or phone" />
+
+                    <!-- Customer Search Results -->
+                    <div *ngIf="customerSearchResults().length > 0" class="mt-4 border border-outline rounded-lg divide-y divide-outline max-h-48 overflow-y-auto">
+                        <div *ngFor="let customer of customerSearchResults()" (click)="selectCustomer(customer)"
+                            class="p-3 hover:bg-surface-hover cursor-pointer transition-colors flex justify-between items-center text-sm">
+                            <div>
+                                <p class="font-medium text-content">{{ customer.firstName }} {{ customer.lastName }}</p>
+                                <p class="text-content-secondary text-xs">{{ customer.email }} | {{ customer.phone }}</p>
+                            </div>
+                            <ui-button size="sm" variant="secondary">Select</ui-button>
+                        </div>
+                    </div>
+
+                    <div *ngIf="isSearchingCustomer()" class="mt-2 text-center text-xs text-content-secondary">
+                        Searching customers...
+                    </div>
+                </div>
+
+                <!-- Selected Customer -->
+                <div *ngIf="selectedCustomer()" class="flex items-center gap-4 p-4 bg-blue-50 border border-blue-100 rounded-lg">
+                    <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+                        {{ selectedCustomer()?.firstName?.substring(0, 1) }}{{ selectedCustomer()?.lastName?.substring(0, 1) }}
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-blue-900">{{ selectedCustomer()?.firstName }} {{ selectedCustomer()?.lastName }}</h3>
+                        <p class="text-sm text-blue-700">{{ selectedCustomer()?.email }} | {{ selectedCustomer()?.phone }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Search -->
             <div class="bg-surface rounded-lg shadow p-6 mb-6">
                 <label class="label">Search Products</label>
                 <input type="text" [(ngModel)]="searchTerm" (input)="searchProducts()" class="input-field"
@@ -115,6 +159,9 @@
                     <div class="border-t pt-3 flex justify-between text-xl font-bold text-content">
                         <span>Total:</span>
                         <span>R$ {{ cartStore.total() | uiNumber: { prefix: 'R$ ' } }}</span>
+                    </div>
+                    <div *ngIf="selectedCustomer()" class="pt-2 text-sm text-blue-600 font-medium italic">
+                        Customer: {{ selectedCustomer()?.firstName }} {{ selectedCustomer()?.lastName }}
                     </div>
                 </div>
 

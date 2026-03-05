@@ -3,7 +3,9 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ModalService, UiBadgeComponent, UiButtonComponent, UiNumberPipe } from '@shared/ui';
+import { Customer } from '../../../../core/models/customer.model';
 import { Product } from '../../../../core/models/product.model';
+import { CustomersService } from '../../../../core/services/customers.service';
 import { ProductsService } from '../../../../core/services/products.service';
 import { CartStore } from '../../store/cart.store';
 import { PaymentModalComponent, PaymentModalResult } from './payment-modal.component';
@@ -17,9 +19,15 @@ import { PaymentModalComponent, PaymentModalResult } from './payment-modal.compo
 })
 export class PosComponent {
     private productsService = inject(ProductsService);
+    private customersService = inject(CustomersService);
     private modalService = inject(ModalService);
     private router = inject(Router);
     cartStore = inject(CartStore);
+
+    customerSearchTerm = '';
+    customerSearchResults = signal<Customer[]>([]);
+    isSearchingCustomer = signal(false);
+    selectedCustomer = this.cartStore.selectedCustomer;
 
     searchTerm = '';
     searchResults = signal<Product[]>([]);
@@ -41,6 +49,34 @@ export class PosComponent {
                 this.isSearching.set(false);
             }
         });
+    }
+
+    searchCustomers(): void {
+        if (!this.customerSearchTerm || this.customerSearchTerm.length < 2) {
+            this.customerSearchResults.set([]);
+            return;
+        }
+
+        this.isSearchingCustomer.set(true);
+        this.customersService.getCustomers(1, 10, { search: this.customerSearchTerm, isActive: true }).subscribe({
+            next: (response) => {
+                this.customerSearchResults.set(response.data);
+                this.isSearchingCustomer.set(false);
+            },
+            error: () => {
+                this.isSearchingCustomer.set(false);
+            }
+        });
+    }
+
+    selectCustomer(customer: Customer): void {
+        this.cartStore.setCustomer(customer);
+        this.customerSearchTerm = '';
+        this.customerSearchResults.set([]);
+    }
+
+    removeCustomer(): void {
+        this.cartStore.setCustomer(null);
     }
 
     addToCart(product: Product): void {

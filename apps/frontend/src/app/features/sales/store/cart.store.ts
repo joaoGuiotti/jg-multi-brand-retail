@@ -1,4 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
+import { Customer } from '../../../core/models/customer.model';
 import { Product } from '../../../core/models/product.model';
 
 export interface CartItem {
@@ -13,9 +14,13 @@ export interface CartItem {
 })
 export class CartStore {
     private items = signal<CartItem[]>([]);
+    private customer = signal<Customer | null>(null);
 
     // Read-only signals
     cartItems = this.items.asReadonly();
+    selectedCustomer = this.customer.asReadonly();
+
+    customerId = computed(() => this.customer()?.id || null);
 
     // Computed values
     itemCount = computed(() =>
@@ -77,12 +82,18 @@ export class CartStore {
         );
     }
 
+    setCustomer(customer: Customer | null): void {
+        this.customer.set(customer);
+    }
+
     clearCart(): void {
         this.items.set([]);
+        this.customer.set(null);
     }
 
     getCartData() {
         return {
+            customerId: this.customer()?.id,
             items: this.items().map(item => ({
                 productId: item.product.id,
                 quantity: item.quantity,

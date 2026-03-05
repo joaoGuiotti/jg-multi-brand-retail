@@ -16,6 +16,7 @@ export type CreateSaleItemInput = {
 export type CreateSaleInput = {
     tenantId: string;
     userId: string;
+    customerId?: string;
     items: CreateSaleItemInput[];
     discount?: number;
 };
@@ -29,7 +30,16 @@ export class CreateSaleUseCase implements UseCase<CreateSaleInput, SaleOutput> {
     ) { }
 
     async execute(input: CreateSaleInput): Promise<SaleOutput> {
-        const { tenantId, userId, items: itemsInput, discount: saleDiscount } = input;
+        const { tenantId, userId, customerId, items: itemsInput, discount: saleDiscount } = input;
+
+        if (customerId) {
+            const customer = await this.prisma.customer.findFirst({
+                where: { id: customerId, tenantId },
+            });
+            if (!customer) {
+                throw new NotFoundException(`Customer ${customerId} not found`);
+            }
+        }
         const items: SaleItem[] = [];
         let subtotal = 0;
 
@@ -72,6 +82,7 @@ export class CreateSaleUseCase implements UseCase<CreateSaleInput, SaleOutput> {
 
         const sale = Sale.create({
             userId,
+            customerId,
             subtotal,
             discount,
             total,

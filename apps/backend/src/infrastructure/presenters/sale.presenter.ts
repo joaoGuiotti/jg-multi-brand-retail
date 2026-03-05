@@ -31,6 +31,8 @@ export class SalePresenter {
     id: string;
     tenantId: string;
     userId: string;
+    customerId: string | null;
+    customerName: string | null;
     invoiceNumber: string | null;
     subtotal: number;
     discount: number;
@@ -48,6 +50,8 @@ export class SalePresenter {
         this.id = output.id;
         this.tenantId = output.tenantId;
         this.userId = output.userId;
+        this.customerId = output.customerId ?? null;
+        this.customerName = output.customerName ?? null;
         this.invoiceNumber = output.invoiceNumber ?? null;
         this.subtotal = output.subtotal;
         this.discount = output.discount;

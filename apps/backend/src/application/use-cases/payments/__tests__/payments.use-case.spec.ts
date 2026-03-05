@@ -1,7 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
-import { Payment } from '../../../domain/entities/payments/payment.entity';
-import { GetPaymentUseCase } from './get-payment.use-case';
-import { ListPaymentsUseCase } from './list-payments.use-case';
+import { Payment } from '../../../../domain/entities/payments/payment.entity';
+import { GetPaymentUseCase } from '../get-payment.use-case';
+import { ListPaymentsUseCase } from '../list-payments.use-case';
 
 const makePayment = (overrides: any = {}) =>
     Payment.create({ saleId: 'sale-1', method: 'CASH', amount: 40, status: 'PAID', installments: 1, fee: 0, ...overrides });

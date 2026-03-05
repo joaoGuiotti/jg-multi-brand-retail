@@ -16,6 +16,7 @@ const createCustomer = () => {
             state: 'SP',
             zipCode: '00000-000',
         }),
+        document: '12345678901',
         isActive: true,
     });
 }
@@ -32,6 +33,7 @@ describe('Customer Entity', () => {
             lastName: 'Doe',
             phone: '123456789',
             email: 'john.doe@example.com',
+            document: '123456789',
             address: Address.create({
                 street: '123 Main St',
                 number: '123',
@@ -51,6 +53,7 @@ describe('Customer Entity', () => {
             lastName: 'Doe',
             phone: '123456789',
             email: 'john.doe@example.com',
+            document: '123456789',
             address: Address.create({
                 street: '123 Main St',
                 number: '123',
@@ -173,6 +176,7 @@ describe('Customer Entity', () => {
                 lastName: longString,
                 phone: longString,
                 email: longString,
+                document: longString,
                 address: Address.create({
                     street: '123 Main St',
                     number: '123',
@@ -189,8 +193,36 @@ describe('Customer Entity', () => {
                 'firstName must be shorter than or equal to 100 characters',
                 'lastName must be shorter than or equal to 100 characters',
                 'phone must be shorter than or equal to 100 characters',
-                'email must be shorter than or equal to 100 characters'
+                'email must be shorter than or equal to 100 characters',
+                'document must be a valid CPF (11 digits) or CNPJ (14 digits)'
             ]);
+        });
+
+        it('Should validate document invalid with min length', () => {
+            const customer = createCustomer();
+            customer.updateDocument('12345');
+            expect(customer.notification.hasErrors()).toBe(true);
+            expect(customer.notification.messages()).toContain('document must be a valid CPF (11 digits) or CNPJ (14 digits)');
+        });
+
+        it('Should validate document invalid with max length', () => {
+            const customer = createCustomer();
+            customer.updateDocument('123456789012345');
+            expect(customer.notification.hasErrors()).toBe(true);
+            expect(customer.notification.messages()).toContain('document must be a valid CPF (11 digits) or CNPJ (14 digits)');
+        });
+
+        it('Should validate document invalid with in-between length', () => {
+            const customer = createCustomer();
+            customer.updateDocument('123456789012');
+            expect(customer.notification.hasErrors()).toBe(true);
+            expect(customer.notification.messages()).toContain('document must be a valid CPF (11 digits) or CNPJ (14 digits)');
+        });
+
+        it('Should validate document as valid CNPJ (14 digits)', () => {
+            const customer = createCustomer();
+            customer.updateDocument('12345678901234');
+            expect(customer.notification.hasErrors()).toBe(false);
         });
     })
 

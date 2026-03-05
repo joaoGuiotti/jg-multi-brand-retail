@@ -19,6 +19,10 @@ export class UpdateCustomerDto {
     @IsOptional()
     phone?: string;
 
+    @IsString()
+    @IsOptional()
+    document?: string;
+
     @IsBoolean()
     @IsOptional()
     isActive?: boolean;

@@ -33,19 +33,22 @@ export class Customer extends AggregateRoot<CustomerProps> {
     public get document(): string { return this.props.document; }
 
 
-    public updateFirstName(firstName: string): void { this.props.firstName = firstName; }
+    public updateFirstName(firstName: string): void { this.props.firstName = firstName; this.validate(['firstName']); }
 
-    public updateLastName(lastName: string): void { this.props.lastName = lastName; }
+    public updateLastName(lastName: string): void { this.props.lastName = lastName; this.validate(['lastName']); }
 
-    public updatePhone(phone: string): void { this.props.phone = phone; }
+    public updatePhone(phone: string): void { this.props.phone = phone; this.validate(['phone']); }
 
-    public updateEmail(email: string): void { this.props.email = email; }
+    public updateEmail(email: string): void { this.props.email = email; this.validate(['email']); }
 
-    public updateAddress(address: Address): void { this.props.address = address; }
+    public updateAddress(address: Address): void { this.props.address = address; this.validate(['address']); }
 
-    public updateIsActive(isActive: boolean): void { this.props.isActive = isActive; }
+    public updateIsActive(isActive: boolean): void { this.props.isActive = isActive; this.validate(['isActive']); }
 
-    public updateDocument(document: string): void { this.props.document = document; }
+    public updateDocument(document: string): void {
+        this.props.document = document;
+        this.validate(['document']);
+    }
 
     public validate(fields?: string[]): void {
         const validator = CustomerValidatorFactory.create();

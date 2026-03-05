@@ -1,6 +1,6 @@
 import { ClassValidatorFields } from "@common/domain/validators/class-validator-field";
 import { Notification } from "@common/domain/validators/notification";
-import { IsBoolean, MaxLength, MinLength } from "class-validator";
+import { IsBoolean, IsString, Matches, MaxLength } from "class-validator";
 import { Customer } from "./customer.entity";
 
 export class CustomerRules {
@@ -19,8 +19,11 @@ export class CustomerRules {
     @IsBoolean({ groups: ['isActive'] })
     isActive: boolean;
 
-    @MaxLength(100, { groups: ['document'] })
-    @MinLength(11, { groups: ['document'] })
+    @IsString({ groups: ['document'] })
+    @Matches(/^\d{11}$|^\d{14}$/, {
+        groups: ['document'],
+        message: 'document must be a valid CPF (11 digits) or CNPJ (14 digits)'
+    })
     document: string;
 
     constructor(customer: Customer) {

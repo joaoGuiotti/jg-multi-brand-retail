@@ -18,9 +18,7 @@ import {
 } from '@angular/forms';
 import { MaskitoDirective } from '@maskito/angular';
 import { maskitoNumberOptionsGenerator, maskitoParseNumber, maskitoStringifyNumber } from '@maskito/kit';
-import { UI_DOCUMENT_MASK } from '../../directives/document-mask.options';
-
-export type InputType = 'text' | 'email' | 'password' | 'number' | 'search' | 'tel' | 'url' | 'document';
+export type InputType = 'text' | 'email' | 'password' | 'number' | 'search' | 'tel' | 'url';
 
 @Component({
     selector: 'ui-input-field',
@@ -61,11 +59,6 @@ export class UiInputFieldComponent implements ControlValueAccessor {
     mask = computed(() => {
         if (this.type() === 'number') {
             return maskitoNumberOptionsGenerator(this.maskitoOptions());
-        }
-        if (this.type() === 'document') {
-            // We'll import this constant or just define it here. 
-            // Better to import to keep it DRY.
-            return UI_DOCUMENT_MASK;
         }
         return null;
     });

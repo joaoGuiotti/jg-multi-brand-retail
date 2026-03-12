@@ -1,8 +1,8 @@
+import { UseCase } from '@common/application/use-case.interface';
+import { SaleRepository } from '@domain/repositories/sale-repository';
+import { TenantRepository } from '@domain/repositories/tenant-repository';
+import { PdfService } from '@infrastructure/services/pdf';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { UseCase } from '../../../common/application/use-case.interface';
-import { TenantRepository } from '../../../domain/repositories/tenant-repository';
-import { SaleRepository } from '../../../domain/repositories/sale-repository';
-import { PdfService } from '../../../infrastructure/services/pdf.service';
 
 export type GenerateSaleReceiptInput = { tenantId: string; id: string };
 
@@ -24,7 +24,7 @@ export class GenerateSaleReceiptUseCase implements UseCase<GenerateSaleReceiptIn
             throw new NotFoundException('Sale not found');
         }
 
-        return this.pdfService.generateReceipt({
+        return (await this.pdfService.generateReceipt({
             storeName: tenant?.name ?? 'My Store',
             logoUrl: tenant?.logoUrl,
             id: sale.id.toString(),
@@ -40,6 +40,6 @@ export class GenerateSaleReceiptUseCase implements UseCase<GenerateSaleReceiptIn
             subtotal: sale.subtotal,
             discount: sale.discount,
             total: sale.total,
-        });
+        })).toBuffer();
     }
 }

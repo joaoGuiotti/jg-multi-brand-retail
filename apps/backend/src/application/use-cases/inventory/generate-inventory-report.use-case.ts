@@ -1,9 +1,9 @@
+import { UseCase } from '@common/application/use-case.interface';
+import { InventoryRepository } from '@domain/repositories/inventory-repository';
+import { TenantRepository } from '@domain/repositories/tenant-repository';
+import { PrismaService } from '@infrastructure/persistence/prisma/prisma.service';
+import { PdfService } from '@infrastructure/services/pdf';
 import { Injectable } from '@nestjs/common';
-import { UseCase } from '../../../common/application/use-case.interface';
-import { TenantRepository } from '../../../domain/repositories/tenant-repository';
-import { InventoryRepository } from '../../../domain/repositories/inventory-repository';
-import { PdfService } from '../../../infrastructure/services/pdf.service';
-import { PrismaService } from '../../../infrastructure/persistence/prisma/prisma.service';
 
 export type GenerateInventoryReportInput = {
     tenantId: string;
@@ -80,7 +80,7 @@ export class GenerateInventoryReportUseCase implements UseCase<GenerateInventory
         const now = new Date();
         const storeName = tenant?.name ?? 'My Store';
 
-        return this.pdfService.generateDocument({
+        return (await this.pdfService.generateDocument({
             header: {
                 title: `${storeName} — Inventory Report`,
                 subtitle: `Generated on ${now.toLocaleDateString('pt-BR')} at ${now.toLocaleTimeString('pt-BR')}`,
@@ -225,10 +225,10 @@ export class GenerateInventoryReportUseCase implements UseCase<GenerateInventory
 
                     const mHY = doc.y;
                     doc.fontSize(8).font('Helvetica-Bold').fillColor('#666666');
-                    doc.text('Date',      L,                            mHY, { width: dateW });
-                    doc.text('Type',      L + dateW,                    mHY, { width: mTypeW });
-                    doc.text('Product',   L + dateW + mTypeW,           mHY, { width: prodW });
-                    doc.text('Qty',       L + dateW + mTypeW + prodW,   mHY, { width: qtyW, align: 'right' });
+                    doc.text('Date', L, mHY, { width: dateW });
+                    doc.text('Type', L + dateW, mHY, { width: mTypeW });
+                    doc.text('Product', L + dateW + mTypeW, mHY, { width: prodW });
+                    doc.text('Qty', L + dateW + mTypeW + prodW, mHY, { width: qtyW, align: 'right' });
                     doc.text('Reference', L + dateW + mTypeW + prodW + qtyW, mHY, { width: refW, align: 'right' });
                     doc.y = mHY + 12;
                     doc.moveDown(0.2);
@@ -248,7 +248,7 @@ export class GenerateInventoryReportUseCase implements UseCase<GenerateInventory
                         const prodSku = prod?.sku ? ` (${prod.sku})` : '';
                         const dateStr = m.createdAt
                             ? m.createdAt.toLocaleDateString('pt-BR') + '\n' +
-                              m.createdAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+                            m.createdAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
                             : '-';
 
                         const typeColors: Record<string, string> = {
@@ -281,6 +281,11 @@ export class GenerateInventoryReportUseCase implements UseCase<GenerateInventory
                     }
                 }
             },
+            footer: {
+                text: `${storeName} Inventory Report — ${now.toLocaleDateString('pt-BR')} — Confidential`,
+                showPageNumbers: true,
+            },
+        })).toBuffer({
             footer: {
                 text: `${storeName} Inventory Report — ${now.toLocaleDateString('pt-BR')} — Confidential`,
                 showPageNumbers: true,

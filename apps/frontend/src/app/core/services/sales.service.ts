@@ -56,4 +56,16 @@ export class SalesService {
     getReceipt(id: string): Observable<Blob> {
         return this.http.get(`${this.apiUrl}/${id}/receipt`, { responseType: 'blob' });
     }
+
+    getSalesReport(filter: SaleFilter): Observable<Blob> {
+        let params = new HttpParams();
+        if (filter.startDate) params = params.set('startDate', filter.startDate);
+        if (filter.endDate) params = params.set('endDate', filter.endDate);
+        if (filter.status) params = params.set('status', filter.status);
+
+        return this.http.get(`${this.apiUrl}/reports/history`, {
+            params,
+            responseType: 'blob'
+        });
+    }
 }

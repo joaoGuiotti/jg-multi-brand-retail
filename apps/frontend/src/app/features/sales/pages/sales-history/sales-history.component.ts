@@ -17,6 +17,7 @@ import { SaleDetailModalComponent } from '../../components/sale-detail-modal/sal
 export class SalesHistoryComponent implements OnInit {
     sales = signal<Sale[]>([]);
     isLoading = signal(false);
+    isDownloadingReport = signal(false);
     errorMessage = signal('');
 
     // Pagination
@@ -106,6 +107,31 @@ export class SalesHistoryComponent implements OnInit {
             data: id,
             title: 'SALE DETAILS',
             minWidth: '900px'
+        });
+    }
+
+    downloadReport(): void {
+        this.isDownloadingReport.set(true);
+        const filter: SaleFilter = {
+            status: (this.selectedStatus() as any) || undefined,
+            startDate: this.startDate() || undefined,
+            endDate: this.endDate() || undefined
+        };
+
+        this.salesService.getSalesReport(filter).subscribe({
+            next: (blob) => {
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `sales-report-${new Date().toISOString().slice(0, 10)}.pdf`;
+                link.click();
+                window.URL.revokeObjectURL(url);
+                this.isDownloadingReport.set(false);
+            },
+            error: (error) => {
+                this.errorMessage.set(error.error?.message || 'Failed to download report');
+                this.isDownloadingReport.set(false);
+            }
         });
     }
 

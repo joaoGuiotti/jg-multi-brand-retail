@@ -9,7 +9,7 @@ import { TenantRepository } from '../../domain/repositories/tenant-repository';
 import { InventoryController } from '../controllers/inventory.controller';
 import { PrismaInventoryRepository } from '../persistence/repositories/prisma-inventory.repository';
 import { PrismaTenantRepository } from '../persistence/repositories/prisma-tenant.repository';
-import { PdfService } from '../services/pdf.service';
+import { PdfService } from '../services/pdf';
 import { PrismaModule } from './prisma.module';
 import { ProductsModule } from './products.module';
 

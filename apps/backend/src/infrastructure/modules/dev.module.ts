@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { PdfDevController } from '../controllers/pdf-dev.controller';
-import { PdfService } from '../services/pdf.service';
+import { PdfService } from '../services/pdf';
 import { PrismaModule } from './prisma.module';
 
 /**

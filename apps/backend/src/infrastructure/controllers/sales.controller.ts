@@ -5,6 +5,7 @@ import { GetDailyRevenueUseCase } from '@application/use-cases/sales/get-daily-r
 import { GetSaleUseCase } from '@application/use-cases/sales/get-sale.use-case';
 import { ListSalesUseCase } from '@application/use-cases/sales/list-sales.use-case';
 import { GenerateSaleReceiptUseCase } from '@application/use-cases/sales/generate-sale-receipt.use-case';
+import { GenerateSalesHistoryReportUseCase } from '@application/use-cases/sales/generate-sales-history-report.use-case';
 import { CreateSaleDto, QuerySaleDto } from '@infrastructure/dtos/sales';
 import {
     Body,
@@ -46,6 +47,7 @@ export class SalesController {
         private completeSaleUseCase: CompleteSaleUseCase,
         private getDailyRevenueUseCase: GetDailyRevenueUseCase,
         private generateSaleReceiptUseCase: GenerateSaleReceiptUseCase,
+        private generateSalesHistoryReportUseCase: GenerateSalesHistoryReportUseCase,
     ) { }
 
     @Post()
@@ -73,6 +75,29 @@ export class SalesController {
             days: days ? Number(days) : 7,
         });
         return output;
+    }
+
+    @Get('reports/history')
+    async getSalesReport(
+        @CurrentUser() user: any,
+        @Query('startDate') startDate?: string,
+        @Query('endDate') endDate?: string,
+        @Query('status') status?: string,
+        @Res() res?: Response,
+    ) {
+        const buffer = await this.generateSalesHistoryReportUseCase.execute({
+            tenantId: user.tenantId,
+            startDate,
+            endDate,
+            status,
+        });
+        const filename = `sales-report-${new Date().toISOString().slice(0, 10)}.pdf`;
+        res!.set({
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': `attachment; filename="${filename}"`,
+            'Content-Length': buffer.length,
+        });
+        res!.end(buffer);
     }
 
     @Get(':id')

@@ -1,13 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, effect, inject, signal, untracked } from '@angular/core';
-import { ThemeService, UiCardComponent } from '@shared/ui';
+import { FormsModule } from '@angular/forms';
+import { ThemeService, UiCardComponent, UiButtonComponent } from '@shared/ui';
 import { ApexOptions, NgApexchartsModule } from 'ng-apexcharts';
 import { SalesService } from '../../../../core/services/sales.service';
 
 @Component({
     selector: 'app-reports-list',
     standalone: true,
-    imports: [CommonModule, UiCardComponent, NgApexchartsModule],
+    imports: [CommonModule, UiCardComponent, NgApexchartsModule, FormsModule, UiButtonComponent],
     templateUrl: './reports-list.component.html',
     styleUrl: './reports-list.component.scss'
 })
@@ -16,7 +17,11 @@ export class ReportsListComponent implements OnInit {
     private themeService = inject(ThemeService);
 
     isLoading = signal(true);
+    isDownloading = signal(false);
     revenueChartOptions = signal<ApexOptions | null>(null);
+
+    startDate = signal<string>('');
+    endDate = signal<string>('');
 
     constructor() {
         effect(() => {
@@ -137,6 +142,30 @@ export class ReportsListComponent implements OnInit {
                     bottom: 0,
                     left: 0
                 }
+            }
+        });
+    }
+
+    downloadSalesReport(): void {
+        this.isDownloading.set(true);
+        const filter = {
+            startDate: this.startDate() || undefined,
+            endDate: this.endDate() || undefined
+        };
+
+        this.salesService.getSalesReport(filter).subscribe({
+            next: (blob) => {
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `sales-report-${new Date().toISOString().slice(0, 10)}.pdf`;
+                link.click();
+                window.URL.revokeObjectURL(url);
+                this.isDownloading.set(false);
+            },
+            error: () => {
+                this.isDownloading.set(false);
+                alert('Failed to download sales report');
             }
         });
     }

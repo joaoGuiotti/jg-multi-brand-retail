@@ -1,5 +1,10 @@
 <div class="max-w-7xl mx-auto">
-    <h1 class="text-3xl font-bold text-content mb-6">Sales History</h1>
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-3xl font-bold text-content">Sales History</h1>
+        <ui-button (clicked)="downloadReport()" variant="primary" [loading]="isDownloadingReport()">
+            Download PDF Report
+        </ui-button>
+    </div>
 
     <!-- Filters -->
     <ui-card [shadow]="true" padding="sm" class="mb-6">

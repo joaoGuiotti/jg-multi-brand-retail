@@ -5,9 +5,13 @@ import { CreateSaleUseCase } from '../../application/use-cases/sales/create-sale
 import { GetDailyRevenueUseCase } from '../../application/use-cases/sales/get-daily-revenue.use-case';
 import { GetSaleUseCase } from '../../application/use-cases/sales/get-sale.use-case';
 import { ListSalesUseCase } from '../../application/use-cases/sales/list-sales.use-case';
+import { GenerateSaleReceiptUseCase } from '../../application/use-cases/sales/generate-sale-receipt.use-case';
 import { SaleRepository } from '../../domain/repositories/sale-repository';
+import { TenantRepository } from '../../domain/repositories/tenant-repository';
 import { SalesController } from '../controllers/sales.controller';
 import { PrismaSaleRepository } from '../persistence/repositories/prisma-sale.repository';
+import { PrismaTenantRepository } from '../persistence/repositories/prisma-tenant.repository';
+import { PdfService } from '../services/pdf.service';
 import { PrismaModule } from './prisma.module';
 import { ProductsModule } from './products.module';
 
@@ -19,12 +23,18 @@ import { ProductsModule } from './products.module';
             provide: SaleRepository,
             useClass: PrismaSaleRepository,
         },
+        {
+            provide: TenantRepository,
+            useClass: PrismaTenantRepository,
+        },
+        PdfService,
         CreateSaleUseCase,
         ListSalesUseCase,
         GetSaleUseCase,
         CancelSaleUseCase,
         CompleteSaleUseCase,
         GetDailyRevenueUseCase,
+        GenerateSaleReceiptUseCase,
     ],
     exports: [
         SaleRepository,
@@ -33,7 +43,7 @@ import { ProductsModule } from './products.module';
         GetSaleUseCase,
         CancelSaleUseCase,
         CompleteSaleUseCase,
-        GetDailyRevenueUseCase,
+        GenerateSaleReceiptUseCase,
     ],
 })
 export class SalesModule { }

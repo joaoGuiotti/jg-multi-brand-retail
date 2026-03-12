@@ -52,4 +52,8 @@ export class SalesService {
         const params = new HttpParams().set('days', days.toString());
         return this.http.get<IResponse<{ date: string; revenue: number }[]>>(`${this.apiUrl}/reports/daily-revenue`, { params });
     }
+
+    getReceipt(id: string): Observable<Blob> {
+        return this.http.get(`${this.apiUrl}/${id}/receipt`, { responseType: 'blob' });
+    }
 }

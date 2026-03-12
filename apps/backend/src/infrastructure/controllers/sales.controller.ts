@@ -4,6 +4,7 @@ import { CreateSaleUseCase } from '@application/use-cases/sales/create-sale.use-
 import { GetDailyRevenueUseCase } from '@application/use-cases/sales/get-daily-revenue.use-case';
 import { GetSaleUseCase } from '@application/use-cases/sales/get-sale.use-case';
 import { ListSalesUseCase } from '@application/use-cases/sales/list-sales.use-case';
+import { GenerateSaleReceiptUseCase } from '@application/use-cases/sales/generate-sale-receipt.use-case';
 import { CreateSaleDto, QuerySaleDto } from '@infrastructure/dtos/sales';
 import {
     Body,
@@ -15,8 +16,10 @@ import {
     Patch,
     Post,
     Query,
+    Res,
     UseGuards
 } from '@nestjs/common';
+import type { Response } from 'express';
 import { ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { Roles } from '../decorators/roles.decorator';
@@ -42,6 +45,7 @@ export class SalesController {
         private cancelSaleUseCase: CancelSaleUseCase,
         private completeSaleUseCase: CompleteSaleUseCase,
         private getDailyRevenueUseCase: GetDailyRevenueUseCase,
+        private generateSaleReceiptUseCase: GenerateSaleReceiptUseCase,
     ) { }
 
     @Post()
@@ -75,6 +79,26 @@ export class SalesController {
     async findOne(@CurrentUser() user: any, @Param('id') id: string) {
         const output = await this.getSaleUseCase.execute({ tenantId: user.tenantId, id });
         return new SalePresenter(output);
+    }
+
+    @Get(':id/receipt')
+    async getReceipt(
+        @CurrentUser() user: any,
+        @Param('id') id: string,
+        @Res() res: Response
+    ) {
+        const buffer = await this.generateSaleReceiptUseCase.execute({
+            tenantId: user.tenantId,
+            id
+        });
+
+        res.set({
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': `attachment; filename=receipt-${id}.pdf`,
+            'Content-Length': buffer.length,
+        });
+
+        res.end(buffer);
     }
 
     @Patch(':id/cancel')

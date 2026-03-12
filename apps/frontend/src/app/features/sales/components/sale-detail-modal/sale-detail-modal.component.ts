@@ -28,6 +28,25 @@ export class SaleDetailModalComponent implements OnInit {
     isLoading = signal(true);
     errorMessage = signal('');
 
+    onPrint(): void {
+        const sale = this.sale();
+        if (!sale) return;
+
+        this.salesService.getReceipt(sale.id).subscribe({
+            next: (blob) => {
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `receipt-${sale.invoiceNumber || sale.id}.pdf`;
+                link.click();
+                window.URL.revokeObjectURL(url);
+            },
+            error: (error) => {
+                this.errorMessage.set('Failed to download receipt');
+            }
+        });
+    }
+
     columns: TableColumn[] = [
         { key: 'product.name', label: 'Product', sortable: true },
         { key: 'quantity', label: 'Qty', width: '80px', sortable: true },

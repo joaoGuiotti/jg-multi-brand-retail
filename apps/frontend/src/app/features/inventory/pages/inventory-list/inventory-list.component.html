@@ -34,8 +34,8 @@
 
     <!-- Filters + Add Button -->
     <ui-card [shadow]="true" padding="sm" class="mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
-            <div>
+        <div class="flex flex-wrap gap-3 items-end">
+            <div class="flex flex-col min-w-[140px] flex-1">
                 <label class="label">Type</label>
                 <select [ngModel]="selectedType()" (ngModelChange)="selectedType.set($event); onFilterChange()"
                     class="input-field">
@@ -45,7 +45,7 @@
                     }
                 </select>
             </div>
-            <div>
+            <div class="flex flex-col min-w-[160px] flex-[2]">
                 <label class="label">Product</label>
                 <select [ngModel]="selectedProductId()"
                     (ngModelChange)="selectedProductId.set($event); onFilterChange()" class="input-field">
@@ -55,17 +55,27 @@
                     }
                 </select>
             </div>
-            <div>
+            <div class="flex flex-col min-w-[140px] flex-1">
                 <label class="label">Start Date</label>
                 <input type="date" [ngModel]="startDate()" (ngModelChange)="startDate.set($event); onFilterChange()"
                     class="input-field" />
             </div>
-            <div>
+            <div class="flex flex-col min-w-[140px] flex-1">
                 <label class="label">End Date</label>
                 <input type="date" [ngModel]="endDate()" (ngModelChange)="endDate.set($event); onFilterChange()"
                     class="input-field" />
             </div>
-            <div class="flex justify-end">
+            <div class="flex gap-2 self-end shrink-0">
+                <ui-button variant="secondary" (clicked)="downloadReport()" [disabled]="isDownloadingReport()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="mr-1">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    {{ isDownloadingReport() ? 'Generating...' : 'Download Report' }}
+                </ui-button>
                 <ui-button variant="primary" (clicked)="openAddMovement()">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"

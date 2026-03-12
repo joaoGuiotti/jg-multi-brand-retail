@@ -2,6 +2,7 @@ import { CreateMovementUseCase } from '@application/use-cases/inventory/create-m
 import { GetProductMovementsUseCase } from '@application/use-cases/inventory/get-product-movements.use-case';
 import { GetStockSummaryUseCase } from '@application/use-cases/inventory/get-stock-summary.use-case';
 import { ListMovementsUseCase } from '@application/use-cases/inventory/list-movements.use-case';
+import { GenerateInventoryReportUseCase } from '@application/use-cases/inventory/generate-inventory-report.use-case';
 import { CreateInventoryMovementDto, QueryInventoryMovementDto } from '@infrastructure/dtos/inventory';
 import {
     Body,
@@ -13,9 +14,11 @@ import {
     Param,
     Post,
     Query,
+    Res,
     UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiProduces, ApiResponse, ApiTags } from '@nestjs/swagger';
+import type { Response } from 'express';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { Roles } from '../decorators/roles.decorator';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
@@ -40,6 +43,8 @@ export class InventoryController {
     private getStockSummaryUseCase: GetStockSummaryUseCase;
     @Inject(GetProductMovementsUseCase)
     private getProductMovementsUseCase: GetProductMovementsUseCase;
+    @Inject(GenerateInventoryReportUseCase)
+    private generateInventoryReportUseCase: GenerateInventoryReportUseCase;
 
     @Post('movements')
     @UseGuards(RolesGuard)
@@ -80,5 +85,33 @@ export class InventoryController {
     @HttpCode(HttpStatus.OK)
     async getStockSummary(@CurrentUser() user: any) {
         return this.getStockSummaryUseCase.execute({ tenantId: user.tenantId });
+    }
+
+    @Get('report')
+    @ApiOperation({ summary: 'Download inventory report as PDF' })
+    @ApiProduces('application/pdf')
+    @ApiResponse({ status: 200, description: 'PDF inventory report', content: { 'application/pdf': { schema: { type: 'string', format: 'binary' } } } })
+    async getInventoryReport(
+        @CurrentUser() user: any,
+        @Query('startDate') startDate?: string,
+        @Query('endDate') endDate?: string,
+        @Query('type') type?: string,
+        @Query('productId') productId?: string,
+        @Res() res?: Response,
+    ) {
+        const buffer = await this.generateInventoryReportUseCase.execute({
+            tenantId: user.tenantId,
+            startDate,
+            endDate,
+            type,
+            productId,
+        });
+        const filename = `inventory-report-${new Date().toISOString().slice(0, 10)}.pdf`;
+        res!.set({
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': `attachment; filename="${filename}"`,
+            'Content-Length': buffer.length,
+        });
+        res!.end(buffer);
     }
 }

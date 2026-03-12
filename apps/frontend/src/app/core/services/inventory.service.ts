@@ -47,4 +47,16 @@ export class InventoryService {
     getProductMovements(productId: string): Observable<InventoryListResponse> {
         return this.http.get<InventoryListResponse>(`${this.apiUrl}/product/${productId}`);
     }
+
+    getReport(filters?: { startDate?: string; endDate?: string; type?: string; productId?: string }): Observable<Blob> {
+        let params = new HttpParams();
+        if (filters?.startDate) params = params.set('startDate', filters.startDate);
+        if (filters?.endDate) params = params.set('endDate', filters.endDate);
+        if (filters?.type) params = params.set('type', filters.type);
+        if (filters?.productId) params = params.set('productId', filters.productId);
+        return this.http.get(`${this.apiUrl}/report`, {
+            params,
+            responseType: 'blob',
+        });
+    }
 }

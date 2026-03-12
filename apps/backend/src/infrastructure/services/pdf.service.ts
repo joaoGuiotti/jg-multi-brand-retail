@@ -24,8 +24,15 @@ export interface PdfTableColumn<T = Record<string, unknown>> {
     key: keyof T | ((row: T) => string);
     /** Column width in points. Remaining space is distributed evenly if omitted. */
     width?: number;
-    /** Text alignment. Default: 'left' */
+    /** Text alignment. Default: 'left', or 'right' for currency/number */
     align?: 'left' | 'center' | 'right';
+    /**
+     * Optional column type for automatic formatting:
+     * - 'currency'  → formats as BRL: "R$ 1.234,56"
+     * - 'number'    → formats with locale thousand separators
+     * - 'date'      → formats as dd/mm/yyyy
+     */
+    type?: 'currency' | 'number' | 'date';
 }
 
 export interface PdfTableOptions<T = Record<string, unknown>> {
@@ -189,15 +196,22 @@ export class PdfService {
 
             // ── Items ─────────────────────────────────────────────────────────
             doc.font('Helvetica').fillColor('#333333');
-            data.items.forEach(item => {
+            data.items.forEach((item, idx) => {
                 const y = doc.y;
                 doc.text(item.name, L, y, { width: 130, lineBreak: true });
                 const afterName = doc.y;
-                doc.text(String(item.quantity),          175, y, { width: 35, align: 'center' });
-                doc.text(`R$${item.unitPrice.toFixed(2)}`, 213, y, { width: 42, align: 'right' });
-                doc.text(`R$${item.total.toFixed(2)}`,     258, y, { width: 42, align: 'right' });
+                doc.text(String(item.quantity),                                                      175, y, { width: 35, align: 'center' });
+                doc.text(item.unitPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }), 213, y, { width: 42, align: 'right' });
+                doc.text(item.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),     258, y, { width: 42, align: 'right' });
                 doc.y = Math.max(afterName, doc.y);
-                doc.moveDown(0.3);
+
+                // Hairline separator between items (skip after last)
+                if (idx < data.items.length - 1) {
+                    const sepY = doc.y + 1;
+                    doc.moveTo(L, sepY).lineTo(R, sepY).lineWidth(0.3).strokeColor('#dddddd').stroke();
+                    doc.lineWidth(1);
+                    doc.y = sepY + 2;
+                }
             });
 
             doc.moveDown(0.2);
@@ -206,17 +220,17 @@ export class PdfService {
 
             // ── Summary ───────────────────────────────────────────────────────
             doc.fontSize(9);
-            this.summaryRow(doc, 'Subtotal:', `R$ ${data.subtotal.toFixed(2)}`, L, R);
+            this.summaryRow(doc, 'Subtotal:', data.subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }), L, R);
             if (data.discount > 0) {
                 doc.fillColor('#cc0000');
-                this.summaryRow(doc, 'Discount:', `-R$ ${data.discount.toFixed(2)}`, L, R);
+                this.summaryRow(doc, 'Discount:', `-${data.discount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`, L, R);
                 doc.fillColor('#333333');
             }
             doc.moveDown(0.3);
             this.drawDivider(doc, L, R);
             doc.moveDown(0.3);
             doc.fontSize(13).font('Helvetica-Bold').fillColor('#000000');
-            this.summaryRow(doc, 'TOTAL:', `R$ ${data.total.toFixed(2)}`, L, R);
+            this.summaryRow(doc, 'TOTAL:', data.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }), L, R);
 
             doc.moveDown(1.5);
             this.drawDivider(doc, L, R, true);
@@ -298,39 +312,64 @@ export class PdfService {
         // Data rows
         doc.font('Helvetica').fillColor('#333333');
         table.rows.forEach((row, rowIndex) => {
-            // Estimate if this row will overflow — use 30pt as safe row height estimate
-            if (doc.y + 30 > pageBottom) {
+            // ── Pass 1: resolve & format all cell values ──────────────────────
+            const cells = table.columns.map((col, i) => {
+                const rawValue = typeof col.key === 'function'
+                    ? col.key(row)
+                    : (row as any)[col.key];
+
+                let value: string;
+                if (typeof col.key === 'function') {
+                    value = rawValue as string;
+                } else if (col.type === 'currency') {
+                    const num = typeof rawValue === 'number' ? rawValue : parseFloat(rawValue ?? '0');
+                    value = isNaN(num) ? String(rawValue ?? '') : num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                } else if (col.type === 'number') {
+                    const num = typeof rawValue === 'number' ? rawValue : parseFloat(rawValue ?? '0');
+                    value = isNaN(num) ? String(rawValue ?? '') : num.toLocaleString('pt-BR');
+                } else if (col.type === 'date') {
+                    const d = rawValue instanceof Date ? rawValue : new Date(rawValue);
+                    value = isNaN(d.getTime()) ? String(rawValue ?? '') : d.toLocaleDateString('pt-BR');
+                } else {
+                    value = String(rawValue ?? '');
+                }
+
+                const align = col.align ?? (col.type === 'currency' || col.type === 'number' ? 'right' : 'left');
+                return { value, align, width: widths[i] };
+            });
+
+            // Estimate overflow (conservative: ~16pt per line)
+            if (doc.y + 16 > pageBottom) {
                 doc.addPage();
                 renderTableHeader();
             }
 
-            let x = margin;
             const y = doc.y;
+
+            // ── Pass 2: render text ───────────────────────────────────────────
+            let x = margin;
             let maxH = 0;
-
-            table.columns.forEach((col, i) => {
-                const value = typeof col.key === 'function'
-                    ? col.key(row)
-                    : String((row as any)[col.key] ?? '');
-
-                // Alternate row background
-                if (rowIndex % 2 === 0) {
-                    doc.save();
-                    doc.rect(margin, y - 2, usableWidth, 16).fill('#f8f8f8');
-                    doc.restore();
-                }
-
-                doc.fillColor('#333333').text(value, x, y, { width: widths[i], align: col.align ?? 'left' });
+            for (const cell of cells) {
+                doc.fillColor('#333333').text(cell.value, x, y, { width: cell.width, align: cell.align });
                 maxH = Math.max(maxH, doc.y - y);
-                x += widths[i];
-            });
+                x += cell.width;
+            }
 
             doc.y = y + maxH;
-            doc.moveDown(0.3);
+
+            // ── Row separator: single hairline under each row ─────────────────
+            const sepY = doc.y + 1;
+            doc.moveTo(margin, sepY)
+                .lineTo(margin + usableWidth, sepY)
+                .lineWidth(0.3)
+                .strokeColor('#cccccc')
+                .stroke();
+
+            doc.y = sepY + 3;
         });
 
-        doc.fillColor('#333333');
-        doc.moveDown(1); // extra space before the footer area
+        doc.lineWidth(1).fillColor('#333333');
+        doc.moveDown(0.5); // space before footer
     }
 
     private drawDivider(doc: PDFKit.PDFDocument, x1: number, x2: number, dashed = false): void {

@@ -189,4 +189,29 @@ export class InventoryListComponent implements OnInit {
             date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
         );
     }
+
+    isDownloadingReport = signal(false);
+
+    downloadReport(): void {
+        this.isDownloadingReport.set(true);
+        this.inventoryService
+            .getReport({
+                startDate: this.startDate() || undefined,
+                endDate: this.endDate() || undefined,
+                type: (this.selectedType() as string) || undefined,
+                productId: this.selectedProductId() || undefined,
+            })
+            .subscribe({
+                next: (blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `inventory-report-${new Date().toISOString().slice(0, 10)}.pdf`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    this.isDownloadingReport.set(false);
+                },
+                error: () => this.isDownloadingReport.set(false),
+            });
+    }
 }

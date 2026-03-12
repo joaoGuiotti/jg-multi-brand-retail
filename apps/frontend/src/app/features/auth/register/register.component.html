@@ -13,51 +13,38 @@
                 <div class="mb-4">
                     <ui-input-field id="name" label="Full Name" formControlName="name"
                         [class.border-error]="name?.invalid && name?.touched" placeholder="John Doe" />
-                    <p *ngIf="name?.invalid && name?.touched" class="mt-1 text-sm text-error">
-                        <span *ngIf="name?.errors?.['required']">Name is required</span>
-                        <span *ngIf="name?.errors?.['minlength']">Name must be at least 3 characters</span>
-                    </p>
                 </div>
 
                 <!-- Email Field -->
                 <div class="mb-4">
                     <ui-input-field id="email" label="Email" formControlName="email"
                         [class.border-error]="email?.invalid && email?.touched" placeholder="you@example.com" />
-                    <p *ngIf="email?.invalid && email?.touched" class="mt-1 text-sm text-error">
-                        <span *ngIf="email?.errors?.['required']">Email is required</span>
-                        <span *ngIf="email?.errors?.['email']">Please enter a valid email</span>
-                    </p>
                 </div>
 
                 <!-- Tenant Name Field -->
                 <div class="mb-4">
                     <ui-input-field id="tenantName" label="Store Name" formControlName="tenantName"
                         [class.border-error]="tenantName?.invalid && tenantName?.touched" placeholder="My Store" />
-                    <p *ngIf="tenantName?.invalid && tenantName?.touched" class="mt-1 text-sm text-error">
-                        <span *ngIf="tenantName?.errors?.['required']">Store name is required</span>
-                        <span *ngIf="tenantName?.errors?.['minlength']">Store name must be at least 3 characters</span>
-                    </p>
+                </div>
+
+                <!-- Logo URL Field -->
+                <div class="mb-4">
+                    <ui-input-field id="logoUrl" label="Logo URL" formControlName="logoUrl"
+                        placeholder="https://example.com/logo.png"
+                        [hint]="'Provide a URL for your business logo to be used in reports and receipts.'" />
                 </div>
 
                 <!-- Password Field -->
                 <div class="mb-4">
-                    <ui-input-field id="password" label="Password" formControlName="password"
+                    <ui-input-field id="password" label="Password" formControlName="password" type="password"
                         [class.border-error]="password?.invalid && password?.touched" placeholder="••••••••" />
-                    <p *ngIf="password?.invalid && password?.touched" class="mt-1 text-sm text-error">
-                        <span *ngIf="password?.errors?.['required']">Password is required</span>
-                        <span *ngIf="password?.errors?.['minlength']">Password must be at least 6 characters</span>
-                    </p>
                 </div>
 
                 <!-- Confirm Password Field -->
                 <div class="mb-6">
                     <ui-input-field id="confirmPassword" label="Confirm Password" formControlName="confirmPassword"
-                        [class.border-error]="confirmPassword?.invalid && confirmPassword?.touched"
+                        type="password" [class.border-error]="confirmPassword?.invalid && confirmPassword?.touched"
                         placeholder="••••••••" />
-                    <p *ngIf="confirmPassword?.invalid && confirmPassword?.touched" class="mt-1 text-sm text-error">
-                        <span *ngIf="confirmPassword?.errors?.['required']">Please confirm your password</span>
-                        <span *ngIf="confirmPassword?.errors?.['passwordMismatch']">Passwords do not match</span>
-                    </p>
                 </div>
 
                 <!-- Error Message -->

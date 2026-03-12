@@ -8,6 +8,7 @@ export class TenantMapper {
             {
                 name: raw.name,
                 slug: raw.slug,
+                logoUrl: raw.logoUrl,
                 settings: raw.settings,
                 active: raw.active,
                 createdAt: raw.createdAt,
@@ -22,6 +23,7 @@ export class TenantMapper {
             id: tenant.id.toString(),
             name: tenant.name,
             slug: tenant.slug,
+            logoUrl: tenant.logoUrl ?? null,
             settings: tenant.settings,
             active: tenant.active,
             createdAt: tenant.createdAt,

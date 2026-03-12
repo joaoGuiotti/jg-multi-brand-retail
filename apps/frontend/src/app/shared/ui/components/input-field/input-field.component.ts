@@ -178,6 +178,12 @@ export class UiInputFieldComponent implements ControlValueAccessor {
         if (errors['pattern']) {
             return 'This field is invalid';
         }
+
+        const firstErrorMessage = Object.values(errors)[0];
+        if (typeof firstErrorMessage === 'string') {
+            return firstErrorMessage;
+        }
+
         return 'This field is invalid';
     }
 }

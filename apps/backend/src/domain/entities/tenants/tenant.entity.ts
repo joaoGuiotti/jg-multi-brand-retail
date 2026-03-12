@@ -4,6 +4,7 @@ import { UniqueEntityID } from '../../../common/domain/unique-entity-id';
 export interface TenantProps {
     name: string;
     slug: string;
+    logoUrl?: string | null;
     settings?: any;
     active: boolean;
     createdAt?: Date;
@@ -31,6 +32,7 @@ export class Tenant extends AggregateRoot<TenantProps> {
 
     get name(): string { return this.props.name; }
     get slug(): string { return this.props.slug; }
+    get logoUrl(): string | null | undefined { return this.props.logoUrl; }
     get settings(): any { return this.props.settings; }
     get active(): boolean { return this.props.active; }
     get createdAt(): Date | undefined { return this.props.createdAt; }

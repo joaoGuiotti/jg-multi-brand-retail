@@ -20,6 +20,7 @@ export class PdfDevController {
     async sampleReceipt(@Res() res: Response) {
         const buffer = await this.pdfService.generateReceipt({
             storeName: 'Demo Store',
+            logoUrl: 'https://api.dicebear.com/9.x/shapes/png?seed=standard-retail&backgroundColor=0a2540',
             storeSlogan: 'The best store in town',
             id: 'abc123',
             invoiceNumber: 'INV-2026-001',
@@ -100,6 +101,7 @@ export class PdfDevController {
             header: {
                 title: 'Products Report',
                 subtitle: `Generated on ${new Date().toLocaleDateString('pt-BR')} — ${products.length} items`,
+                logoUrl: 'https://api.dicebear.com/9.x/shapes/png?seed=standard-retail&backgroundColor=0a2540',
             },
             table: {
                 columns: [
@@ -148,6 +150,7 @@ export class PdfDevController {
             header: {
                 title: 'Monthly Sales Summary',
                 subtitle: `Report for ${month} — Generated on ${now.toLocaleDateString('pt-BR')}`,
+                logoUrl: 'https://api.dicebear.com/9.x/shapes/png?seed=standard-retail&backgroundColor=0a2540',
             },
             body: (doc) => {
                 const L = 40;

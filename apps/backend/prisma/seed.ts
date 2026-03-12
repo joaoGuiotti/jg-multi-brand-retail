@@ -41,6 +41,7 @@ async function main() {
     data: {
       name: 'Loja Demo',
       slug: 'loja-demo',
+      logoUrl: 'https://api.dicebear.com/9.x/shapes/png?seed=standard-retail&backgroundColor=0a2540',
       active: true,
       settings: {
         currency: 'BRL',

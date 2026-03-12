@@ -84,6 +84,8 @@ export class GenerateInventoryReportUseCase implements UseCase<GenerateInventory
             header: {
                 title: `${storeName} — Inventory Report`,
                 subtitle: `Generated on ${now.toLocaleDateString('pt-BR')} at ${now.toLocaleTimeString('pt-BR')}`,
+                logoUrl: tenant?.logoUrl,
+                align: 'left',
             },
             body: (doc) => {
                 const L = 40;

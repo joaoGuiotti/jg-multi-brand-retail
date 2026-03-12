@@ -27,7 +27,8 @@ export class RegisterComponent {
             email: ['', [Validators.required, Validators.email]],
             password: ['', [Validators.required, Validators.minLength(6)]],
             confirmPassword: ['', [Validators.required]],
-            tenantName: ['', [Validators.required, Validators.minLength(3)]]
+            tenantName: ['', [Validators.required, Validators.minLength(3)]],
+            logoUrl: ['', []]
         }, {
             validators: this.passwordMatchValidator
         });
@@ -38,8 +39,8 @@ export class RegisterComponent {
         const confirmPassword = form.get('confirmPassword');
 
         if (password && confirmPassword && password.value !== confirmPassword.value) {
-            confirmPassword.setErrors({ passwordMismatch: true });
-            return { passwordMismatch: true };
+            confirmPassword.setErrors({ passwordMismatch: 'Passwords do not match' });
+            return { passwordMismatch: 'Passwords do not match' };
         }
         return null;
     }
@@ -68,4 +69,5 @@ export class RegisterComponent {
     get password() { return this.registerForm.get('password'); }
     get confirmPassword() { return this.registerForm.get('confirmPassword'); }
     get tenantName() { return this.registerForm.get('tenantName'); }
+    get logoUrl() { return this.registerForm.get('logoUrl'); }
 }

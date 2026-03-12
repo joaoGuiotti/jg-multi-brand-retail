@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import PDFDocument from 'pdfkit';
+import * as https from 'https';
+import * as http from 'http';
+import { URL } from 'url';
 
 // ─── Generic Document Types ───────────────────────────────────────────────────
 
@@ -8,6 +11,10 @@ export interface PdfHeaderOptions {
     title: string;
     /** Smaller subtitle below the title */
     subtitle?: string;
+    /** Optional URL to a logo image (PNG/JPEG) to render above the title */
+    logoUrl?: string | null;
+    /** Title/Logo alignment. Default: 'center' */
+    align?: 'left' | 'center';
 }
 
 export interface PdfFooterOptions {
@@ -68,6 +75,8 @@ export interface ReceiptData {
     /** Tenant / business name – auto-populated from TenantRepository */
     storeName: string;
     storeSlogan?: string;
+    /** URL to logo image rendered above the store name */
+    logoUrl?: string | null;
     invoiceNumber?: string | null;
     id: string;
     customerName?: string | null;
@@ -91,14 +100,22 @@ export class PdfService {
      */
     async generateDocument<T>(options: PdfDocumentOptions<T>): Promise<Buffer> {
         const margin = options.margin ?? 40;
-        // Reserve space at the bottom for the footer (text + spacing)
         const footerReserve = options.footer ? 40 : 0;
+
+        // Pre-fetch logo if provided (outside Promise to allow await)
+        let logoBuffer: Buffer | undefined;
+        if (options.header?.logoUrl) {
+            logoBuffer = await this.fetchImageBuffer(options.header.logoUrl).catch((err) => {
+                console.error(`[PdfService] Failed to fetch logo from ${options.header?.logoUrl}:`, err.message);
+                return undefined;
+            });
+        }
 
         return new Promise((resolve, reject) => {
             const doc = new PDFDocument({
                 margin,
                 size: options.size ?? 'A4',
-                bufferPages: true, // required for page-number footer
+                bufferPages: true,
             });
 
             const buffers: Buffer[] = [];
@@ -108,7 +125,7 @@ export class PdfService {
 
             // ── Header ──────────────────────────────────────────────────────
             if (options.header) {
-                this.renderHeader(doc, options.header, margin);
+                this.renderHeader(doc, options.header, margin, logoBuffer);
             }
 
             // ── Custom body / table ──────────────────────────────────────────
@@ -128,7 +145,6 @@ export class PdfService {
                     doc.switchToPage(i);
                     this.renderFooter(doc, options.footer, i + 1, totalPages);
                 }
-                // Return cursor to last content page
                 doc.switchToPage(totalPages - 1);
             }
 
@@ -146,6 +162,12 @@ export class PdfService {
         const L = 40;
         const R = 300;
 
+        // Pre-fetch logo if provided
+        let logoBuffer: Buffer | undefined;
+        if (data.logoUrl) {
+            logoBuffer = await this.fetchImageBuffer(data.logoUrl).catch(() => undefined);
+        }
+
         return new Promise((resolve, reject) => {
             const doc = new PDFDocument({ margin: 40, size: [340, 842] });
             const buffers: Buffer[] = [];
@@ -154,8 +176,34 @@ export class PdfService {
             doc.on('error', reject);
 
             // ── Store Header ─────────────────────────────────────────────────
-            doc.fontSize(18).font('Helvetica-Bold').fillColor('#111111')
-                .text(data.storeName.toUpperCase(), { align: 'center' });
+            const logoSize = 40;
+            const gap = 10;
+            const sStartY = doc.y;
+
+            if (logoBuffer) {
+                doc.fontSize(18).font('Helvetica-Bold');
+                const nameW = doc.widthOfString(data.storeName.toUpperCase());
+                const totalW = logoSize + gap + nameW;
+                const blockX = L + (R - L - totalW) / 2;
+
+                const headerH = Math.max(logoSize, 22); // font height approx 22
+
+                // Logo
+                doc.image(logoBuffer, blockX, sStartY + (headerH - logoSize) / 2, {
+                    width: logoSize,
+                    height: logoSize,
+                    fit: [logoSize, logoSize],
+                });
+
+                // Name
+                doc.fontSize(18).font('Helvetica-Bold').fillColor('#111111')
+                    .text(data.storeName.toUpperCase(), blockX + logoSize + gap, sStartY + (headerH - 22) / 2 + 3);
+
+                doc.y = sStartY + headerH + 5;
+            } else {
+                doc.fontSize(18).font('Helvetica-Bold').fillColor('#111111')
+                    .text(data.storeName.toUpperCase(), { align: 'center' });
+            }
 
             if (data.storeSlogan) {
                 doc.fontSize(8).font('Helvetica').fillColor('#888888')
@@ -247,16 +295,72 @@ export class PdfService {
 
     // ─── Generic Helpers ──────────────────────────────────────────────────────
 
-    private renderHeader(doc: PDFKit.PDFDocument, header: PdfHeaderOptions, margin: number): void {
-        doc.fontSize(20).font('Helvetica-Bold').fillColor('#111111')
-            .text(header.title, { align: 'center' });
+    private renderHeader(doc: PDFKit.PDFDocument, header: PdfHeaderOptions, margin: number, logoBuffer?: Buffer): void {
+        const align = header.align ?? 'center';
+        const pageW = doc.page.width - margin * 2;
+        const logoSize = 40;
+        const gap = 15;
 
-        if (header.subtitle) {
-            doc.fontSize(10).font('Helvetica').fillColor('#666666')
-                .text(header.subtitle, { align: 'center' });
+        const titleSize = 20;
+        const subtitleSize = 10;
+
+        if (logoBuffer) {
+            const startY = doc.y;
+
+            // Measure title and subtitle
+            doc.fontSize(titleSize).font('Helvetica-Bold');
+            const titleW = doc.widthOfString(header.title);
+            const titleH = doc.heightOfString(header.title, { width: pageW - (logoSize + gap) });
+
+            let totalTextH = titleH;
+            if (header.subtitle) {
+                doc.fontSize(subtitleSize).font('Helvetica');
+                totalTextH += doc.heightOfString(header.subtitle, { width: pageW - (logoSize + gap) }) - 2;
+            }
+
+            const headerH = Math.max(logoSize, totalTextH);
+
+            let blockX = margin;
+            if (align === 'center') {
+                // For centered headers, we only center the whole block if the title fits in one line
+                if (titleH < titleSize * 1.5) {
+                    const combinedW = logoSize + gap + titleW;
+                    blockX = margin + (pageW - combinedW) / 2;
+                }
+            }
+
+            // Render Logo
+            doc.image(logoBuffer, blockX, startY + (headerH - logoSize) / 2, {
+                width: logoSize,
+                height: logoSize,
+                fit: [logoSize, logoSize],
+            });
+
+            // Render Text
+            const textX = blockX + logoSize + gap;
+            const textY = startY + (headerH - totalTextH) / 2;
+            const textW = pageW - (textX - margin);
+
+            doc.fontSize(titleSize).font('Helvetica-Bold').fillColor('#111111')
+                .text(header.title, textX, textY, { width: textW });
+
+            if (header.subtitle) {
+                doc.fontSize(subtitleSize).font('Helvetica').fillColor('#666666')
+                    .text(header.subtitle, textX, doc.y - 2, { width: textW });
+            }
+
+            doc.y = startY + headerH + 10;
+        } else {
+            doc.fontSize(titleSize).font('Helvetica-Bold').fillColor('#111111')
+                .text(header.title, { align: align });
+
+            if (header.subtitle) {
+                doc.fontSize(subtitleSize).font('Helvetica').fillColor('#666666')
+                    .text(header.subtitle, { align: align });
+            }
+            doc.moveDown(0.5);
         }
 
-        doc.moveDown(0.5);
         this.drawDivider(doc, margin, doc.page.width - margin);
         doc.moveDown(0.5);
     }
@@ -384,5 +488,57 @@ export class PdfService {
         doc.text(label, L, y);
         doc.text(value, L, y, { align: 'right', width: R - L });
         doc.moveDown(0.3);
+    }
+
+    private async fetchImageBuffer(url: string, maxRedirects = 3): Promise<Buffer> {
+        return new Promise((resolve, reject) => {
+            const fetch = (targetUrl: string, redirectsRemaining: number) => {
+                const parsedUrl = new URL(targetUrl);
+                const protocol = parsedUrl.protocol === 'https:' ? https : http;
+
+                const options = {
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                    },
+                    timeout: 5000,
+                };
+
+                const request = protocol.get(targetUrl, options, (response) => {
+                    const statusCode = response.statusCode ?? 0;
+
+                    // Handle redirects
+                    if (statusCode >= 300 && statusCode < 400 && response.headers.location) {
+                        if (redirectsRemaining > 0) {
+                            const location = response.headers.location;
+                            const absoluteLocation = location.startsWith('http')
+                                ? location
+                                : new URL(location, targetUrl).toString();
+                            fetch(absoluteLocation, redirectsRemaining - 1);
+                            return;
+                        } else {
+                            reject(new Error('Too many redirects'));
+                            return;
+                        }
+                    }
+
+                    if (statusCode !== 200) {
+                        reject(new Error(`Failed to fetch image: ${statusCode}`));
+                        return;
+                    }
+
+                    const data: Buffer[] = [];
+                    response.on('data', (chunk) => data.push(chunk));
+                    response.on('end', () => resolve(Buffer.concat(data)));
+                });
+
+                request.on('error', reject);
+                request.on('timeout', () => {
+                    request.destroy();
+                    reject(new Error('Image fetch timeout'));
+                });
+            };
+
+            fetch(url, maxRedirects);
+        });
     }
 }

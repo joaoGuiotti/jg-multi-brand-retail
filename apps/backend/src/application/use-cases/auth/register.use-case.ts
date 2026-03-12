@@ -16,6 +16,7 @@ export type RegisterInput = {
     name: string;
     tenantName: string;
     tenantSlug?: string;
+    logoUrl?: string;
 }
 
 @Injectable()
@@ -45,6 +46,7 @@ export class RegisterUseCase implements UseCase<RegisterInput, AuthOutput> {
             tenant = Tenant.create({
                 name: input.tenantName,
                 slug: tenantSlug,
+                logoUrl: input.logoUrl,
                 active: true,
                 settings: {
                     currency: 'BRL',
@@ -90,14 +92,11 @@ export class RegisterUseCase implements UseCase<RegisterInput, AuthOutput> {
         tenantId: string,
     ) {
         const payload = {
-            user: {
-                id: user.id.toString(),
-                email: user.email,
-                name: user.name,
-                role,
-                tenantId: tenantId,
-            },
-            role
+            sub: user.id.toString(),
+            email: user.email,
+            name: user.name,
+            role,
+            tenantId: tenantId,
         };
 
         const [accessToken, refreshToken] = await Promise.all([

@@ -26,6 +26,7 @@ export class GenerateSaleReceiptUseCase implements UseCase<GenerateSaleReceiptIn
 
         return this.pdfService.generateReceipt({
             storeName: tenant?.name ?? 'My Store',
+            logoUrl: tenant?.logoUrl,
             id: sale.id.toString(),
             invoiceNumber: sale.invoiceNumber,
             customerName: sale.customerName,

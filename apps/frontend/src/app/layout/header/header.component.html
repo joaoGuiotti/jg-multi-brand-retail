@@ -1,5 +1,4 @@
 <header class="bg-surface shadow-sm border-b border-outline h-16 flex items-center justify-between px-6">
-  <!-- Left: Menu Toggle & Title -->
   <div class="flex items-center gap-4">
     <button (click)="onToggleSidebar()" class="p-2 rounded-lg hover:bg-surface-hover transition-colors lg:hidden"
       aria-label="Toggle sidebar">
@@ -15,11 +14,9 @@
   </div>
 
 
-  <!-- Right: User Menu -->
   <div class="relative flex items-center gap-2">
-    <!-- Center: Theme Toggle -->
     <ui-theme-toggle></ui-theme-toggle>
-    <button (click)="toggleUserMenu()"
+    <button #userButton (click)="userMenu.toggle()"
       class="flex items-center gap-3 p-2 rounded-lg hover:bg-surface-hover transition-colors">
       <div class="text-right hidden sm:block">
         <p class="text-sm font-medium text-content">{{ user()?.name || 'User' }}</p>
@@ -30,22 +27,22 @@
       </div>
     </button>
 
-    <!-- Dropdown Menu -->
-    <div *ngIf="isUserMenuOpen"
-      class="absolute top-12 right-0 mt-3 w-48 bg-surface rounded-lg shadow-lg border border-outline py-1 z-50">
-      <div class="px-4 py-2 border-b border-outline">
-        <p class="text-sm font-medium text-content">{{ user()?.name }}</p>
-        <p class="text-xs text-content-secondary">{{ user()?.email }}</p>
-      </div>
+    <ui-overlay #userMenu [target]="userButton" width="200" panelClass="p-0">
+      <div class="w-50 bg-surface rounded-lg py-1">
+        <div class="px-4 py-2 border-b border-outline">
+          <p class="text-sm font-medium text-content">{{ user()?.name }}</p>
+          <p class="text-xs text-content-secondary">{{ user()?.email }}</p>
+        </div>
 
-      <button (click)="logout()"
-        class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-        </svg>
-        Logout
-      </button>
-    </div>
+        <button (click)="logout(); userMenu.hide()"
+          class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+          </svg>
+          Logout
+        </button>
+      </div>
+    </ui-overlay>
   </div>
 </header>

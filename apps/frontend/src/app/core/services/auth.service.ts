@@ -73,7 +73,8 @@ export class AuthService {
                     email: payload.email,
                     name: payload.name,
                     role: payload.role,
-                    tenantId: payload.tenantId
+                    tenantId: payload.tenantId,
+                    logoUrl: payload.logoUrl
                 };
                 this.currentUserSubject.next(user);
                 this.user.set(user);

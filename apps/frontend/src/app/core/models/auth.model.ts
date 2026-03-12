@@ -4,6 +4,7 @@ export interface User {
     name: string;
     role: 'SUPER_ADMIN' | 'ADMIN' | 'USER';
     tenantId: string;
+    logoUrl?: string;
 }
 
 export interface LoginRequest {

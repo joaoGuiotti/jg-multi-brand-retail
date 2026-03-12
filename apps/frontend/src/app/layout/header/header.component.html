@@ -8,6 +8,9 @@
       </svg>
     </button>
 
+    <div class="flex items-center gap-2" *ngIf="user()?.logoUrl">
+      <img [src]="user()?.logoUrl" alt="Tenant Logo" class="h-8 w-auto object-contain rounded-sm">
+    </div>
     <h1 class="text-xl font-semibold text-content">Retail POS</h1>
   </div>
 

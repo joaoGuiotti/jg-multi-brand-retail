@@ -1,9 +1,27 @@
 <aside [class.translate-x-0]="isOpen" [class.-translate-x-full]="!isOpen"
-  class="fixed h-screen lg:static inset-y-0 left-0 z-50 w-64 bg-surface border-r border-outline transform transition-transform duration-300 ease-in-out lg:translate-x-0">
+  class="fixed h-screen lg:static inset-y-0 left-0 z-50 bg-surface border-r border-outline transform transition-all duration-300 ease-in-out lg:translate-x-0"
+  [class.w-64]="!isCollapsed || isMobile()" [class.lg:w-20]="isCollapsed">
   <!-- Sidebar Header -->
-  <div class="h-16 flex items-center justify-between px-6 border-b border-outline">
-    <span class="text-lg font-semibold text-content">Menu</span>
-    <button (click)="onToggle()" class="lg:hidden p-2 rounded-lg hover:bg-surface-hover" aria-label="Close sidebar">
+  <div class="h-16 flex items-center border-b border-outline overflow-hidden"
+    [class.px-6]="!isCollapsed || isMobile()" [class.lg:justify-center]="isCollapsed" [class.lg:px-0]="isCollapsed" [class.gap-4]="!isCollapsed || isMobile()">
+    <!-- Desktop-only collapse toggle -->
+    <button (click)="toggleCollapse.emit()" class="hidden lg:block p-1 rounded-lg hover:bg-surface-hover transition-colors"
+      aria-label="Toggle sidebar collapse">
+      <!-- List icon when collapsed -->
+      <svg *ngIf="isCollapsed" class="w-6 h-6 text-content-secondary" fill="none" stroke="currentColor"
+        viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+      </svg>
+      <!-- Collapse icon when expanded -->
+      <svg *ngIf="!isCollapsed" class="w-6 h-6 text-content-secondary" fill="none" stroke="currentColor"
+        viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16"></path>
+      </svg>
+    </button>
+    <span class="text-lg font-semibold text-content" *ngIf="!isCollapsed || isMobile()">Menu</span>
+
+    <button (click)="onToggle()" class="lg:hidden p-2 rounded-lg hover:bg-surface-hover ml-auto"
+      aria-label="Close sidebar">
       <svg class="w-5 h-5 text-content-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
       </svg>
@@ -14,11 +32,16 @@
   <nav class="p-4 space-y-1">
     <a *ngFor="let item of menuItems" [routerLink]="item.route"
       routerLinkActive="bg-primary-light text-primary border-primary" [routerLinkActiveOptions]="{exact: false}"
-      class="flex items-center gap-3 px-4 py-3 rounded-lg text-content-secondary hover:bg-surface-hover transition-colors border-l-4 border-transparent">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      [uiTooltip]="item.label" [uiTooltipDisabled]="!isCollapsed || isMobile()"
+      class="sidebar-link flex items-center rounded-lg text-content-secondary hover:bg-surface-hover transition-all border-l-4 border-transparent px-4 py-3 gap-3"
+      [class.lg:p-3]="isCollapsed" [class.lg:justify-center]="isCollapsed" [class.lg:gap-0]="isCollapsed">
+      <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="item.icon"></path>
       </svg>
-      <span class="font-medium">{{ item.label }}</span>
+      <span class="font-medium whitespace-nowrap transition-opacity duration-200" [class.lg:opacity-0]="isCollapsed"
+        [class.lg:hidden]="isCollapsed">
+        {{ item.label }}
+      </span>
     </a>
   </nav>
 </aside>

@@ -1,6 +1,10 @@
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
+import { UiTooltipDirective } from '@shared/ui';
 
 interface MenuItem {
   label: string;
@@ -11,13 +15,25 @@ interface MenuItem {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, UiTooltipDirective],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss'
 })
 export class SidebarComponent {
+  private breakpointObserver = inject(BreakpointObserver);
+  
+  // Track if screen is smaller than Tailwind's lg (1024px)
+  isMobile = toSignal(
+    this.breakpointObserver.observe('(max-width: 1023px)').pipe(
+      map(result => result.matches)
+    ),
+    { initialValue: false }
+  );
+
   @Input() isOpen = true;
+  @Input() isCollapsed = false;
   @Output() toggleSidebar = new EventEmitter<void>();
+  @Output() toggleCollapse = new EventEmitter<void>();
 
   menuItems: MenuItem[] = [
     {

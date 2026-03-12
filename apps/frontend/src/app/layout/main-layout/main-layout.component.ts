@@ -13,8 +13,13 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
 })
 export class MainLayoutComponent {
   isSidebarOpen = true;
+  isSidebarCollapsed = false;
 
   toggleSidebar(): void {
     this.isSidebarOpen = !this.isSidebarOpen;
+  }
+
+  toggleSidebarCollapse(): void {
+    this.isSidebarCollapsed = !this.isSidebarCollapsed;
   }
 }

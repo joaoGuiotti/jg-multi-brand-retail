@@ -1,3 +1,5 @@
+@import '@angular/cdk/overlay-prebuilt.css';
+
 /* Design tokens are loaded globally via angular.json styles array from @shared/ui */
 
 @tailwind base;

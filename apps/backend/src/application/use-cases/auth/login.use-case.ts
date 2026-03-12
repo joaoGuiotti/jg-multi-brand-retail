@@ -23,6 +23,7 @@ export type LoginOutput = {
             id: string;
             name: string;
             slug: string;
+            logoUrl?: string | null;
         };
     };
     accessToken: string;
@@ -67,7 +68,7 @@ export class LoginUseCase implements UseCase<LoginInput, LoginOutput> {
         }
 
         // Generate tokens
-        const tokens = await this.generateTokens(user, tenantId);
+        const tokens = await this.generateTokens(user, tenantId, tenant.logoUrl);
 
         return {
             user: {
@@ -79,19 +80,21 @@ export class LoginUseCase implements UseCase<LoginInput, LoginOutput> {
                     id: tenant.id.toString(),
                     name: tenant.name,
                     slug: tenant.slug,
+                    logoUrl: tenant.logoUrl,
                 },
             },
             ...tokens,
         };
     }
 
-    private async generateTokens(user: User, tenantId: string) {
+    private async generateTokens(user: User, tenantId: string, logoUrl?: string | null) {
         const payload = {
             sub: user.id.toString(),
             email: user.email,
             name: user.name,
             role: user.role,
             tenantId: tenantId,
+            logoUrl: logoUrl,
         };
 
         const [accessToken, refreshToken] = await Promise.all([

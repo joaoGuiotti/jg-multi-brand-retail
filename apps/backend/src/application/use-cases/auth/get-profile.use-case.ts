@@ -36,6 +36,7 @@ export class GetProfileUseCase implements UseCase<GetProfileInput, UserProfileOu
                 id: tenant.id.toString(),
                 name: tenant.name,
                 slug: tenant.slug,
+                logoUrl: tenant.logoUrl,
             } : null,
         };
     }

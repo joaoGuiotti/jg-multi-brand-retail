@@ -14,6 +14,7 @@ export type AuthUserOutput = {
         id: string;
         name: string;
         slug: string;
+        logoUrl?: string | null;
     };
 };
 
@@ -32,5 +33,6 @@ export type UserProfileOutput = {
         id: string;
         name: string;
         slug: string;
+        logoUrl?: string | null;
     } | null;
 };

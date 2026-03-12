@@ -2,10 +2,11 @@
 import { Component, inject } from '@angular/core';
 import { ThemeService } from '../../services/theme';
 import { UiButtonComponent } from '../button/button.component';
+import { UiTooltipDirective } from '@shared/ui/directives';
 
 @Component({
     selector: 'ui-theme-toggle',
-    imports: [UiButtonComponent],
+    imports: [UiButtonComponent, UiTooltipDirective],
     templateUrl: './theme-toggle.component.html',
     styleUrl: './theme-toggle.component.scss'
 })

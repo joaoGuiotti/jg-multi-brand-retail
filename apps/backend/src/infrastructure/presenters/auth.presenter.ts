@@ -16,7 +16,7 @@ export class UserProfilePresenter {
     name: string;
     role: string;
     active: boolean;
-    tenant: { id: string; name: string; slug: string } | null;
+    tenant: { id: string; name: string; slug: string; logoUrl?: string | null } | null;
 
     constructor(output: UserProfileOutput) {
         this.id = output.id;
@@ -25,7 +25,7 @@ export class UserProfilePresenter {
         this.role = output.role;
         this.active = output.active;
         this.tenant = output.tenant
-            ? { id: output.tenant.id, name: output.tenant.name, slug: output.tenant.slug }
+            ? { id: output.tenant.id, name: output.tenant.name, slug: output.tenant.slug, logoUrl: output.tenant.logoUrl }
             : null;
     }
 }

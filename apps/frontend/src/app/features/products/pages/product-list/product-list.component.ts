@@ -2,10 +2,11 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { BadgeVariant, TableColumn, TableConfig, TableSort, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiNumberPipe, UiTableColumnDirective, UiTableComponent } from '@shared/ui';
+import { BadgeVariant, TableColumn, TableConfig, TableSort, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiModalService, UiNumberPipe, UiTableColumnDirective, UiTableComponent } from '@shared/ui';
 import { IResponse } from 'src/app/core/models/response-base';
 import { Product, ProductFilter } from '../../../../core/models/product.model';
 import { ProductsService } from '../../../../core/services/products.service';
+import { ProductFormComponent } from '../product-form/product-form.component';
 
 @Component({
     selector: 'app-product-list',
@@ -15,7 +16,6 @@ import { ProductsService } from '../../../../core/services/products.service';
     styleUrl: './product-list.component.scss'
 })
 export class ProductListComponent implements OnInit {
-
     products = signal<Product[]>([]);
     isLoading = signal(false);
     errorMessage = signal('');
@@ -30,7 +30,6 @@ export class ProductListComponent implements OnInit {
     showActiveOnly = true;
     showLowStockOnly = false;
     currentSort = signal<TableSort | null>(null);
-
 
     columns = signal<TableColumn[]>([
         { key: 'name', label: 'Product' },
@@ -55,10 +54,9 @@ export class ProductListComponent implements OnInit {
         rowIdKey: 'id'
     }));
 
-
-
     constructor(
         private productsService: ProductsService,
+        private modalService: UiModalService,
         private router: Router
     ) { }
 
@@ -114,7 +112,31 @@ export class ProductListComponent implements OnInit {
     }
 
     editProduct(id: string): void {
-        this.router.navigate(['/products', id, 'edit']);
+        this.modalService.open<{ id: string }, { refresh: boolean } | undefined>(
+            ProductFormComponent,
+            {
+                title: 'Edit Product',
+                data: { id },
+                minWidth: '40%',
+            }).afterClosed().subscribe((result) => {
+                if (result?.refresh) {
+                    this.loadProducts();
+                }
+            });
+
+    }
+
+    openProductModal(): void {
+        this.modalService.open<void, { refresh: boolean } | undefined>(
+            ProductFormComponent,
+            {
+                title: 'New Product',
+                minWidth: '40%',
+            }).afterClosed().subscribe((result) => {
+                if (result?.refresh) {
+                    this.loadProducts();
+                }
+            });
     }
 
     deleteProduct(id: string): void {

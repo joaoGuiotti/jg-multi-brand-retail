@@ -1,5 +1,6 @@
 // ── Modal Types ───────────────────────────────────────────────────────────────
 import { InjectionToken } from '@angular/core';
+import { from, Observable } from 'rxjs';
 
 /**
  * InjectionToken that provides the `ModalRef` to the dynamically opened component.
@@ -95,7 +96,7 @@ export class ModalRef<R = unknown> {
      * Returns a promise that resolves when the modal is closed,
      * or rejects when it is dismissed.
      */
-    afterClosed(): Promise<R | undefined> {
-        return this._promise;
+    afterClosed(): Observable<R | undefined> {
+        return from(this._promise);
     }
 }

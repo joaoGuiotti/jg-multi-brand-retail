@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { ModalService, TableColumn, TableConfig, TableSort, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiNumberPipe, UiTableColumnDirective, UiTableComponent } from '@shared/ui';
+import { TableColumn, TableConfig, TableSort, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiModalService, UiNumberPipe, UiTableColumnDirective, UiTableComponent } from '@shared/ui';
 import { Sale, SaleFilter } from '../../../../core/models/sale.model';
 import { SalesService } from '../../../../core/services/sales.service';
 import { SaleDetailModalComponent } from '../../components/sale-detail-modal/sale-detail-modal.component';
@@ -54,7 +54,7 @@ export class SalesHistoryComponent implements OnInit {
     constructor(
         private salesService: SalesService,
         private router: Router,
-        private modalService: ModalService
+        private modalService: UiModalService
     ) { }
 
     ngOnInit(): void {

@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ModalService, UiAutocompleteComponent, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiDocumentPipe, UiNumberPipe } from '@shared/ui';
+import { UiAutocompleteComponent, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiDocumentPipe, UiModalService, UiNumberPipe } from '@shared/ui';
 import { Customer } from '../../../../core/models/customer.model';
 import { Product } from '../../../../core/models/product.model';
 import { CustomersService } from '../../../../core/services/customers.service';
@@ -20,7 +20,7 @@ import { PaymentModalComponent, PaymentModalResult } from './payment-modal.compo
 export class PosComponent {
     private productsService = inject(ProductsService);
     private customersService = inject(CustomersService);
-    private modalService = inject(ModalService);
+    private modalService = inject(UiModalService);
     private router = inject(Router);
     cartStore = inject(CartStore);
 
@@ -113,7 +113,7 @@ export class PosComponent {
             return;
         }
 
-        const ref = this.modalService.open<PaymentModalComponent, { total: number }, PaymentModalResult>(
+        const ref = this.modalService.open<{ total: number }, PaymentModalResult>(
             PaymentModalComponent,
             {
                 title: 'Process Payment',
@@ -127,14 +127,11 @@ export class PosComponent {
         // Inject the ModalRef into the content component after creation
         // The component's modalRef property is set by the service via setInput
         ref.afterClosed()
-            .then((result) => {
+            .subscribe((result) => {
                 if (result?.invoiceNumber) {
                     alert(`Sale completed! Invoice: ${result.invoiceNumber}`);
                 }
             })
-            .catch(() => {
-                // dismissed — no action needed
-            });
     }
 
     clearCart(): void {

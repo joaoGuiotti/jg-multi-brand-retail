@@ -26,7 +26,7 @@ import { ModalOptions, ModalRef } from './modal.types';
  * ```
  */
 @Injectable({ providedIn: 'root' })
-export class ModalService {
+export class UiModalService {
     private readonly appRef = inject(ApplicationRef);
     private readonly injector = inject(EnvironmentInjector);
     private readonly document = inject(DOCUMENT);
@@ -38,8 +38,8 @@ export class ModalService {
      * @param options    Optional display and data configuration.
      * @returns          A `ModalRef` to control the modal lifecycle.
      */
-    open<C, D = unknown, R = unknown>(
-        component: Type<C>,
+    open<D = unknown, R = unknown>(
+        component: Type<unknown>,
         options?: ModalOptions<D>,
     ): ModalRef<R> {
         const ref = new ModalRef<R>();
@@ -78,7 +78,7 @@ export class ModalService {
         ref._destroyFn = destroy;
 
         // Also clean up if the promise settles (either path)
-        ref.afterClosed().then(destroy, destroy);
+        ref.afterClosed().subscribe(destroy);
 
         return ref;
     }

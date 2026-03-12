@@ -2,13 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
-    ModalService,
     TableColumn,
     TableConfig,
     TableSort,
     UiBadgeComponent,
     UiButtonComponent,
     UiCardComponent,
+    UiModalService,
     UiTableColumnDirective,
     UiTableComponent,
 } from '@shared/ui';
@@ -79,7 +79,7 @@ export class InventoryListComponent implements OnInit {
     constructor(
         private inventoryService: InventoryService,
         private productsService: ProductsService,
-        private modalService: ModalService,
+        private modalService: UiModalService,
     ) { }
 
     ngOnInit(): void {
@@ -151,13 +151,12 @@ export class InventoryListComponent implements OnInit {
                 minWidth: '480px',
             })
             .afterClosed()
-            .then((result) => {
+            .subscribe((result) => {
                 if (result) {
                     this.loadSummary();
                     this.loadMovements();
                 }
             })
-            .catch(() => { });
     }
 
     getProduct(productId: string): Product | undefined {

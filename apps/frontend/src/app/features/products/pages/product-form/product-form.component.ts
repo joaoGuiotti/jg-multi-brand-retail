@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, Optional } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { UiButtonComponent, UiCardComponent, UiInputFieldComponent } from '@shared/ui';
+import { MODAL_DATA, MODAL_REF, ModalRef, UiButtonComponent, UiCardComponent, UiInputFieldComponent } from '@shared/ui';
 import { ProductsService } from '../../../../core/services/products.service';
 
 @Component({
@@ -19,11 +19,17 @@ export class ProductFormComponent implements OnInit {
     errorMessage = '';
     isSubmitting = false;
 
+    get isModal(): boolean {
+        return this.modalRef !== null;
+    }
+
     constructor(
         private fb: FormBuilder,
         private productsService: ProductsService,
         private router: Router,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        @Optional() @Inject(MODAL_REF) private modalRef: ModalRef,
+        @Optional() @Inject(MODAL_DATA) private modalData: any
     ) {
         this.productForm = this.fb.group({
             name: ['', [Validators.required, Validators.minLength(3)]],
@@ -38,7 +44,11 @@ export class ProductFormComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.productId = this.route.snapshot.paramMap.get('id');
+        if (this.isModal) {
+            this.productId = this.modalData?.['id'];
+        } else {
+            this.productId = this.route.snapshot.paramMap.get('id');
+        }
         if (this.productId) {
             this.isEditMode = true;
             this.loadProduct(this.productId);
@@ -78,7 +88,11 @@ export class ProductFormComponent implements OnInit {
             if (this.isEditMode && this.productId) {
                 this.productsService.updateProduct(this.productId, formValue).subscribe({
                     next: () => {
-                        this.router.navigate(['/products']);
+                        if (this.isModal) {
+                            this.modalRef.close({ refresh: true });
+                        } else {
+                            this.router.navigate(['/products']);
+                        }
                     },
                     error: (error) => {
                         this.errorMessage = error.error?.message || 'Failed to update product';
@@ -88,7 +102,11 @@ export class ProductFormComponent implements OnInit {
             } else {
                 this.productsService.createProduct(formValue).subscribe({
                     next: () => {
-                        this.router.navigate(['/products']);
+                        if (this.isModal) {
+                            this.modalRef.close({ refresh: true });
+                        } else {
+                            this.router.navigate(['/products']);
+                        }
                     },
                     error: (error) => {
                         this.errorMessage = error.error?.message || 'Failed to create product';
@@ -100,7 +118,11 @@ export class ProductFormComponent implements OnInit {
     }
 
     cancel(): void {
-        this.router.navigate(['/products']);
+        if (this.isModal) {
+            this.modalRef.close();
+        } else {
+            this.router.navigate(['/products']);
+        }
     }
 
     get name() { return this.productForm.get('name'); }

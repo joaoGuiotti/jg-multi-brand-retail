@@ -1,13 +1,13 @@
 import { Component, Inject, OnInit, Optional } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MODAL_DATA, MODAL_REF, ModalRef, UiButtonComponent, UiCardComponent, UiInputFieldComponent } from '@shared/ui';
+import { MODAL_DATA, MODAL_REF, ModalRef, UiButtonComponent, UiCardComponent, UiHasRoleDirective, UiInputFieldComponent } from '@shared/ui';
 import { ProductsService } from '../../../../core/services/products.service';
 
 @Component({
     selector: 'app-product-form',
     standalone: true,
-    imports: [ReactiveFormsModule, UiButtonComponent, UiCardComponent, UiInputFieldComponent],
+    imports: [ReactiveFormsModule, UiButtonComponent, UiCardComponent, UiInputFieldComponent, UiHasRoleDirective],
     templateUrl: './product-form.component.html',
     styleUrl: './product-form.component.scss'
 })

@@ -36,7 +36,10 @@ export const routes: Routes = [
             { path: 'sales', loadComponent: () => import('./features/sales/pages/sales-history/sales-history.component').then(m => m.SalesHistoryComponent) },
             { path: 'inventory', loadComponent: () => import('./features/inventory/pages/inventory-list/inventory-list.component').then(m => m.InventoryListComponent) },
             { path: 'reports', loadComponent: () => import('./features/reports/pages/reports-list/reports-list.component').then(m => m.ReportsListComponent) },
-        ]
+            { path: 'users', loadComponent: () => import('./features/users/pages/user-list/user-list.component').then(m => m.UserListComponent) },
+            { path: 'users/new', loadComponent: () => import('./features/users/pages/user-form/user-form.component').then(m => m.UserFormComponent) },
+        ],
     },
+    { path: 'access-denied', loadComponent: () => import('./features/errors/pages/access-denied/access-denied.component').then(m => m.AccessDeniedComponent) },
     { path: '**', redirectTo: '/login' }
 ];

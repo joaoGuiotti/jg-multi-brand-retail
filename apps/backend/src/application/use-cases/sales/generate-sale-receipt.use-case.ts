@@ -24,7 +24,7 @@ export class GenerateSaleReceiptUseCase implements UseCase<GenerateSaleReceiptIn
             throw new NotFoundException('Sale not found');
         }
 
-        return (await this.pdfService.generateReceipt({
+        const receipt = await this.pdfService.generateReceipt({
             storeName: tenant?.name ?? 'My Store',
             logoUrl: tenant?.logoUrl,
             id: sale.id.toString(),
@@ -40,6 +40,8 @@ export class GenerateSaleReceiptUseCase implements UseCase<GenerateSaleReceiptIn
             subtotal: sale.subtotal,
             discount: sale.discount,
             total: sale.total,
-        })).toBuffer();
+        });
+
+        return receipt.toBuffer();
     }
 }

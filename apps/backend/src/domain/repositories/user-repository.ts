@@ -6,4 +6,5 @@ export abstract class UserRepository {
     abstract findByEmail(email: string): Promise<{ user: User, tenantId: string } | null>;
     abstract update(tenantId: string, user: User): Promise<User>;
     abstract countByTenant(tenantId: string): Promise<number>;
+    abstract findAllByTenant(tenantId: string): Promise<User[]>;
 }

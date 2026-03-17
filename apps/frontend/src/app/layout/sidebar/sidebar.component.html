@@ -30,7 +30,7 @@
 
   <!-- Navigation Menu -->
   <nav class="p-4 space-y-1">
-    <a *ngFor="let item of menuItems" [routerLink]="item.route"
+    <a *ngFor="let item of filteredMenuItems" [routerLink]="item.route"
       routerLinkActive="bg-primary-light text-primary border-primary" [routerLinkActiveOptions]="{exact: false}"
       [uiTooltip]="item.label" [uiTooltipDisabled]="!isCollapsed || isMobile()"
       class="sidebar-link flex items-center rounded-lg text-content-secondary hover:bg-surface-hover transition-all border-l-4 border-transparent px-4 py-3 gap-3"

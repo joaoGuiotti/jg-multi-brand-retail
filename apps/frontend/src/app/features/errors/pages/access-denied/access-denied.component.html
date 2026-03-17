@@ -1,0 +1,36 @@
+<div class="min-h-[80vh] flex items-center justify-center px-4 py-12">
+  <div class="max-w-md w-full">
+    <ui-card [shadow]="false" [bordered]="true" [dashed]="true" padding="lg" class="text-center">
+      
+      <div class="flex justify-center mb-6">
+        <div class="p-4 bg-error-bg text-error rounded-full shadow-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            <line x1="12" x2="12" y1="15" y2="17"/>
+          </svg>
+        </div>
+      </div>
+
+      <h1 class="text-2xl font-bold text-content-primary mb-2">{{ title() }}</h1>
+      <p class="text-content-tertiary mb-8">
+        {{ message() }}
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <ui-button variant="ghost" (clicked)="goBack()">
+          <div class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m15 18-6-6 6-6"/>
+            </svg>
+            Voltar
+          </div>
+        </ui-button>
+        <ui-button variant="primary" (clicked)="goToDashboard()">
+          Ir para o Dashboard
+        </ui-button>
+      </div>
+
+    </ui-card>
+  </div>
+</div>

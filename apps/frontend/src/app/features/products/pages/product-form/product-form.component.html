@@ -88,7 +88,7 @@
 
             <!-- Actions -->
             <div class="flex gap-3">
-                <ui-button type="submit" variant="primary" [loading]="isSubmitting"
+                <ui-button [uiHasRole]="'ADMIN'" type="submit" variant="primary" [loading]="isSubmitting"
                     [disabled]="productForm.invalid || isSubmitting">
                     {{ isEditMode ? 'Update Product' : 'Create Product' }}
                 </ui-button>

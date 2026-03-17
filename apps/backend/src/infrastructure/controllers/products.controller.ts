@@ -36,7 +36,8 @@ enum Role {
 @ApiTags('products')
 @ApiBearerAuth()
 @Controller('products')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN, Role.USER)
 export class ProductsController {
 
     constructor(
@@ -50,8 +51,7 @@ export class ProductsController {
     ) { }
 
     @Post()
-    @UseGuards(RolesGuard)
-    @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+    @Roles(Role.ADMIN)
     async create(@CurrentUser() user: any, @Body() createProductDto: CreateProductDto) {
         return this.createProductUseCase.execute({ ...createProductDto, tenantId: user.tenantId });
     }
@@ -81,8 +81,7 @@ export class ProductsController {
     }
 
     @Patch(':id')
-    @UseGuards(RolesGuard)
-    @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+    @Roles(Role.ADMIN)
     update(
         @CurrentUser() user: any,
         @Param('id') id: string,
@@ -96,16 +95,14 @@ export class ProductsController {
     }
 
     @Delete(':id')
-    @UseGuards(RolesGuard)
-    @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+    @Roles(Role.ADMIN)
     @HttpCode(HttpStatus.NO_CONTENT)
     remove(@CurrentUser() user: any, @Param('id') id: string) {
         return this.deleteProductUseCase.execute({ tenantId: user.tenantId, id });
     }
 
     @Patch(':id/stock')
-    @UseGuards(RolesGuard)
-    @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+    @Roles(Role.ADMIN)
     updateStock(
         @CurrentUser() user: any,
         @Param('id') id: string,
@@ -115,8 +112,7 @@ export class ProductsController {
     }
 
     @Patch(':id/stock/adjust')
-    @UseGuards(RolesGuard)
-    @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+    @Roles(Role.ADMIN)
     adjustStock(
         @CurrentUser() user: any,
         @Param('id') id: string,

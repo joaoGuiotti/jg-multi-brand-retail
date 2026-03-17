@@ -22,12 +22,16 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../decorators/current-user.decorator';
+import { Roles } from '../decorators/roles.decorator';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { RolesGuard } from '../guards/roles.guard';
+import { Role } from '@prisma/client';
 
 @ApiTags('customers')
 @ApiBearerAuth()
 @Controller('customers')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN, Role.USER)
 export class CustomersController {
     constructor(
         private createCustomerUseCase: CreateCustomerUseCase,
@@ -84,6 +88,7 @@ export class CustomersController {
     }
 
     @Delete(':id')
+    @Roles(Role.ADMIN)
     @HttpCode(HttpStatus.NO_CONTENT)
     async remove(
         @CurrentUser() user: any,

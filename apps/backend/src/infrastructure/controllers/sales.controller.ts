@@ -36,7 +36,8 @@ enum Role {
 
 @ApiTags('sales')
 @Controller('sales')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN, Role.USER)
 export class SalesController {
 
     constructor(
@@ -51,8 +52,6 @@ export class SalesController {
     ) { }
 
     @Post()
-    @UseGuards(RolesGuard)
-    @Roles(Role.ADMIN, Role.USER)
     async create(@CurrentUser() user: any, @Body() createSaleDto: CreateSaleDto) {
         const output = await this.createSaleUseCase.execute({
             tenantId: user.tenantId,
@@ -127,7 +126,6 @@ export class SalesController {
     }
 
     @Patch(':id/cancel')
-    @UseGuards(RolesGuard)
     @Roles(Role.ADMIN)
     @HttpCode(HttpStatus.OK)
     async cancel(@CurrentUser() user: any, @Param('id') id: string) {
@@ -136,8 +134,6 @@ export class SalesController {
     }
 
     @Patch(':id/complete')
-    @UseGuards(RolesGuard)
-    @Roles(Role.ADMIN, Role.USER)
     @HttpCode(HttpStatus.OK)
     async complete(@CurrentUser() user: any, @Param('id') id: string) {
         const output = await this.completeSaleUseCase.execute({ tenantId: user.tenantId, id });

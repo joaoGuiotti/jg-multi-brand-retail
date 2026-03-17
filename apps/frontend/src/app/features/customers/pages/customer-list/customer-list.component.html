@@ -67,7 +67,7 @@
                         <ui-button variant="ghost" size="sm" (clicked)="editCustomer(customer.id)">
                             Edit
                         </ui-button>
-                        <ui-button variant="danger" size="sm" (clicked)="deleteCustomer(customer.id)">
+                        <ui-button [uiHasRole]="'ADMIN'" variant="danger" size="sm" (clicked)="deleteCustomer(customer.id)">
                             Delete
                         </ui-button>
                     </div>

@@ -5,11 +5,13 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { UiTooltipDirective } from '@shared/ui';
+import { AuthService } from '../../core/services/auth.service';
 
 interface MenuItem {
   label: string;
   icon: string;
   route: string;
+  roles?: string[];
 }
 
 @Component({
@@ -21,6 +23,9 @@ interface MenuItem {
 })
 export class SidebarComponent {
   private breakpointObserver = inject(BreakpointObserver);
+  private authService = inject(AuthService);
+  
+  user = this.authService.user;
   
   // Track if screen is smaller than Tailwind's lg (1024px)
   isMobile = toSignal(
@@ -70,8 +75,23 @@ export class SidebarComponent {
       label: 'Reports',
       icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
       route: '/reports'
+    },
+    {
+      label: 'Funcionários',
+      icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z',
+      route: '/users',
+      roles: ['ADMIN', 'SUPER_ADMIN']
     }
   ];
+
+  get filteredMenuItems(): MenuItem[] {
+    const currentUserRole = this.user()?.role;
+    return this.menuItems.filter(item => {
+      if (!item.roles) return true;
+      if (!currentUserRole) return false;
+      return item.roles.includes(currentUserRole);
+    });
+  }
 
   onToggle(): void {
     this.toggleSidebar.emit();

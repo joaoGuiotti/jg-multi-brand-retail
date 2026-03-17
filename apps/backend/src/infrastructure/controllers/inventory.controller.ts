@@ -33,7 +33,8 @@ enum Role {
 
 @ApiTags('inventory')
 @Controller('inventory')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN, Role.USER)
 export class InventoryController {
     @Inject(CreateMovementUseCase)
     private createMovementUseCase: CreateMovementUseCase;
@@ -47,8 +48,6 @@ export class InventoryController {
     private generateInventoryReportUseCase: GenerateInventoryReportUseCase;
 
     @Post('movements')
-    @UseGuards(RolesGuard)
-    @Roles(Role.ADMIN, Role.USER)
     async createMovement(
         @CurrentUser() user: any,
         @Body() dto: CreateInventoryMovementDto,

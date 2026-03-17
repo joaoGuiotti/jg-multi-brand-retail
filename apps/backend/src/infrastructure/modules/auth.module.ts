@@ -6,6 +6,8 @@ import { GetProfileUseCase } from '../../application/use-cases/auth/get-profile.
 import { LoginUseCase } from '../../application/use-cases/auth/login.use-case';
 import { RefreshTokenUseCase } from '../../application/use-cases/auth/refresh-token.use-case';
 import { RegisterUseCase } from '../../application/use-cases/auth/register.use-case';
+import { CreateUserUseCase } from '../../application/use-cases/auth/create-user.use-case';
+import { ListUsersUseCase } from '../../application/use-cases/auth/list-users.use-case';
 import { TenantRepository } from '../../domain/repositories/tenant-repository';
 import { UserRepository } from '../../domain/repositories/user-repository';
 import { AuthController } from '../controllers/auth.controller';
@@ -35,6 +37,8 @@ import { PrismaModule } from './prisma.module';
         LoginUseCase,
         RefreshTokenUseCase,
         GetProfileUseCase,
+        CreateUserUseCase,
+        ListUsersUseCase,
         JwtStrategy,
     ],
     exports: [
@@ -44,6 +48,8 @@ import { PrismaModule } from './prisma.module';
         LoginUseCase,
         RefreshTokenUseCase,
         GetProfileUseCase,
+        CreateUserUseCase,
+        ListUsersUseCase,
     ],
 })
 export class AuthModule { }

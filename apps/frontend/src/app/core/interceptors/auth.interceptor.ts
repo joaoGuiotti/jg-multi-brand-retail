@@ -24,6 +24,14 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
             if (error.status === 401) {
                 localStorage.removeItem('access_token');
                 router.navigate(['/login']);
+            } else if (error.status === 403) {
+                // Handle 403 Forbidden - redirect to access denied
+                router.navigate(['/access-denied'], {
+                    queryParams: { 
+                        title: 'Acesso Negado', 
+                        message: 'Você não tem permissão para realizar esta ação ou acessar este recurso.' 
+                    }
+                });
             }
             return throwError(() => error);
         })

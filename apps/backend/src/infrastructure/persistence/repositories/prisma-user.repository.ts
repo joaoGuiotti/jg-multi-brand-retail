@@ -46,4 +46,11 @@ export class PrismaUserRepository implements UserRepository {
     async countByTenant(tenantId: string): Promise<number> {
         return this.prisma.user.count({ where: { tenantId } });
     }
+
+    async findAllByTenant(tenantId: string): Promise<User[]> {
+        const users = await this.prisma.user.findMany({
+            where: { tenantId },
+        });
+        return users.map(user => UserMapper.toDomain(user));
+    }
 }

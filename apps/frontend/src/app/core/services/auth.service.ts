@@ -6,6 +6,7 @@ import { tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { LoginRequest, LoginResponse, RegisterRequest, User } from '../models/auth.model';
 import { IResponse } from '../models/response-base';
+import { JwtHelperService } from '@auth0/angular-jwt';
 
 @Injectable({
     providedIn: 'root'
@@ -16,6 +17,8 @@ export class AuthService {
 
     private currentUserSubject = new BehaviorSubject<User | null>(null);
     public currentUser$ = this.currentUserSubject.asObservable();
+
+    private jwtHelper = new JwtHelperService();
 
     // Signal for reactive components
     public user = signal<User | null>(null);
@@ -41,6 +44,14 @@ export class AuthService {
             );
     }
 
+    listUsers(): Observable<IResponse<User[]>> {
+        return this.http.get<IResponse<User[]>>(`${this.API_URL}/auth/users`);
+    }
+
+    createUser(data: Partial<User> & { password?: string }): Observable<IResponse<User>> {
+        return this.http.post<IResponse<User>>(`${this.API_URL}/auth/users`, data);
+    }
+
     logout(): void {
         localStorage.removeItem(this.TOKEN_KEY);
         this.currentUserSubject.next(null);
@@ -53,7 +64,8 @@ export class AuthService {
     }
 
     isAuthenticated(): boolean {
-        return !!this.getToken();
+        const token = this.getToken();
+        return token ? !this.jwtHelper.isTokenExpired(token) : false;
     }
 
     private handleAuthResponse(response: LoginResponse): void {
@@ -67,18 +79,23 @@ export class AuthService {
         const token = this.getToken();
         if (token) {
             try {
-                const payload = JSON.parse(atob(token.split('.')[1]));
-                const user: User = {
-                    id: payload.sub,
-                    email: payload.email,
-                    name: payload.name,
-                    role: payload.role,
-                    tenantId: payload.tenantId,
-                    logoUrl: payload.logoUrl
-                };
-                this.currentUserSubject.next(user);
-                this.user.set(user);
+                const payload = this.jwtHelper.decodeToken(token);
+                if (payload) {
+                    const user: User = {
+                        id: payload.sub,
+                        email: payload.email,
+                        name: payload.name,
+                        role: payload.role,
+                        tenantId: payload.tenantId,
+                        logoUrl: payload.logoUrl
+                    };
+                    this.currentUserSubject.next(user);
+                    this.user.set(user);
+                } else {
+                    this.logout();
+                }
             } catch (error) {
+                console.error('Token decode error:', error);
                 this.logout();
             }
         }

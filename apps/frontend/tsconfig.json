@@ -25,6 +25,9 @@
       ],
       "@shared/ui/*": [
         "src/app/shared/ui/*"
+      ],
+      "@core/*": [
+        "src/app/core/*"
       ]
     }
   },

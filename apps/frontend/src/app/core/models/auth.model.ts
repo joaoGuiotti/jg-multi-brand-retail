@@ -2,7 +2,7 @@ export interface User {
     id: string;
     email: string;
     name: string;
-    role: 'SUPER_ADMIN' | 'ADMIN' | 'USER';
+    role: EUserRole;
     tenantId: string;
     logoUrl?: string;
 }
@@ -23,4 +23,10 @@ export interface RegisterRequest {
     password: string;
     name: string;
     tenantName: string;
+}
+
+export enum EUserRole {
+    SUPER_ADMIN = 'SUPER_ADMIN',
+    ADMIN = 'ADMIN',
+    USER = 'USER'
 }

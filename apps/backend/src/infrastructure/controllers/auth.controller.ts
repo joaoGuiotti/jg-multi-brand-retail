@@ -1,11 +1,20 @@
 import { CreateUserUseCase } from '@application/use-cases/auth/create-user.use-case';
+import { ForgotPasswordUseCase } from '@application/use-cases/auth/forgot-password.use-case';
 import { GetProfileUseCase } from '@application/use-cases/auth/get-profile.use-case';
 import { ListUsersUseCase } from '@application/use-cases/auth/list-users.use-case';
 import { LoginUseCase } from '@application/use-cases/auth/login.use-case';
 import { RefreshTokenUseCase } from '@application/use-cases/auth/refresh-token.use-case';
 import { RegisterUseCase } from '@application/use-cases/auth/register.use-case';
+import { ResetPasswordUseCase } from '@application/use-cases/auth/reset-password.use-case';
 import { Roles } from '@infrastructure/decorators/roles.decorator';
-import { CreateUserDto, LoginDto, RefreshTokenDto, RegisterDto } from '@infrastructure/dtos/auth';
+import {
+    CreateUserDto,
+    ForgotPasswordDto,
+    LoginDto,
+    RefreshTokenDto,
+    RegisterDto,
+    ResetPasswordDto,
+} from '@infrastructure/dtos/auth';
 import { RolesGuard } from '@infrastructure/guards/roles.guard';
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
@@ -24,6 +33,8 @@ export class AuthController {
         private readonly getProfileUseCase: GetProfileUseCase,
         private readonly createUserUseCase: CreateUserUseCase,
         private readonly listUsersUseCase: ListUsersUseCase,
+        private readonly forgotPasswordUseCase: ForgotPasswordUseCase,
+        private readonly resetPasswordUseCase: ResetPasswordUseCase,
     ) { }
 
     @Post('register')
@@ -72,5 +83,17 @@ export class AuthController {
         return this.listUsersUseCase.execute({
             tenantId: user.tenantId,
         });
+    }
+
+    @Post('forgot-password')
+    @HttpCode(HttpStatus.OK)
+    async forgotPassword(@Body() dto: ForgotPasswordDto) {
+        return this.forgotPasswordUseCase.execute(dto);
+    }
+
+    @Post('reset-password')
+    @HttpCode(HttpStatus.OK)
+    async resetPassword(@Body() dto: ResetPasswordDto) {
+        return this.resetPasswordUseCase.execute(dto);
     }
 }

@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { provideTransformInterceptor } from './infrastructure/interceptors/transform/transform-interceptor.provider';
 import { AuthModule } from './infrastructure/modules/auth.module';
 import { ConfigModule } from './infrastructure/modules/config.module';
@@ -15,6 +16,7 @@ const isDev = process.env.NODE_ENV !== 'production';
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    EventEmitterModule.forRoot(),
     PrismaModule,
     AuthModule,
     ProductsModule,

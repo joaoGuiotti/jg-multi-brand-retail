@@ -10,6 +10,7 @@ export interface JwtPayload {
     email: string;
     tenantId: string;
     role: string;
+    tokenVersion?: number;
 }
 
 @Injectable()
@@ -33,6 +34,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             throw new UnauthorizedException('User not found or inactive');
         }
 
+        // Revocation check: if tokenVersion in JWT doesn't match the DB value,
+        // the user's session was invalidated (e.g., password reset).
+        if (
+            payload.tokenVersion !== undefined &&
+            user.tokenVersion !== payload.tokenVersion
+        ) {
+            throw new UnauthorizedException('Session has been invalidated. Please log in again.');
+        }
+
         const tenant = await this.tenantRepository.findById(payload.tenantId);
 
         if (!tenant || !tenant.active) {
@@ -53,3 +63,4 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         };
     }
 }
+

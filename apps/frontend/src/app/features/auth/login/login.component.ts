@@ -1,9 +1,10 @@
 
-import { Component, isDevMode } from '@angular/core';
+import { Component, OnInit, isDevMode } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { UiButtonComponent, UiCardComponent, UiInputFieldComponent } from '@shared/ui';
 import { AuthService } from '../../../core/services/auth.service';
+import { AUTH_QUERY_PARAMS } from '../auth.constants';
 
 @Component({
     selector: 'app-login',
@@ -11,9 +12,10 @@ import { AuthService } from '../../../core/services/auth.service';
     templateUrl: './login.component.html',
     styleUrl: './login.component.scss'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
     loginForm: FormGroup;
     errorMessage = '';
+    successMessage = '';
     isLoading = false;
     isDevMode = isDevMode();
     copiedField: string | null = null;
@@ -21,7 +23,8 @@ export class LoginComponent {
     constructor(
         private fb: FormBuilder,
         private authService: AuthService,
-        private router: Router
+        private router: Router,
+        private route: ActivatedRoute
     ) {
         this.loginForm = this.fb.group({
             email: ['', [Validators.required, Validators.email]],
@@ -29,10 +32,18 @@ export class LoginComponent {
         });
     }
 
+    ngOnInit(): void {
+        const passwordReset = this.route.snapshot.queryParamMap.get(AUTH_QUERY_PARAMS.PASSWORD_RESET_SUCCESS);
+        if (passwordReset === 'true') {
+            this.successMessage = 'Senha atualizada com sucesso. Faça login com a nova senha.';
+        }
+    }
+
     onSubmit(): void {
         if (this.loginForm.valid) {
             this.isLoading = true;
             this.errorMessage = '';
+            this.successMessage = '';
 
             this.authService.login(this.loginForm.value).subscribe({
                 next: () => {

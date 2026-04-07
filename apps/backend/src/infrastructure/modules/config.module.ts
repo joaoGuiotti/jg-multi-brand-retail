@@ -58,6 +58,12 @@ export class ConfigModule extends NestConfigModule {
             validationSchema: Joi.object({
                 NODE_ENV: Joi.string().valid('development', 'production', 'test').default('development'),
                 PORT: Joi.number().default(3000),
+                MAIL_HOST: Joi.string().default('localhost'),
+                MAIL_PORT: Joi.number().default(1025),
+                MAIL_USER: Joi.string().allow('').default(''),
+                MAIL_PASS: Joi.string().allow('').default(''),
+                MAIL_FROM: Joi.string().default('Retail SaaS <no-reply@retailsaas.com>'),
+                FRONTEND_URL: Joi.string().default('http://localhost:4200'),
             }).concat(DB_SCHEMA),
             ...otherOptions,
         });

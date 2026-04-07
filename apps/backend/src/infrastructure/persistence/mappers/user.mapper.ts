@@ -12,6 +12,7 @@ export class UserMapper {
                 name: raw.name,
                 active: raw.active,
                 twoFaSecret: raw.twoFaSecret,
+                tokenVersion: raw.tokenVersion,
                 createdAt: raw.createdAt,
                 updatedAt: raw.updatedAt,
             },
@@ -28,6 +29,7 @@ export class UserMapper {
             name: user.name,
             active: user.active,
             twoFaSecret: user.twoFaSecret,
+            tokenVersion: user.tokenVersion,
             createdAt: user.createdAt,
             updatedAt: user.updatedAt,
         };

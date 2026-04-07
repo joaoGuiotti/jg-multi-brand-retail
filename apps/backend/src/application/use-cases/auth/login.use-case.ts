@@ -95,6 +95,7 @@ export class LoginUseCase implements UseCase<LoginInput, LoginOutput> {
             role: user.role,
             tenantId: tenantId,
             logoUrl: logoUrl,
+            tokenVersion: user.tokenVersion,
         };
 
         const [accessToken, refreshToken] = await Promise.all([

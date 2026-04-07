@@ -39,6 +39,7 @@ export class RefreshTokenUseCase implements UseCase<RefreshTokenInput, RefreshTo
                 user.email,
                 payload.tenantId,
                 user.role,
+                user.tokenVersion,
             );
 
             return tokens;
@@ -52,8 +53,9 @@ export class RefreshTokenUseCase implements UseCase<RefreshTokenInput, RefreshTo
         email: string,
         tenantId: string,
         role: Role,
+        tokenVersion: number,
     ) {
-        const payload = { sub: userId, email, tenantId, role };
+        const payload = { sub: userId, email, tenantId, role, tokenVersion };
 
         const [accessToken, refreshToken] = await Promise.all([
             this.jwtService.signAsync(payload, {

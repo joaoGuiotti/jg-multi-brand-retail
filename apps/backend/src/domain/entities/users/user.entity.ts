@@ -9,6 +9,7 @@ export interface UserProps {
     name: string;
     active: boolean;
     twoFaSecret?: string | null;
+    tokenVersion?: number;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -38,6 +39,7 @@ export class User extends AggregateRoot<UserProps> {
     get name(): string { return this.props.name; }
     get active(): boolean { return this.props.active; }
     get twoFaSecret(): string | undefined | null { return this.props.twoFaSecret; }
+    get tokenVersion(): number { return this.props.tokenVersion ?? 1; }
     get createdAt(): Date | undefined { return this.props.createdAt; }
     get updatedAt(): Date | undefined { return this.props.updatedAt; }
 
@@ -58,6 +60,12 @@ export class User extends AggregateRoot<UserProps> {
 
     public updateRole(role: Role): void {
         this.props.role = role;
+        this.props.updatedAt = new Date();
+    }
+
+    public updatePassword(passwordHash: string): void {
+        this.props.passwordHash = passwordHash;
+        this.props.tokenVersion = (this.props.tokenVersion ?? 1) + 1;
         this.props.updatedAt = new Date();
     }
 

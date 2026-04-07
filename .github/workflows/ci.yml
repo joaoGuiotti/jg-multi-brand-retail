@@ -9,7 +9,7 @@ on:
   pull_request:
     branches:
       - main
-      - main-sdd 
+      - main-sdd
 
 jobs:
   backend-tests:

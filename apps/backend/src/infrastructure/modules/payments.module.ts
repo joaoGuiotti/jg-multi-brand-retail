@@ -10,26 +10,26 @@ import { PrismaPaymentRepository } from '../persistence/repositories/prisma-paym
 import { PrismaModule } from './prisma.module';
 
 @Module({
-    imports: [PrismaModule],
-    controllers: [PaymentsController],
-    providers: [
-        {
-            provide: PaymentRepository,
-            useClass: PrismaPaymentRepository,
-        },
-        CreatePaymentUseCase,
-        CancelPaymentUseCase,
-        ListPaymentsUseCase,
-        GetPaymentUseCase,
-        GetSalePaymentsUseCase,
-    ],
-    exports: [
-        PaymentRepository,
-        CreatePaymentUseCase,
-        CancelPaymentUseCase,
-        ListPaymentsUseCase,
-        GetPaymentUseCase,
-        GetSalePaymentsUseCase,
-    ],
+  imports: [PrismaModule],
+  controllers: [PaymentsController],
+  providers: [
+    {
+      provide: PaymentRepository,
+      useClass: PrismaPaymentRepository,
+    },
+    CreatePaymentUseCase,
+    CancelPaymentUseCase,
+    ListPaymentsUseCase,
+    GetPaymentUseCase,
+    GetSalePaymentsUseCase,
+  ],
+  exports: [
+    PaymentRepository,
+    CreatePaymentUseCase,
+    CancelPaymentUseCase,
+    ListPaymentsUseCase,
+    GetPaymentUseCase,
+    GetSalePaymentsUseCase,
+  ],
 })
-export class PaymentsModule { }
+export class PaymentsModule {}

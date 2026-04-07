@@ -26,74 +26,76 @@ import { JwtStrategy } from '../strategies/jwt.strategy';
 import { PrismaModule } from './prisma.module';
 
 @Module({
-    imports: [
-        PrismaModule,
-        PassportModule,
-        JwtModule.register({}),
-        ConfigModule,
-        EventEmitterModule.forRoot(),
-        MailerModule.forRootAsync({
-            imports: [ConfigModule],
-            inject: [ConfigService],
-            useFactory: (config: ConfigService) => ({
-                transport: {
-                    host: config.get<string>('MAIL_HOST', 'localhost'),
-                    port: config.get<number>('MAIL_PORT', 1025),
-                    auth: {
-                        user: config.get<string>('MAIL_USER', ''),
-                        pass: config.get<string>('MAIL_PASS', ''),
-                    },
-                },
-                defaults: {
-                    from: config.get<string>('MAIL_FROM', '"Retail SaaS" <no-reply@retailsaas.com>'),
-                },
-                template: {
-                    dir: join(__dirname, '../services/mail/templates'),
-                    adapter: new HandlebarsAdapter(),
-                    options: { strict: true },
-                },
-            }),
-        }),
-    ],
-    controllers: [AuthController],
-    providers: [
-        {
-            provide: UserRepository,
-            useClass: PrismaUserRepository,
+  imports: [
+    PrismaModule,
+    PassportModule,
+    JwtModule.register({}),
+    ConfigModule,
+    EventEmitterModule.forRoot(),
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        transport: {
+          host: config.get<string>('MAIL_HOST', 'localhost'),
+          port: config.get<number>('MAIL_PORT', 1025),
+          auth: {
+            user: config.get<string>('MAIL_USER', ''),
+            pass: config.get<string>('MAIL_PASS', ''),
+          },
         },
-        {
-            provide: TenantRepository,
-            useClass: PrismaTenantRepository,
+        defaults: {
+          from: config.get<string>(
+            'MAIL_FROM',
+            '"Retail SaaS" <no-reply@retailsaas.com>',
+          ),
         },
-        {
-            provide: PasswordResetTokenRepository,
-            useClass: PrismaPasswordResetTokenRepository,
+        template: {
+          dir: join(__dirname, '../services/mail/templates'),
+          adapter: new HandlebarsAdapter(),
+          options: { strict: true },
         },
-        RegisterUseCase,
-        LoginUseCase,
-        RefreshTokenUseCase,
-        GetProfileUseCase,
-        CreateUserUseCase,
-        ListUsersUseCase,
-        ForgotPasswordUseCase,
-        ResetPasswordUseCase,
-        JwtStrategy,
-        MailService,
-    ],
-    exports: [
-        UserRepository,
-        TenantRepository,
-        PasswordResetTokenRepository,
-        RegisterUseCase,
-        LoginUseCase,
-        RefreshTokenUseCase,
-        GetProfileUseCase,
-        CreateUserUseCase,
-        ListUsersUseCase,
-        ForgotPasswordUseCase,
-        ResetPasswordUseCase,
-        MailService,
-    ],
+      }),
+    }),
+  ],
+  controllers: [AuthController],
+  providers: [
+    {
+      provide: UserRepository,
+      useClass: PrismaUserRepository,
+    },
+    {
+      provide: TenantRepository,
+      useClass: PrismaTenantRepository,
+    },
+    {
+      provide: PasswordResetTokenRepository,
+      useClass: PrismaPasswordResetTokenRepository,
+    },
+    RegisterUseCase,
+    LoginUseCase,
+    RefreshTokenUseCase,
+    GetProfileUseCase,
+    CreateUserUseCase,
+    ListUsersUseCase,
+    ForgotPasswordUseCase,
+    ResetPasswordUseCase,
+    JwtStrategy,
+    MailService,
+  ],
+  exports: [
+    UserRepository,
+    TenantRepository,
+    PasswordResetTokenRepository,
+    RegisterUseCase,
+    LoginUseCase,
+    RefreshTokenUseCase,
+    GetProfileUseCase,
+    CreateUserUseCase,
+    ListUsersUseCase,
+    ForgotPasswordUseCase,
+    ResetPasswordUseCase,
+    MailService,
+  ],
 })
-export class AuthModule { }
-
+export class AuthModule {}

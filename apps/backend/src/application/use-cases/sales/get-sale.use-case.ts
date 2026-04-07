@@ -7,15 +7,15 @@ export type GetSaleInput = { tenantId: string; id: string };
 
 @Injectable()
 export class GetSaleUseCase implements UseCase<GetSaleInput, SaleOutput> {
-    constructor(private saleRepository: SaleRepository) { }
+  constructor(private saleRepository: SaleRepository) {}
 
-    async execute(input: GetSaleInput): Promise<SaleOutput> {
-        const sale = await this.saleRepository.findById(input.tenantId, input.id);
+  async execute(input: GetSaleInput): Promise<SaleOutput> {
+    const sale = await this.saleRepository.findById(input.tenantId, input.id);
 
-        if (!sale) {
-            throw new NotFoundException('Sale not found');
-        }
-
-        return SaleOutputMapper.toOutput(sale, input.tenantId);
+    if (!sale) {
+      throw new NotFoundException('Sale not found');
     }
+
+    return SaleOutputMapper.toOutput(sale, input.tenantId);
+  }
 }

@@ -27,8 +27,6 @@ const isDev = process.env.NODE_ENV !== 'production';
     ...(isDev ? [DevModule] : []),
   ],
   controllers: [],
-  providers: [
-    provideTransformInterceptor()
-  ],
+  providers: [provideTransformInterceptor()],
 })
-export class AppModule { }
+export class AppModule {}

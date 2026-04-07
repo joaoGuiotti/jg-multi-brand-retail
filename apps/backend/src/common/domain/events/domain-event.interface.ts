@@ -1,7 +1,7 @@
-import { ValueObject } from "../value-object";
+import { ValueObject } from '../value-object';
 
 export interface IDomainEvent {
-    id: ValueObject;
-    occurredAt: Date;
-    eventVersion: string;
+  id: ValueObject;
+  occurredAt: Date;
+  eventVersion: string;
 }

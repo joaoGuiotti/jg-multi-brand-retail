@@ -17,36 +17,36 @@ import { PrismaModule } from './prisma.module';
 import { ProductsModule } from './products.module';
 
 @Module({
-    imports: [PrismaModule, ProductsModule],
-    controllers: [SalesController],
-    providers: [
-        {
-            provide: SaleRepository,
-            useClass: PrismaSaleRepository,
-        },
-        {
-            provide: TenantRepository,
-            useClass: PrismaTenantRepository,
-        },
-        PdfService,
-        CreateSaleUseCase,
-        ListSalesUseCase,
-        GetSaleUseCase,
-        CancelSaleUseCase,
-        CompleteSaleUseCase,
-        GetDailyRevenueUseCase,
-        GenerateSaleReceiptUseCase,
-        GenerateSalesHistoryReportUseCase,
-    ],
-    exports: [
-        SaleRepository,
-        CreateSaleUseCase,
-        ListSalesUseCase,
-        GetSaleUseCase,
-        CancelSaleUseCase,
-        CompleteSaleUseCase,
-        GenerateSaleReceiptUseCase,
-        GenerateSalesHistoryReportUseCase,
-    ],
+  imports: [PrismaModule, ProductsModule],
+  controllers: [SalesController],
+  providers: [
+    {
+      provide: SaleRepository,
+      useClass: PrismaSaleRepository,
+    },
+    {
+      provide: TenantRepository,
+      useClass: PrismaTenantRepository,
+    },
+    PdfService,
+    CreateSaleUseCase,
+    ListSalesUseCase,
+    GetSaleUseCase,
+    CancelSaleUseCase,
+    CompleteSaleUseCase,
+    GetDailyRevenueUseCase,
+    GenerateSaleReceiptUseCase,
+    GenerateSalesHistoryReportUseCase,
+  ],
+  exports: [
+    SaleRepository,
+    CreateSaleUseCase,
+    ListSalesUseCase,
+    GetSaleUseCase,
+    CancelSaleUseCase,
+    CompleteSaleUseCase,
+    GenerateSaleReceiptUseCase,
+    GenerateSalesHistoryReportUseCase,
+  ],
 })
-export class SalesModule { }
+export class SalesModule {}

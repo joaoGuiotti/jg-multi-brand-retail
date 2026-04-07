@@ -3,8 +3,13 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main-sdd
       - main
+      - main-sdd
+
+  pull_request:
+    branches:
+      - main
+      - main-sdd
 
 jobs:
   backend-tests:

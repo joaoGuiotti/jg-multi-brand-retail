@@ -2,32 +2,32 @@ import { UniqueEntityID } from './unique-entity-id';
 import { Notification } from './validators/notification';
 
 export abstract class Entity<T = any> {
-    protected readonly _id: UniqueEntityID;
-    public readonly props: T;
-    public notification: Notification = new Notification();
+  protected readonly _id: UniqueEntityID;
+  public readonly props: T;
+  public notification: Notification = new Notification();
 
-    constructor(props: T, id?: UniqueEntityID) {
-        this._id = id ? id : new UniqueEntityID();
-        this.props = props;
+  constructor(props: T, id?: UniqueEntityID) {
+    this._id = id ? id : new UniqueEntityID();
+    this.props = props;
+  }
+
+  get id() {
+    return this._id;
+  }
+
+  public equals(object?: Entity<T>): boolean {
+    if (object === null || object === undefined) {
+      return false;
     }
 
-    get id() {
-        return this._id;
+    if (this === object) {
+      return true;
     }
 
-    public equals(object?: Entity<T>): boolean {
-        if (object === null || object === undefined) {
-            return false;
-        }
-
-        if (this === object) {
-            return true;
-        }
-
-        if (!(object instanceof Entity)) {
-            return false;
-        }
-
-        return this._id.equals(object._id);
+    if (!(object instanceof Entity)) {
+      return false;
     }
+
+    return this._id.equals(object._id);
+  }
 }

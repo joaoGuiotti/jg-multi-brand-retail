@@ -10,26 +10,26 @@ import { PrismaCustomerRepository } from '../persistence/repositories/prisma-cus
 import { PrismaModule } from './prisma.module';
 
 @Module({
-    imports: [PrismaModule],
-    controllers: [CustomersController],
-    providers: [
-        {
-            provide: CustomerRepository,
-            useClass: PrismaCustomerRepository,
-        },
-        CreateCustomerUseCase,
-        ListCustomersUseCase,
-        GetCustomerUseCase,
-        UpdateCustomerUseCase,
-        DeleteCustomerUseCase,
-    ],
-    exports: [
-        CustomerRepository,
-        CreateCustomerUseCase,
-        ListCustomersUseCase,
-        GetCustomerUseCase,
-        UpdateCustomerUseCase,
-        DeleteCustomerUseCase,
-    ],
+  imports: [PrismaModule],
+  controllers: [CustomersController],
+  providers: [
+    {
+      provide: CustomerRepository,
+      useClass: PrismaCustomerRepository,
+    },
+    CreateCustomerUseCase,
+    ListCustomersUseCase,
+    GetCustomerUseCase,
+    UpdateCustomerUseCase,
+    DeleteCustomerUseCase,
+  ],
+  exports: [
+    CustomerRepository,
+    CreateCustomerUseCase,
+    ListCustomersUseCase,
+    GetCustomerUseCase,
+    UpdateCustomerUseCase,
+    DeleteCustomerUseCase,
+  ],
 })
-export class CustomersModule { }
+export class CustomersModule {}

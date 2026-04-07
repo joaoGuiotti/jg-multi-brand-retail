@@ -12,30 +12,30 @@ import { PrismaProductRepository } from '../persistence/repositories/prisma-prod
 import { PrismaModule } from './prisma.module';
 
 @Module({
-    imports: [PrismaModule],
-    controllers: [ProductsController],
-    providers: [
-        {
-            provide: ProductRepository,
-            useClass: PrismaProductRepository,
-        },
-        CreateProductUseCase,
-        ListProductsUseCase,
-        GetProductUseCase,
-        UpdateProductUseCase,
-        DeleteProductUseCase,
-        UpdateStockUseCase,
-        AdjustStockUseCase,
-    ],
-    exports: [
-        ProductRepository,
-        CreateProductUseCase,
-        ListProductsUseCase,
-        GetProductUseCase,
-        UpdateProductUseCase,
-        DeleteProductUseCase,
-        UpdateStockUseCase,
-        AdjustStockUseCase,
-    ],
+  imports: [PrismaModule],
+  controllers: [ProductsController],
+  providers: [
+    {
+      provide: ProductRepository,
+      useClass: PrismaProductRepository,
+    },
+    CreateProductUseCase,
+    ListProductsUseCase,
+    GetProductUseCase,
+    UpdateProductUseCase,
+    DeleteProductUseCase,
+    UpdateStockUseCase,
+    AdjustStockUseCase,
+  ],
+  exports: [
+    ProductRepository,
+    CreateProductUseCase,
+    ListProductsUseCase,
+    GetProductUseCase,
+    UpdateProductUseCase,
+    DeleteProductUseCase,
+    UpdateStockUseCase,
+    AdjustStockUseCase,
+  ],
 })
-export class ProductsModule { }
+export class ProductsModule {}

@@ -8,8 +8,8 @@ import { PrismaModule } from './prisma.module';
  * Provides dev/testing endpoints (e.g. PDF preview).
  */
 @Module({
-    imports: [PrismaModule],
-    controllers: [PdfDevController],
-    providers: [PdfService],
+  imports: [PrismaModule],
+  controllers: [PdfDevController],
+  providers: [PdfService],
 })
-export class DevModule { }
+export class DevModule {}

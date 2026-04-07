@@ -14,31 +14,31 @@ import { PrismaModule } from './prisma.module';
 import { ProductsModule } from './products.module';
 
 @Module({
-    imports: [PrismaModule, ProductsModule],
-    controllers: [InventoryController],
-    providers: [
-        {
-            provide: InventoryRepository,
-            useClass: PrismaInventoryRepository,
-        },
-        {
-            provide: TenantRepository,
-            useClass: PrismaTenantRepository,
-        },
-        PdfService,
-        CreateMovementUseCase,
-        ListMovementsUseCase,
-        GetStockSummaryUseCase,
-        GetProductMovementsUseCase,
-        GenerateInventoryReportUseCase,
-    ],
-    exports: [
-        InventoryRepository,
-        CreateMovementUseCase,
-        ListMovementsUseCase,
-        GetStockSummaryUseCase,
-        GetProductMovementsUseCase,
-        GenerateInventoryReportUseCase,
-    ],
+  imports: [PrismaModule, ProductsModule],
+  controllers: [InventoryController],
+  providers: [
+    {
+      provide: InventoryRepository,
+      useClass: PrismaInventoryRepository,
+    },
+    {
+      provide: TenantRepository,
+      useClass: PrismaTenantRepository,
+    },
+    PdfService,
+    CreateMovementUseCase,
+    ListMovementsUseCase,
+    GetStockSummaryUseCase,
+    GetProductMovementsUseCase,
+    GenerateInventoryReportUseCase,
+  ],
+  exports: [
+    InventoryRepository,
+    CreateMovementUseCase,
+    ListMovementsUseCase,
+    GetStockSummaryUseCase,
+    GetProductMovementsUseCase,
+    GenerateInventoryReportUseCase,
+  ],
 })
-export class InventoryModule { }
+export class InventoryModule {}

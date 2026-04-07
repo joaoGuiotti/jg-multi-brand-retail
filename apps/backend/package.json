@@ -109,6 +109,14 @@
     },
     "transformIgnorePatterns": [
       "node_modules/(?!uuid)"
-    ]
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 28,
+        "functions": 44,
+        "lines": 34,
+        "statements": 34
+      }
+    }
   }
 }

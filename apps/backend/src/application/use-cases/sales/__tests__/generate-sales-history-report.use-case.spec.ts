@@ -27,10 +27,21 @@ describe('GenerateSalesHistoryReportUseCase', () => {
   let saleRepository: any;
   let pdfService: any;
 
+  let mockPdfBuilder: any;
+
   beforeEach(() => {
     tenantRepository = { findById: jest.fn() };
     saleRepository = { findAll: jest.fn() };
-    pdfService = { generateList: jest.fn() };
+    mockPdfBuilder = {
+      addTable: jest.fn().mockReturnThis(),
+      goToNextPage: jest.fn().mockReturnThis(),
+      addBreakLine: jest.fn().mockReturnThis(),
+      addSummaryRow: jest.fn().mockReturnThis(),
+      toBuffer: jest.fn().mockResolvedValue(Buffer.from('pdf-content')),
+    };
+    pdfService = {
+      startDocumentBuilder: jest.fn().mockResolvedValue(mockPdfBuilder),
+    };
     useCase = new GenerateSalesHistoryReportUseCase(
       tenantRepository,
       saleRepository,
@@ -47,7 +58,6 @@ describe('GenerateSalesHistoryReportUseCase', () => {
 
     tenantRepository.findById.mockResolvedValue(tenant);
     saleRepository.findAll.mockResolvedValue({ data: sales, total: 2 });
-    pdfService.generateList.mockResolvedValue(Buffer.from('pdf-content'));
 
     const result = await useCase.execute({ tenantId: 't1' });
 
@@ -60,7 +70,8 @@ describe('GenerateSalesHistoryReportUseCase', () => {
         sortOrder: 'desc',
       }),
     );
-    expect(pdfService.generateList).toHaveBeenCalled();
+    expect(pdfService.startDocumentBuilder).toHaveBeenCalled();
+    expect(mockPdfBuilder.toBuffer).toHaveBeenCalled();
     expect(result).toEqual(Buffer.from('pdf-content'));
   });
 
@@ -70,7 +81,7 @@ describe('GenerateSalesHistoryReportUseCase', () => {
       name: 'Test Store',
     });
     saleRepository.findAll.mockResolvedValue({ data: [], total: 0 });
-    pdfService.generateList.mockResolvedValue(Buffer.from('empty-report'));
+    mockPdfBuilder.toBuffer.mockResolvedValue(Buffer.from('empty-report'));
 
     const result = await useCase.execute({ tenantId: 't1' });
 

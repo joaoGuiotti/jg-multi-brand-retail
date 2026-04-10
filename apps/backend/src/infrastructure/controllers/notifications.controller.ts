@@ -23,7 +23,7 @@ import { NotificationFiltersDto } from '../dtos/notifications/notification-filte
 import { UpdatePreferenceDto } from '../dtos/notifications/update-preference.dto';
 import { INOTIFICATIONS_REPOSITORY_TOKEN } from '../../domain/repositories/notifications/notifications.repository.interface';
 import type { INotificationsRepository } from '../../domain/repositories/notifications/notifications.repository.interface';
-import { NotificationDispatcherService } from '../services/notification-dispatcher.service';
+import { CreateNotificationUseCase } from '../../application/use-cases/notifications/create-notification.use-case';
 import { CreateNotificationDto } from '../dtos/notifications/create-notification.dto';
 import { NotificationCollectionPresenter } from '../presenters/notification.presenter';
 
@@ -39,7 +39,7 @@ export class NotificationsController {
     private readonly updatePreferenceUseCase: UpdatePreferenceUseCase,
     @Inject(INOTIFICATIONS_REPOSITORY_TOKEN)
     private readonly notificationsRepository: INotificationsRepository,
-    private readonly dispatcherService: NotificationDispatcherService,
+    private readonly createNotificationUseCase: CreateNotificationUseCase,
   ) {}
 
   @Get()
@@ -105,7 +105,8 @@ export class NotificationsController {
     @Headers('x-tenant-id') tenantId: string,
     @Body() dto: CreateNotificationDto,
   ) {
-    await this.dispatcherService.dispatch(tenantId, dto);
+    // Agora usando o Use Case que dispara os eventos de domínio automaticamente
+    await this.createNotificationUseCase.execute(tenantId, dto);
     return { success: true };
   }
 }

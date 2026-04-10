@@ -39,7 +39,7 @@ export class NotificationPresenter {
   createdAt: Date;
 
   constructor(entity: NotificationEntity) {
-    this.id = entity.id;
+    this.id = entity.id.toString();
     this.tenantId = entity.tenantId;
     this.userId = entity.userId;
     this.type = entity.type;
@@ -47,7 +47,7 @@ export class NotificationPresenter {
     this.title = entity.title;
     this.message = entity.message;
     this.actionUrl = entity.actionUrl;
-    this.readAt = entity.readAt;
+    this.readAt = entity.readAt || undefined;
     this.createdAt = entity.createdAt;
   }
 }

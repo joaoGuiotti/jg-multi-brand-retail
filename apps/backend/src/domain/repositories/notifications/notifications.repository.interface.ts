@@ -7,6 +7,11 @@ import { PaginationOutput } from '@common/application/pagination-output';
 
 export interface INotificationsRepository {
   create(notification: NotificationEntity): Promise<NotificationEntity>;
+  findById(
+    id: string,
+    tenantId: string,
+    userId: string,
+  ): Promise<NotificationEntity | null>;
   markAsRead(
     id: string,
     tenantId: string,

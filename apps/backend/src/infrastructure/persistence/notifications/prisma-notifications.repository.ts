@@ -8,25 +8,28 @@ import {
   NotificationPriority,
 } from '../../../domain/entities/notifications/notification.entity';
 import { NotificationPreferenceEntity } from '../../../domain/entities/notifications/notification-preference.entity';
+import { UniqueEntityID } from '../../../common/domain/unique-entity-id';
 
 @Injectable()
 export class PrismaNotificationsRepository implements INotificationsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   private mapToEntity(dbRecord: any): NotificationEntity {
-    return new NotificationEntity({
-      id: dbRecord.id,
-      tenantId: dbRecord.tenantId,
-      userId: dbRecord.userId,
-      type: dbRecord.type as NotificationType,
-      priority: dbRecord.priority as NotificationPriority,
-      title: dbRecord.title,
-      message: dbRecord.message,
-      data: dbRecord.data as Record<string, any> | undefined,
-      actionUrl: dbRecord.actionUrl,
-      readAt: dbRecord.readAt,
-      createdAt: dbRecord.createdAt,
-    });
+    return NotificationEntity.create(
+      {
+        tenantId: dbRecord.tenantId,
+        userId: dbRecord.userId,
+        type: dbRecord.type as NotificationType,
+        priority: dbRecord.priority as NotificationPriority,
+        title: dbRecord.title,
+        message: dbRecord.message,
+        data: dbRecord.data as Record<string, any> | undefined,
+        actionUrl: dbRecord.actionUrl,
+        readAt: dbRecord.readAt,
+        createdAt: dbRecord.createdAt,
+      },
+      new UniqueEntityID(dbRecord.id),
+    );
   }
 
   private mapToPreferenceEntity(dbRecord: any): NotificationPreferenceEntity {
@@ -43,7 +46,7 @@ export class PrismaNotificationsRepository implements INotificationsRepository {
   async create(notification: NotificationEntity): Promise<NotificationEntity> {
     const created = await this.prisma.notification.create({
       data: {
-        id: notification.id,
+        id: notification.id.toString(),
         tenantId: notification.tenantId,
         userId: notification.userId,
         type: notification.type,
@@ -57,16 +60,34 @@ export class PrismaNotificationsRepository implements INotificationsRepository {
     return this.mapToEntity(created);
   }
 
+  async findById(
+    id: string,
+    tenantId: string,
+    userId: string,
+  ): Promise<NotificationEntity | null> {
+    const notification = await this.prisma.notification.findFirst({
+      where: { id, tenantId, userId },
+    });
+    return notification ? this.mapToEntity(notification) : null;
+  }
+
   async markAsRead(
     id: string,
     tenantId: string,
     userId: string,
   ): Promise<NotificationEntity | null> {
+    // Note: Em uma arquitetura DDD pura, o Use Case deveria carregar a entidade, 
+    // chamar markAsRead() nela e depois salvar. 
+    // Mantemos este método para compatibilidade, mas ele agora retorna a entidade mapeada.
     const updated = await this.prisma.notification.updateMany({
       where: { id, tenantId, userId, readAt: null },
       data: { readAt: new Date() },
     });
-    if (updated.count === 0) return null;
+    if (updated.count === 0) {
+       // Se já está lida, retornamos a entidade atualizada
+       const current = await this.findById(id, tenantId, userId);
+       return current;
+    }
 
     const notification = await this.prisma.notification.findUnique({
       where: { id },

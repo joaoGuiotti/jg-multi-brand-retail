@@ -21,17 +21,20 @@ model Tenant {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  users        User[]
-  products     Product[]
-  categories   Category[]
-  brands       Brand[]
-  suppliers    Supplier[]
-  sales        Sale[]
-  payments     Payment[]
-  conditionals Conditional[]
-  inventory    InventoryMovement[]
-  auditLogs    AuditLog[]
-  customers    Customer[]
+  users               User[]
+  products            Product[]
+  categories          Category[]
+  brands              Brand[]
+  suppliers           Supplier[]
+  sales               Sale[]
+  payments            Payment[]
+  conditionals        Conditional[]
+  inventory           InventoryMovement[]
+  auditLogs           AuditLog[]
+  customers               Customer[]
+  passwordResetTokens     PasswordResetToken[]
+  notifications           Notification[]
+  notificationPreferences NotificationPreference[]
 
   @@map("tenants")
 }
@@ -51,14 +54,18 @@ model User {
   name         String
   active       Boolean  @default(true)
   twoFaSecret  String?  @map("two_fa_secret")
+  tokenVersion Int      @default(1) @map("token_version")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  tenant       Tenant              @relation(fields: [tenantId], references: [id])
-  sales        Sale[]
-  conditionals Conditional[]
-  inventory    InventoryMovement[]
-  auditLogs    AuditLog[]
+  tenant              Tenant               @relation(fields: [tenantId], references: [id])
+  sales               Sale[]
+  conditionals        Conditional[]
+  inventory           InventoryMovement[]
+  auditLogs               AuditLog[]
+  passwordResetTokens     PasswordResetToken[]
+  notifications           Notification[]
+  notificationPreferences NotificationPreference[]
 
   @@index([tenantId])
   @@map("users")
@@ -372,4 +379,85 @@ model Customer {
   @@index([tenantId])
   @@index([email])
   @@map("customers")
+}
+
+// =====================
+// AUTH — PASSWORD RESET
+// =====================
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  tenantId  String    @map("tenant_id")
+  userId    String    @map("user_id")
+  tokenHash String    @map("token_hash")
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+  @@index([userId])
+  @@map("password_reset_tokens")
+}
+
+// =====================
+// NOTIFICATIONS
+// =====================
+
+enum NotificationType {
+  LOW_STOCK
+  OUT_OF_STOCK
+  GOAL_ACHIEVED
+  RETURN_PENDING
+  RETURN_APPROVED
+  PROMOTION_EXPIRING
+  SALE_COMPLETED
+  COMMISSION_CALCULATED
+  SYSTEM
+}
+
+enum NotificationPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model Notification {
+  id        String               @id @default(uuid())
+  tenantId  String               @map("tenant_id")
+  userId    String               @map("user_id")
+  type      NotificationType
+  priority  NotificationPriority @default(MEDIUM)
+  title     String
+  message   String
+  data      Json?                
+  actionUrl String?              @map("action_url") 
+  readAt    DateTime?            @map("read_at")
+  createdAt DateTime             @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+  @@index([userId, readAt])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+model NotificationPreference {
+  id       String           @id @default(uuid())
+  tenantId String           @map("tenant_id")
+  userId   String           @map("user_id")
+  type     NotificationType
+  enabled  Boolean          @default(true)
+  sound    Boolean          @default(true)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([userId, type])
+  @@map("notification_preferences")
 }

@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { UseCase } from '../../../common/application/use-case.interface';
 import { ProductRepository } from '../../../domain/repositories/product-repository';
 import { SaleRepository } from '../../../domain/repositories/sale-repository';
@@ -8,35 +12,38 @@ export type CancelSaleInput = { tenantId: string; id: string };
 
 @Injectable()
 export class CancelSaleUseCase implements UseCase<CancelSaleInput, SaleOutput> {
-    constructor(
-        private saleRepository: SaleRepository,
-        private productRepository: ProductRepository,
-    ) { }
+  constructor(
+    private saleRepository: SaleRepository,
+    private productRepository: ProductRepository,
+  ) {}
 
-    async execute(input: CancelSaleInput): Promise<SaleOutput> {
-        const { tenantId, id } = input;
-        const sale = await this.saleRepository.findById(tenantId, id);
+  async execute(input: CancelSaleInput): Promise<SaleOutput> {
+    const { tenantId, id } = input;
+    const sale = await this.saleRepository.findById(tenantId, id);
 
-        if (!sale) {
-            throw new NotFoundException('Sale not found');
-        }
-
-        try {
-            sale.cancel();
-        } catch (error: any) {
-            throw new BadRequestException(error.message);
-        }
-
-        // Restore stock
-        for (const item of sale.items) {
-            const product = await this.productRepository.findById(tenantId, item.productId);
-            if (product) {
-                product.adjustStock(item.quantity);
-                await this.productRepository.update(tenantId, product);
-            }
-        }
-
-        const updated = await this.saleRepository.update(tenantId, sale);
-        return SaleOutputMapper.toOutput(updated, tenantId);
+    if (!sale) {
+      throw new NotFoundException('Sale not found');
     }
+
+    try {
+      sale.cancel();
+    } catch (error: any) {
+      throw new BadRequestException(error.message);
+    }
+
+    // Restore stock
+    for (const item of sale.items) {
+      const product = await this.productRepository.findById(
+        tenantId,
+        item.productId,
+      );
+      if (product) {
+        product.adjustStock(item.quantity);
+        await this.productRepository.update(tenantId, product);
+      }
+    }
+
+    const updated = await this.saleRepository.update(tenantId, sale);
+    return SaleOutputMapper.toOutput(updated, tenantId);
+  }
 }

@@ -1,29 +1,35 @@
 import { Sale } from '../entities/sales/sale.entity';
 
 export interface SaleFilters {
-    userId?: string;
-    customerId?: string;
-    status?: string;
-    startDate?: string;
-    endDate?: string;
-    page?: number;
-    limit?: number;
-    sortBy?: string;
-    sortOrder?: 'asc' | 'desc';
+  userId?: string;
+  customerId?: string;
+  status?: string;
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }
 
 export interface SaleSearchResult {
-    data: Sale[];
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
+  data: Sale[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
 
 export abstract class SaleRepository {
-    abstract create(tenantId: string, sale: Sale): Promise<Sale>;
-    abstract findById(tenantId: string, id: string): Promise<Sale | null>;
-    abstract findAll(tenantId: string, filters: SaleFilters): Promise<SaleSearchResult>;
-    abstract update(tenantId: string, sale: Sale): Promise<Sale>;
-    abstract getDailyRevenue(tenantId: string, days: number): Promise<{ date: string; revenue: number }[]>;
+  abstract create(tenantId: string, sale: Sale): Promise<Sale>;
+  abstract findById(tenantId: string, id: string): Promise<Sale | null>;
+  abstract findAll(
+    tenantId: string,
+    filters: SaleFilters,
+  ): Promise<SaleSearchResult>;
+  abstract update(tenantId: string, sale: Sale): Promise<Sale>;
+  abstract getDailyRevenue(
+    tenantId: string,
+    days: number,
+  ): Promise<{ date: string; revenue: number }[]>;
 }

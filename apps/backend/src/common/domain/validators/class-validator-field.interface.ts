@@ -1,12 +1,11 @@
-import { Notification } from "./notification";
-
+import { Notification } from './notification';
 
 export type FieldsErros =
-    | {
-        [field: string]: string[];
+  | {
+      [field: string]: string[];
     }
-    | string;
+  | string;
 
 export interface IClassValidatorField {
-    validate(notification: Notification, data: any, fields: string[]): boolean;
+  validate(notification: Notification, data: any, fields: string[]): boolean;
 }

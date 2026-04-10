@@ -6,16 +6,22 @@ import { PaymentOutput, PaymentOutputMapper } from './common/payment-output';
 export type GetPaymentInput = { tenantId: string; id: string };
 
 @Injectable()
-export class GetPaymentUseCase implements UseCase<GetPaymentInput, PaymentOutput> {
-    constructor(private paymentRepository: PaymentRepository) { }
+export class GetPaymentUseCase implements UseCase<
+  GetPaymentInput,
+  PaymentOutput
+> {
+  constructor(private paymentRepository: PaymentRepository) {}
 
-    async execute(input: GetPaymentInput): Promise<PaymentOutput> {
-        const payment = await this.paymentRepository.findById(input.tenantId, input.id);
+  async execute(input: GetPaymentInput): Promise<PaymentOutput> {
+    const payment = await this.paymentRepository.findById(
+      input.tenantId,
+      input.id,
+    );
 
-        if (!payment) {
-            throw new NotFoundException('Payment not found');
-        }
-
-        return PaymentOutputMapper.toOutput(payment, input.tenantId);
+    if (!payment) {
+      throw new NotFoundException('Payment not found');
     }
+
+    return PaymentOutputMapper.toOutput(payment, input.tenantId);
+  }
 }

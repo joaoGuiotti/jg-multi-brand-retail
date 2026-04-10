@@ -2,11 +2,12 @@ import { Component, EventEmitter, inject, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ThemeToggleComponent, UiOverlayComponent } from '@shared/ui';
 import { AuthService } from '../../core/services/auth.service';
+import { NotificationBellComponent } from '../../features/notifications/components/notification-bell/notification-bell.component';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, ThemeToggleComponent, UiOverlayComponent],
+  imports: [CommonModule, ThemeToggleComponent, UiOverlayComponent, NotificationBellComponent],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })

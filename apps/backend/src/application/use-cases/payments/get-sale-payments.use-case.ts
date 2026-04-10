@@ -6,11 +6,17 @@ import { PaymentOutput, PaymentOutputMapper } from './common/payment-output';
 export type GetSalePaymentsInput = { tenantId: string; saleId: string };
 
 @Injectable()
-export class GetSalePaymentsUseCase implements UseCase<GetSalePaymentsInput, PaymentOutput[]> {
-    constructor(private paymentRepository: PaymentRepository) { }
+export class GetSalePaymentsUseCase implements UseCase<
+  GetSalePaymentsInput,
+  PaymentOutput[]
+> {
+  constructor(private paymentRepository: PaymentRepository) {}
 
-    async execute(input: GetSalePaymentsInput): Promise<PaymentOutput[]> {
-        const payments = await this.paymentRepository.findBySale(input.tenantId, input.saleId);
-        return payments.map(p => PaymentOutputMapper.toOutput(p, input.tenantId));
-    }
+  async execute(input: GetSalePaymentsInput): Promise<PaymentOutput[]> {
+    const payments = await this.paymentRepository.findBySale(
+      input.tenantId,
+      input.saleId,
+    );
+    return payments.map((p) => PaymentOutputMapper.toOutput(p, input.tenantId));
+  }
 }

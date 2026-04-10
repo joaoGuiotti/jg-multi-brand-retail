@@ -5,40 +5,40 @@ import { PaginationPresenterProps } from '@common/presenters/pagination.presente
 import { Transform } from 'class-transformer';
 
 export class MovementPresenter {
-    id: string;
-    tenantId: string;
-    productId: string;
-    userId: string;
-    type: string;
-    quantity: number;
-    reference: string | null;
+  id: string;
+  tenantId: string;
+  productId: string;
+  userId: string;
+  type: string;
+  quantity: number;
+  reference: string | null;
 
-    @Transform(({ value }) => value?.toISOString())
-    createdAt: Date | undefined;
+  @Transform(({ value }) => value?.toISOString())
+  createdAt: Date | undefined;
 
-    constructor(output: MovementOutput) {
-        this.id = output.id;
-        this.tenantId = output.tenantId;
-        this.productId = output.productId;
-        this.userId = output.userId;
-        this.type = output.type;
-        this.quantity = output.quantity;
-        this.reference = output.reference ?? null;
-        this.createdAt = output.createdAt;
-    }
+  constructor(output: MovementOutput) {
+    this.id = output.id;
+    this.tenantId = output.tenantId;
+    this.productId = output.productId;
+    this.userId = output.userId;
+    this.type = output.type;
+    this.quantity = output.quantity;
+    this.reference = output.reference ?? null;
+    this.createdAt = output.createdAt;
+  }
 }
 
 export class MovementCollectionPresenter extends CollectionPresenter {
-    data: MovementPresenter[];
+  data: MovementPresenter[];
 
-    constructor(output: PaginationOutput<MovementOutput>) {
-        const paginationProps: PaginationPresenterProps = {
-            page: output.meta.page,
-            limit: output.meta.limit,
-            totalPages: output.meta.totalPages,
-            total: output.meta.total,
-        };
-        super(paginationProps);
-        this.data = output.data.map((item) => new MovementPresenter(item));
-    }
+  constructor(output: PaginationOutput<MovementOutput>) {
+    const paginationProps: PaginationPresenterProps = {
+      page: output.meta.page,
+      limit: output.meta.limit,
+      totalPages: output.meta.totalPages,
+      total: output.meta.total,
+    };
+    super(paginationProps);
+    this.data = output.data.map((item) => new MovementPresenter(item));
+  }
 }

@@ -23,13 +23,16 @@
     "prisma:seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
+    "@nestjs-modules/mailer": "^2.3.4",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.3",
     "@nestjs/core": "^11.0.1",
+    "@nestjs/event-emitter": "^3.0.1",
     "@nestjs/jwt": "^11.0.2",
     "@nestjs/mapped-types": "^2.1.0",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/platform-socket.io": "^11.1.18",
     "@nestjs/swagger": "^11.2.6",
     "@prisma/adapter-pg": "^7.4.1",
     "@prisma/client": "^7.4.1",
@@ -39,14 +42,17 @@
     "class-validator": "^0.14.3",
     "dotenv": "^17.3.1",
     "eventemitter2": "^6.4.9",
+    "handlebars": "^4.7.9",
     "joi": "^18.0.2",
     "lodash": "^4.17.23",
+    "nodemailer": "^8.0.4",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "pdfkit": "^0.17.2",
     "pg": "^8.18.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
+    "socket.io": "^4.8.3",
     "uuid": "^13.0.0"
   },
   "devDependencies": {
@@ -59,6 +65,7 @@
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^22.19.11",
+    "@types/nodemailer": "^8.0.0",
     "@types/passport-jwt": "^4.0.1",
     "@types/pdfkit": "^0.17.5",
     "@types/pg": "^8.16.0",
@@ -104,6 +111,14 @@
     },
     "transformIgnorePatterns": [
       "node_modules/(?!uuid)"
-    ]
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 28,
+        "functions": 44,
+        "lines": 34,
+        "statements": 34
+      }
+    }
   }
 }

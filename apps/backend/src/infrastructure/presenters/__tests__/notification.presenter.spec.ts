@@ -1,5 +1,11 @@
-import { NotificationPresenter, NotificationCollectionPresenter } from '../notification.presenter';
-import { NotificationType, NotificationPriority } from '@domain/entities/notifications/notification.entity';
+import {
+  NotificationPresenter,
+  NotificationCollectionPresenter,
+} from '../notification.presenter';
+import {
+  NotificationType,
+  NotificationPriority,
+} from '@domain/entities/notifications/notification.entity';
 
 describe('NotificationPresenter', () => {
   const mockNotification = {
@@ -17,7 +23,7 @@ describe('NotificationPresenter', () => {
 
   it('should format a single notification', () => {
     const presenter = new NotificationPresenter(mockNotification as any);
-    
+
     expect(presenter.id).toBe('1');
     expect(presenter.title).toBe('Test');
     expect(presenter.message).toBe('Message');
@@ -35,7 +41,7 @@ describe('NotificationPresenter', () => {
     };
 
     const presenter = new NotificationCollectionPresenter(collection as any);
-    
+
     expect(presenter.data).toHaveLength(1);
     expect(presenter.meta.total).toBe(1);
   });

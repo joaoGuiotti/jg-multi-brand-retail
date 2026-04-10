@@ -76,17 +76,17 @@ export class PrismaNotificationsRepository implements INotificationsRepository {
     tenantId: string,
     userId: string,
   ): Promise<NotificationEntity | null> {
-    // Note: Em uma arquitetura DDD pura, o Use Case deveria carregar a entidade, 
-    // chamar markAsRead() nela e depois salvar. 
+    // Note: Em uma arquitetura DDD pura, o Use Case deveria carregar a entidade,
+    // chamar markAsRead() nela e depois salvar.
     // Mantemos este método para compatibilidade, mas ele agora retorna a entidade mapeada.
     const updated = await this.prisma.notification.updateMany({
       where: { id, tenantId, userId, readAt: null },
       data: { readAt: new Date() },
     });
     if (updated.count === 0) {
-       // Se já está lida, retornamos a entidade atualizada
-       const current = await this.findById(id, tenantId, userId);
-       return current;
+      // Se já está lida, retornamos a entidade atualizada
+      const current = await this.findById(id, tenantId, userId);
+      return current;
     }
 
     const notification = await this.prisma.notification.findUnique({

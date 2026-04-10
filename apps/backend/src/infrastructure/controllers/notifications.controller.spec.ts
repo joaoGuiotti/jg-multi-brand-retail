@@ -52,9 +52,9 @@ describe('NotificationsController', () => {
   it('should update preference', async () => {
     const dto = { type: 'SYSTEM', enabled: true, sound: true } as any;
     updatePrefUseCase.execute.mockResolvedValue(dto);
-    
+
     const result = await controller.updatePreference(mockUser, dto);
-    
+
     expect(result).toEqual(dto);
     expect(updatePrefUseCase.execute).toHaveBeenCalledWith('t1', 'u1', dto);
   });

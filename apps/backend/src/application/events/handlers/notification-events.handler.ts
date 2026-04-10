@@ -17,7 +17,9 @@ export class NotificationEventsHandler {
   @OnEvent('notification.created')
   handleNotificationCreated(event: NotificationCreatedEvent) {
     const { notification } = event;
-    this.logger.debug(`Handling notification.created for user ${notification.userId}`);
+    this.logger.debug(
+      `Handling notification.created for user ${notification.userId}`,
+    );
 
     const room = `${notification.tenantId}:${notification.userId}`;
     this.notificationsGateway.server
@@ -36,8 +38,10 @@ export class NotificationEventsHandler {
   @OnEvent('notification.read')
   handleNotificationRead(event: NotificationReadEvent) {
     const { notification } = event;
-    this.logger.debug(`Handling notification.read for notification ${notification.id}`);
-    
+    this.logger.debug(
+      `Handling notification.read for notification ${notification.id.toString()}`,
+    );
+
     // Aqui poderíamos emitir um evento via socket para atualizar o contador no frontend se necessário
   }
 }

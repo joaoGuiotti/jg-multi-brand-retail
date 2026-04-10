@@ -49,7 +49,7 @@ export class RefreshTokenUseCase implements UseCase<
       );
 
       return tokens;
-    } catch (error) {
+    } catch {
       throw new UnauthorizedException('Invalid refresh token');
     }
   }

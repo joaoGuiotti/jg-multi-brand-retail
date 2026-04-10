@@ -10,17 +10,17 @@ export class DomainEventPublisher {
 
   public async publishEvents(aggregate: AggregateRoot) {
     const events = aggregate.getUncommittedEvents();
-    
+
     for (const event of events) {
       const eventName = this.getEventName(event);
       this.logger.debug(`Publishing domain event: ${eventName}`);
-      
+
       // Emit system-wide via EventEmitter2
       await this.eventEmitter.emitAsync(eventName, event);
-      
+
       aggregate.markEventAsDispatched(event);
     }
-    
+
     aggregate.clearEvents();
   }
 

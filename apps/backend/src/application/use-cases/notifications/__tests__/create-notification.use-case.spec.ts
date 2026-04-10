@@ -1,7 +1,10 @@
 import { INotificationsRepository } from '../../../../domain/repositories/notifications/notifications.repository.interface';
 import { CreateNotificationUseCase } from '../create-notification.use-case';
 import { DomainEventPublisher } from '../../../../common/application/domain-event-publisher';
-import { NotificationType, NotificationPriority } from '../../../../domain/entities/notifications/notification.entity';
+import {
+  NotificationType,
+  NotificationPriority,
+} from '../../../../domain/entities/notifications/notification.entity';
 
 describe('CreateNotificationUseCase', () => {
   let useCase: CreateNotificationUseCase;

@@ -23,12 +23,17 @@ describe('GetUserNotificationsUseCase', () => {
 
     repository.getUserNotifications.mockResolvedValue({
       data: [],
-      meta: { total: 0, page: 1, limit: 10, totalPages: 0 }
+      meta: { total: 0, page: 1, limit: 10, totalPages: 0 },
     } as any);
 
     await useCase.execute(tenantId, userId, filters);
 
-    expect(repository.getUserNotifications).toHaveBeenCalledWith(tenantId, userId, 1, 10);
+    expect(repository.getUserNotifications).toHaveBeenCalledWith(
+      tenantId,
+      userId,
+      1,
+      10,
+    );
   });
 
   it('should use default values for page and limit when filters are empty', async () => {
@@ -38,11 +43,16 @@ describe('GetUserNotificationsUseCase', () => {
 
     repository.getUserNotifications.mockResolvedValue({
       data: [],
-      meta: { total: 0, page: 1, limit: 20, totalPages: 0 }
+      meta: { total: 0, page: 1, limit: 20, totalPages: 0 },
     } as any);
 
     await useCase.execute(tenantId, userId, filters);
 
-    expect(repository.getUserNotifications).toHaveBeenCalledWith(tenantId, userId, 1, 20);
+    expect(repository.getUserNotifications).toHaveBeenCalledWith(
+      tenantId,
+      userId,
+      1,
+      20,
+    );
   });
 });

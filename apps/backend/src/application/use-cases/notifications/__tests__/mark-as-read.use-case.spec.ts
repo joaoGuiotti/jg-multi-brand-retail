@@ -1,7 +1,11 @@
 import { INotificationsRepository } from '../../../../domain/repositories/notifications/notifications.repository.interface';
 import { MarkAsReadUseCase } from '../mark-as-read.use-case';
 import { DomainEventPublisher } from '../../../../common/application/domain-event-publisher';
-import { NotificationEntity, NotificationType, NotificationPriority } from '../../../../domain/entities/notifications/notification.entity';
+import {
+  NotificationEntity,
+  NotificationType,
+  NotificationPriority,
+} from '../../../../domain/entities/notifications/notification.entity';
 import { UniqueEntityID } from '../../../../common/domain/unique-entity-id';
 import { NotFoundException } from '@nestjs/common';
 
@@ -26,14 +30,17 @@ describe('MarkAsReadUseCase', () => {
     const userId = 'user-1';
     const id = new UniqueEntityID().toString();
 
-    const notification = NotificationEntity.create({
-      tenantId,
-      userId,
-      type: NotificationType.SYSTEM,
-      priority: NotificationPriority.MEDIUM,
-      title: 'Title',
-      message: 'Message',
-    }, new UniqueEntityID(id));
+    const notification = NotificationEntity.create(
+      {
+        tenantId,
+        userId,
+        type: NotificationType.SYSTEM,
+        priority: NotificationPriority.MEDIUM,
+        title: 'Title',
+        message: 'Message',
+      },
+      new UniqueEntityID(id),
+    );
 
     repository.findById.mockResolvedValue(notification);
     repository.markAsRead.mockResolvedValue(notification);
@@ -50,8 +57,8 @@ describe('MarkAsReadUseCase', () => {
   it('should throw NotFoundException if notification does not exist', async () => {
     repository.findById.mockResolvedValue(null);
 
-    await expect(
-      useCase.execute('t1', 'u1', 'id-1')
-    ).rejects.toThrow(NotFoundException);
+    await expect(useCase.execute('t1', 'u1', 'id-1')).rejects.toThrow(
+      NotFoundException,
+    );
   });
 });

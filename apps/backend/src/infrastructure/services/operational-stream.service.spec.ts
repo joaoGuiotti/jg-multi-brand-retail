@@ -17,12 +17,15 @@ describe('OperationalStreamService', () => {
     const eventType = 'TEST_EVENT';
     const payload = { foo: 'bar' };
 
-    service.getStream(tenantId).pipe(take(1)).subscribe((message) => {
-      expect(message.data.type).toBe(eventType);
-      expect(message.data.payload).toEqual(payload);
-      expect(message.data.timestamp).toBeDefined();
-      done();
-    });
+    service
+      .getStream(tenantId)
+      .pipe(take(1))
+      .subscribe((message) => {
+        expect(message.data.type).toBe(eventType);
+        expect(message.data.payload).toEqual(payload);
+        expect(message.data.timestamp).toBeDefined();
+        done();
+      });
 
     service.pushEvent(tenantId, eventType, payload);
   });
@@ -36,7 +39,7 @@ describe('OperationalStreamService', () => {
     service.getStream(tenantB).subscribe({
       next: () => {
         eventsReceivedCount++;
-      }
+      },
     });
 
     service.pushEvent(tenantA, 'EVENT_A', { data: 'A' });

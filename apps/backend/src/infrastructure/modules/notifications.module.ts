@@ -34,9 +34,6 @@ import { DomainEventPublisher } from '../../common/application/domain-event-publ
     NotificationEventsHandler,
     DomainEventPublisher,
   ],
-  exports: [
-    INOTIFICATIONS_REPOSITORY_TOKEN,
-    OperationalStreamService,
-  ],
+  exports: [INOTIFICATIONS_REPOSITORY_TOKEN, OperationalStreamService],
 })
 export class NotificationsModule {}

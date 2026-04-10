@@ -28,7 +28,7 @@ export class MarkAsReadUseCase {
     }
 
     notification.markAsRead();
-    
+
     // Persist changes
     const updated = await this.notificationsRepository.markAsRead(
       notificationId,

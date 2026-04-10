@@ -14,7 +14,7 @@ export class CreateNotificationUseCase {
     @Inject(INOTIFICATIONS_REPOSITORY_TOKEN)
     private readonly notificationsRepository: INotificationsRepository,
     private readonly eventPublisher: DomainEventPublisher,
-  ) { }
+  ) {}
 
   async execute(
     tenantId: string,

@@ -1,0 +1,63 @@
+import { Component, effect, inject, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { NotificationsStore } from '../../store/notifications.store';
+import { NotificationsWsService } from '../../services/notifications-ws.service';
+import { NotificationPanelComponent } from '../notification-panel/notification-panel.component';
+import { AuthService } from '../../../../core/services/auth.service';
+import { UiOverlayComponent } from '../../../../shared/ui/components/overlay/overlay.component';
+
+@Component({
+  selector: 'app-notification-bell',
+  standalone: true,
+  imports: [CommonModule, NotificationPanelComponent, UiOverlayComponent],
+  template: `
+    <div class="relative inline-block text-left">
+      <button 
+        #bellButton
+        (click)="overlay.toggle()"
+        class="relative p-2 text-content-secondary hover:text-content transition"
+      >
+        <!-- Bell Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+        </svg>
+
+        <!-- Unread Badge -->
+        <span 
+          *ngIf="store.unreadCount() > 0"
+          class="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold leading-none text-content-inverse bg-error rounded-full ring-2 ring-surface shadow-sm"
+        >
+          {{ store.unreadCount() > 99 ? '99+' : store.unreadCount() }}
+        </span>
+      </button>
+
+      <!-- Panel Dropdown using UiOverlay -->
+      <ui-overlay #overlay [target]="bellButton" [width]="320">
+        <app-notification-panel (close)="overlay.hide()"></app-notification-panel>
+      </ui-overlay>
+    </div>
+  `
+})
+export class NotificationBellComponent implements OnInit, OnDestroy {
+  store = inject(NotificationsStore);
+  ws = inject(NotificationsWsService);
+  authService = inject(AuthService);
+
+  constructor() {
+    effect(() => {
+      const user = this.authService.user();
+      if (user && user.tenantId && user.id) {
+         const token = localStorage.getItem('access_token') || '';
+         this.ws.connect(token, user.tenantId, user.id);
+      }
+    });
+  }
+
+  ngOnInit() {
+    this.store.init();
+  }
+
+  ngOnDestroy() {
+    this.ws.disconnect();
+  }
+}

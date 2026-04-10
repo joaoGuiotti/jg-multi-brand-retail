@@ -11,6 +11,8 @@ import { PrismaModule } from './infrastructure/modules/prisma.module';
 import { ProductsModule } from './infrastructure/modules/products.module';
 import { SalesModule } from './infrastructure/modules/sales.module';
 
+import { NotificationsModule } from './infrastructure/modules/notifications.module';
+
 const isDev = process.env.NODE_ENV !== 'production';
 
 @Module({
@@ -24,6 +26,7 @@ const isDev = process.env.NODE_ENV !== 'production';
     PaymentsModule,
     InventoryModule,
     CustomersModule,
+    NotificationsModule,
     ...(isDev ? [DevModule] : []),
   ],
   controllers: [],

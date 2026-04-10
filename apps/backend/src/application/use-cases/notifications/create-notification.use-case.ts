@@ -2,7 +2,10 @@ import { Injectable, Inject } from '@nestjs/common';
 import { INOTIFICATIONS_REPOSITORY_TOKEN } from '../../../domain/repositories/notifications/notifications.repository.interface';
 import type { INotificationsRepository } from '../../../domain/repositories/notifications/notifications.repository.interface';
 import { CreateNotificationDto } from '../../../infrastructure/dtos/notifications/create-notification.dto';
-import { NotificationEntity, NotificationPriority } from '../../../domain/entities/notifications/notification.entity';
+import {
+  NotificationEntity,
+  NotificationPriority,
+} from '../../../domain/entities/notifications/notification.entity';
 import { v4 as uuid } from 'uuid';
 
 @Injectable()
@@ -12,7 +15,10 @@ export class CreateNotificationUseCase {
     private readonly notificationsRepository: INotificationsRepository,
   ) {}
 
-  async execute(tenantId: string, dto: CreateNotificationDto): Promise<NotificationEntity> {
+  async execute(
+    tenantId: string,
+    dto: CreateNotificationDto,
+  ): Promise<NotificationEntity> {
     const notification = new NotificationEntity({
       id: uuid(),
       tenantId,

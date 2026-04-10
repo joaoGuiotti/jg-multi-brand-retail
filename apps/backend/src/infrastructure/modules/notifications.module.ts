@@ -32,6 +32,10 @@ import { OperationalStreamService } from '../services/operational-stream.service
     NotificationDispatcherService,
     OperationalStreamService,
   ],
-  exports: [INOTIFICATIONS_REPOSITORY_TOKEN, NotificationDispatcherService, OperationalStreamService],
+  exports: [
+    INOTIFICATIONS_REPOSITORY_TOKEN,
+    NotificationDispatcherService,
+    OperationalStreamService,
+  ],
 })
 export class NotificationsModule {}

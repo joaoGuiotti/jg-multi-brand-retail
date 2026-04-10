@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Patch, Body, Query, Param, Headers, Inject, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Body,
+  Query,
+  Param,
+  Headers,
+  Inject,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { AuthenticatedUser } from '../decorators/authenticated-user.interface';
@@ -37,15 +48,17 @@ export class NotificationsController {
     @CurrentUser() user: AuthenticatedUser,
     @Query() filters: NotificationFiltersDto,
   ) {
-    const output = await this.getUserNotificationsUseCase.execute(user.tenantId, user.id, filters);
+    const output = await this.getUserNotificationsUseCase.execute(
+      user.tenantId,
+      user.id,
+      filters,
+    );
     return new NotificationCollectionPresenter(output);
   }
 
   @Get('preferences')
   @UseGuards(JwtAuthGuard)
-  async getPreferences(
-    @CurrentUser() user: AuthenticatedUser,
-  ) {
+  async getPreferences(@CurrentUser() user: AuthenticatedUser) {
     return this.getUserPreferencesUseCase.execute(user.tenantId, user.id);
   }
 
@@ -60,10 +73,11 @@ export class NotificationsController {
 
   @Get('unread-count')
   @UseGuards(JwtAuthGuard)
-  async getUnreadCount(
-    @CurrentUser() user: AuthenticatedUser,
-  ) {
-    const count = await this.notificationsRepository.getUnreadCount(user.tenantId, user.id);
+  async getUnreadCount(@CurrentUser() user: AuthenticatedUser) {
+    const count = await this.notificationsRepository.getUnreadCount(
+      user.tenantId,
+      user.id,
+    );
     return { count };
   }
 
@@ -78,10 +92,11 @@ export class NotificationsController {
 
   @Patch('read-all')
   @UseGuards(JwtAuthGuard)
-  async markAllAsRead(
-    @CurrentUser() user: AuthenticatedUser,
-  ) {
-    const count = await this.markAllAsReadUseCase.execute(user.tenantId, user.id);
+  async markAllAsRead(@CurrentUser() user: AuthenticatedUser) {
+    const count = await this.markAllAsReadUseCase.execute(
+      user.tenantId,
+      user.id,
+    );
     return { count };
   }
 

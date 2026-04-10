@@ -10,7 +10,10 @@ export class GetUserPreferencesUseCase {
     private readonly notificationsRepository: INotificationsRepository,
   ) {}
 
-  async execute(tenantId: string, userId: string): Promise<NotificationPreferenceEntity[]> {
+  async execute(
+    tenantId: string,
+    userId: string,
+  ): Promise<NotificationPreferenceEntity[]> {
     return this.notificationsRepository.getUserPreferences(tenantId, userId);
   }
 }

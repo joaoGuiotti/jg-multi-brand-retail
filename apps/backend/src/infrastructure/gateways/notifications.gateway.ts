@@ -18,7 +18,9 @@ import { MarkAsReadUseCase } from '../../application/use-cases/notifications/mar
   },
   namespace: '/notifications',
 })
-export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class NotificationsGateway
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer()
   server: Server;
 
@@ -28,16 +30,17 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 
   async handleConnection(client: Socket) {
     try {
-      const authHeader = client.handshake.auth.token || client.handshake.headers.authorization;
+      const authHeader =
+        client.handshake.auth.token || client.handshake.headers.authorization;
       // In a real app we decode the JWT token here
       // For MVP we mock extraction from handshake query
       const tenantId = client.handshake.query.tenantId as string;
       const userId = client.handshake.query.userId as string;
 
       if (!tenantId || !userId) {
-         this.logger.warn(`Client missing identifying queries: ${client.id}`);
-         client.disconnect();
-         return;
+        this.logger.warn(`Client missing identifying queries: ${client.id}`);
+        client.disconnect();
+        return;
       }
 
       const room = `${tenantId}:${userId}`;
@@ -45,7 +48,9 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
       client.data.tenantId = tenantId;
       client.data.userId = userId;
 
-      this.logger.log(`Client connected: ${client.id} to room ${room}. Query: ${JSON.stringify(client.handshake.query)}`);
+      this.logger.log(
+        `Client connected: ${client.id} to room ${room}. Query: ${JSON.stringify(client.handshake.query)}`,
+      );
     } catch (error) {
       this.logger.error(`Error connecting client ${client.id}`, error.stack);
       client.disconnect();
@@ -63,7 +68,11 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
   ) {
     try {
       const { tenantId, userId } = client.data;
-      await this.markAsReadUseCase.execute(tenantId, userId, payload.notificationId);
+      await this.markAsReadUseCase.execute(
+        tenantId,
+        userId,
+        payload.notificationId,
+      );
       return { success: true };
     } catch (error) {
       this.logger.error(`Error marking notification read: ${error.message}`);

@@ -24,20 +24,27 @@ export class NotificationDispatcherService {
       const preference = await this.notificationsRepository.getPreferenceByType(
         tenantId,
         dto.userId,
-        dto.type
+        dto.type,
       );
 
       // If preference exists and is disabled, we skip the notification
       if (preference && !preference.enabled) {
-        this.logger.debug(`Notification suppressed for user ${dto.userId} due to preference: ${dto.type}`);
+        this.logger.debug(
+          `Notification suppressed for user ${dto.userId} due to preference: ${dto.type}`,
+        );
         return;
       }
 
-      const notification = await this.createNotificationUseCase.execute(tenantId, dto);
+      const notification = await this.createNotificationUseCase.execute(
+        tenantId,
+        dto,
+      );
 
       const room = `${tenantId}:${dto.userId}`;
-      this.notificationsGateway.server.to(room).emit('notification_receive', notification);
-      
+      this.notificationsGateway.server
+        .to(room)
+        .emit('notification_receive', notification);
+
       // Push to Operational SSE Stream
       this.sseService.pushEvent(tenantId, dto.type, {
         notificationId: notification.id,
@@ -46,9 +53,14 @@ export class NotificationDispatcherService {
         priority: dto.priority,
       });
 
-      this.logger.debug(`Dispatched notification ${notification.id} to room ${room}`);
+      this.logger.debug(
+        `Dispatched notification ${notification.id} to room ${room}`,
+      );
     } catch (error) {
-      this.logger.error(`Failed to dispatch notification to user ${dto.userId}:`, error.stack);
+      this.logger.error(
+        `Failed to dispatch notification to user ${dto.userId}:`,
+        error.stack,
+      );
     }
   }
 }

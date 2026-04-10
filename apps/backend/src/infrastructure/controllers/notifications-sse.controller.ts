@@ -14,9 +14,10 @@ export class NotificationsSseController {
 
   @Sse('stream')
   @UseGuards(JwtAuthGuard)
-  @ApiOperation({ 
-    summary: 'Operational Event Stream', 
-    description: 'Server-Sent Events stream for real-time operational monitoring.' 
+  @ApiOperation({
+    summary: 'Operational Event Stream',
+    description:
+      'Server-Sent Events stream for real-time operational monitoring.',
   })
   stream(@CurrentUser() user: AuthenticatedUser): Observable<MessageEvent> {
     return this.sseService.getStream(user.tenantId);

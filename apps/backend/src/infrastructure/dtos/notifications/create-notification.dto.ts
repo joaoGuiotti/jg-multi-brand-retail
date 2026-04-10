@@ -1,5 +1,15 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsString, IsObject, IsUUID } from 'class-validator';
-import { NotificationType, NotificationPriority } from '../../../domain/entities/notifications/notification.entity';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsObject,
+  IsUUID,
+} from 'class-validator';
+import {
+  NotificationType,
+  NotificationPriority,
+} from '../../../domain/entities/notifications/notification.entity';
 
 export class CreateNotificationDto {
   @IsUUID()

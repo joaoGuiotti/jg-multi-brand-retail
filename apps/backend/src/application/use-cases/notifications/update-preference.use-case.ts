@@ -12,7 +12,11 @@ export class UpdatePreferenceUseCase {
     private readonly notificationsRepository: INotificationsRepository,
   ) {}
 
-  async execute(tenantId: string, userId: string, dto: UpdatePreferenceDto): Promise<NotificationPreferenceEntity> {
+  async execute(
+    tenantId: string,
+    userId: string,
+    dto: UpdatePreferenceDto,
+  ): Promise<NotificationPreferenceEntity> {
     const preference = new NotificationPreferenceEntity({
       id: uuidv4(),
       tenantId,

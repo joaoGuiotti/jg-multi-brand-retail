@@ -10,8 +10,16 @@ export class MarkAsReadUseCase {
     private readonly notificationsRepository: INotificationsRepository,
   ) {}
 
-  async execute(tenantId: string, userId: string, notificationId: string): Promise<NotificationEntity> {
-    const updated = await this.notificationsRepository.markAsRead(notificationId, tenantId, userId);
+  async execute(
+    tenantId: string,
+    userId: string,
+    notificationId: string,
+  ): Promise<NotificationEntity> {
+    const updated = await this.notificationsRepository.markAsRead(
+      notificationId,
+      tenantId,
+      userId,
+    );
     if (!updated) {
       throw new NotFoundException('Notification not found or already read');
     }

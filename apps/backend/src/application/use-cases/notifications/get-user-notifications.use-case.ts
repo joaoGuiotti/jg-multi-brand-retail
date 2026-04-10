@@ -10,14 +10,18 @@ export class GetUserNotificationsUseCase {
   constructor(
     @Inject(INOTIFICATIONS_REPOSITORY_TOKEN)
     private readonly notificationsRepository: INotificationsRepository,
-  ) { }
+  ) {}
 
-  async execute(tenantId: string, userId: string, filters: NotificationFiltersDto): Promise<PaginationOutput<NotificationEntity>> {
+  async execute(
+    tenantId: string,
+    userId: string,
+    filters: NotificationFiltersDto,
+  ): Promise<PaginationOutput<NotificationEntity>> {
     return this.notificationsRepository.getUserNotifications(
       tenantId,
       userId,
       filters.page ?? 1,
-      filters.limit ?? 20
+      filters.limit ?? 20,
     );
   }
 }

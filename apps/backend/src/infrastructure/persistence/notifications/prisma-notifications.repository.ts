@@ -2,7 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { PaginationOutput } from '@common/application/pagination-output';
 import type { INotificationsRepository } from '../../../domain/repositories/notifications/notifications.repository.interface';
-import { NotificationEntity, NotificationType, NotificationPriority } from '../../../domain/entities/notifications/notification.entity';
+import {
+  NotificationEntity,
+  NotificationType,
+  NotificationPriority,
+} from '../../../domain/entities/notifications/notification.entity';
 import { NotificationPreferenceEntity } from '../../../domain/entities/notifications/notification-preference.entity';
 
 @Injectable()
@@ -53,14 +57,20 @@ export class PrismaNotificationsRepository implements INotificationsRepository {
     return this.mapToEntity(created);
   }
 
-  async markAsRead(id: string, tenantId: string, userId: string): Promise<NotificationEntity | null> {
+  async markAsRead(
+    id: string,
+    tenantId: string,
+    userId: string,
+  ): Promise<NotificationEntity | null> {
     const updated = await this.prisma.notification.updateMany({
       where: { id, tenantId, userId, readAt: null },
       data: { readAt: new Date() },
     });
     if (updated.count === 0) return null;
-    
-    const notification = await this.prisma.notification.findUnique({ where: { id } });
+
+    const notification = await this.prisma.notification.findUnique({
+      where: { id },
+    });
     return notification ? this.mapToEntity(notification) : null;
   }
 
@@ -72,7 +82,12 @@ export class PrismaNotificationsRepository implements INotificationsRepository {
     return updated.count;
   }
 
-  async getUserNotifications(tenantId: string, userId: string, page: number, limit: number): Promise<PaginationOutput<NotificationEntity>> {
+  async getUserNotifications(
+    tenantId: string,
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<PaginationOutput<NotificationEntity>> {
     const [total, data] = await Promise.all([
       this.prisma.notification.count({ where: { tenantId, userId } }),
       this.prisma.notification.findMany({
@@ -100,14 +115,19 @@ export class PrismaNotificationsRepository implements INotificationsRepository {
     });
   }
 
-  async getUserPreferences(tenantId: string, userId: string): Promise<NotificationPreferenceEntity[]> {
+  async getUserPreferences(
+    tenantId: string,
+    userId: string,
+  ): Promise<NotificationPreferenceEntity[]> {
     const preferences = await this.prisma.notificationPreference.findMany({
       where: { tenantId, userId },
     });
     return preferences.map((p) => this.mapToPreferenceEntity(p));
   }
 
-  async updatePreference(preference: NotificationPreferenceEntity): Promise<NotificationPreferenceEntity> {
+  async updatePreference(
+    preference: NotificationPreferenceEntity,
+  ): Promise<NotificationPreferenceEntity> {
     const updated = await this.prisma.notificationPreference.upsert({
       where: {
         userId_type: {
@@ -131,7 +151,11 @@ export class PrismaNotificationsRepository implements INotificationsRepository {
     return this.mapToPreferenceEntity(updated);
   }
 
-  async getPreferenceByType(tenantId: string, userId: string, type: NotificationType): Promise<NotificationPreferenceEntity | null> {
+  async getPreferenceByType(
+    tenantId: string,
+    userId: string,
+    type: NotificationType,
+  ): Promise<NotificationPreferenceEntity | null> {
     const preference = await this.prisma.notificationPreference.findUnique({
       where: {
         userId_type: {

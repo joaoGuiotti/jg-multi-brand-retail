@@ -39,13 +39,22 @@ describe('CreateSaleUseCase', () => {
   let useCase: CreateSaleUseCase;
   let saleRepository: any;
   let productRepository: any;
+  let paymentRepository: any;
   let prisma: any;
 
   beforeEach(() => {
     saleRepository = { create: jest.fn() };
     productRepository = { findById: jest.fn(), update: jest.fn() };
-    prisma = {};
-    useCase = new CreateSaleUseCase(saleRepository, productRepository, prisma);
+    paymentRepository = { create: jest.fn() };
+    prisma = {
+      $transaction: jest.fn((callback) => callback(prisma)),
+    };
+    useCase = new CreateSaleUseCase(
+      saleRepository,
+      productRepository,
+      paymentRepository,
+      prisma,
+    );
   });
 
   const baseInput = {
@@ -133,5 +142,53 @@ describe('CreateSaleUseCase', () => {
     });
     const createdSale = saleRepository.create.mock.calls[0][1];
     expect(createdSale.subtotal).toBe(35); // (20*2)-5
+  });
+
+  it('should complete sale if paid fully in CASH', async () => {
+    const product = makeProduct();
+    productRepository.findById.mockResolvedValue(product);
+    saleRepository.create.mockImplementation((tenantId, sale) =>
+      Promise.resolve(sale),
+    );
+
+    const result = await useCase.execute({
+      ...baseInput,
+      payments: [{ method: 'CASH', amount: 40 }],
+    });
+
+    expect(result.status).toBe('COMPLETED');
+    expect(paymentRepository.create).toHaveBeenCalled();
+  });
+
+  it('should remain PENDING if paid with CREDIT_CARD', async () => {
+    const product = makeProduct();
+    productRepository.findById.mockResolvedValue(product);
+    saleRepository.create.mockImplementation((tenantId, sale) =>
+      Promise.resolve(sale),
+    );
+
+    const result = await useCase.execute({
+      ...baseInput,
+      payments: [{ method: 'CREDIT_CARD', amount: 40 }],
+    });
+
+    expect(result.status).toBe('PENDING');
+    expect(paymentRepository.create).toHaveBeenCalled();
+  });
+
+  it('should remain PENDING if partial CASH payment', async () => {
+    const product = makeProduct();
+    productRepository.findById.mockResolvedValue(product);
+    saleRepository.create.mockImplementation((tenantId, sale) =>
+      Promise.resolve(sale),
+    );
+
+    const result = await useCase.execute({
+      ...baseInput,
+      payments: [{ method: 'CASH', amount: 20 }],
+    });
+
+    expect(result.status).toBe('PENDING');
+    expect(paymentRepository.create).toHaveBeenCalled();
   });
 });

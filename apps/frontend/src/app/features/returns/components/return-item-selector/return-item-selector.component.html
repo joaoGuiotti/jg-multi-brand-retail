@@ -1,0 +1,83 @@
+<div class="space-y-4">
+  <ui-card *ngFor="let item of sale.items" [bordered]="true" [shadow]="isItemSelected(item.productId)" padding="none"
+    class="transition-all duration-300" [ngClass]="{
+          'border-primary/50 bg-primary/5 shadow-md': isItemSelected(item.productId),
+          'border-outline bg-surface': !isItemSelected(item.productId)
+        }">
+    <div class="flex items-center gap-4 p-4">
+      <!-- Checkbox Selection -->
+      <div class="flex items-center justify-center">
+        <label class="relative flex items-center cursor-pointer">
+          <input type="checkbox" [checked]="isItemSelected(item.productId)" (change)="toggleItem(item)"
+            class="sr-only peer">
+          <div
+            class="w-6 h-6 border-2 border-outline rounded-md peer-checked:bg-primary peer-checked:border-primary transition-all">
+          </div>
+          <svg *ngIf="isItemSelected(item.productId)" class="absolute w-5 h-5 text-white left-0.5 top-0.5" fill="none"
+            stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </label>
+      </div>
+
+      <!-- Product Info -->
+      <div class="flex-1">
+        <div class="font-bold text-content text-lg">{{ item.product?.name }}</div>
+        <div class="text-xs text-content-tertiary uppercase tracking-wider">{{ item.product?.sku }}</div>
+        <div class="mt-1 text-sm text-content-secondary">
+          Preço Unitário: {{ item.unitPrice | currency:'BRL' }}
+        </div>
+      </div>
+
+      <!-- Controls (Only visible/active if selected) -->
+      <div class="flex items-start gap-6"
+        [ngClass]="{'opacity-50 pointer-events-none': !isItemSelected(item.productId)}">
+
+        <!-- Quantity Adjustment -->
+        <div class="flex flex-col gap-1 w-28">
+          <label class="text-[10px] uppercase font-bold text-content-tertiary">Qtd para Retorno</label>
+          <div class="flex items-center bg-surface border border-outline rounded-lg overflow-hidden h-9 px-1">
+            <ui-button variant="ghost" size="sm" class="!w-7 !h-7 !p-0 min-w-0"
+              (clicked)="updateQuantity(item.productId, (getItemSelected(item.productId)?.quantity ?? 0) - 1, item.quantity)">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 12H6"></path>
+              </svg>
+            </ui-button>
+
+            <input type="number" [ngModel]="getItemSelected(item.productId)?.quantity"
+              (ngModelChange)="updateQuantity(item.productId, $event, item.quantity)"
+              class="w-full text-center bg-transparent border-none focus:ring-0 text-sm font-bold p-0">
+
+            <ui-button variant="ghost" size="sm" class="!w-7 !h-7 !p-0 min-w-0"
+              (clicked)="updateQuantity(item.productId, (getItemSelected(item.productId)?.quantity ?? 0) + 1, item.quantity)">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12M6 12h12"></path>
+              </svg>
+            </ui-button>
+          </div>
+          <span class="text-[10px] text-content-tertiary text-center">Max: {{ item.quantity }}</span>
+        </div>
+
+        <!-- Condition Select -->
+        <div class="flex flex-col gap-1 w-36">
+          <label class="text-[10px] uppercase font-bold text-content-tertiary">Condição</label>
+          <select [ngModel]="getItemSelected(item.productId)?.condition"
+            (ngModelChange)="updateCondition(item.productId, $event)"
+            class="bg-surface border border-outline rounded-lg text-xs font-medium h-9 px-2 focus:ring-primary focus:border-primary">
+            <option value="GOOD">Em Bom Estado</option>
+            <option value="DAMAGED">Avariado</option>
+            <option value="DEFECTIVE">Com Defeito</option>
+          </select>
+        </div>
+
+        <!-- Total Per Item -->
+        <div class="flex flex-col items-end w-28">
+          <label class="text-[10px] uppercase font-bold text-content-tertiary">Estorno Parcial</label>
+          <div class="font-bold text-primary">
+            {{ ((getItemSelected(item.productId)?.quantity ?? 0) * item.unitPrice) | currency:'BRL' }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </ui-card>
+</div>

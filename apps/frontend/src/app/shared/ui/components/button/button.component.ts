@@ -8,7 +8,7 @@ import {
     Output,
 } from '@angular/core';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 @Component({
@@ -80,6 +80,9 @@ export class UiButtonComponent {
             danger:
                 outline ? 'bg-transparent hover:bg-danger/5 text-danger border border-danger focus:ring-error'
                     : 'bg-danger hover:bg-red-700 text-white focus:ring-error',
+            success:
+                outline ? 'bg-transparent hover:bg-success/5 text-success border border-success focus:ring-success'
+                    : 'bg-success hover:bg-success-hover text-white focus:ring-success',
         };
 
         return variants[variant];

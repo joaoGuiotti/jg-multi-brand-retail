@@ -10,6 +10,7 @@ export * from './overlay/overlay.component';
 export * from './pagination/pagination.component';
 export * from './table';
 export * from './theme-toggle/theme-toggle.component';
+export * from './stepper/stepper.component';
 
 // ── Types ───────────────────────────────────────────────────────────────────
 export type { BadgeSize, BadgeVariant } from './badge/badge.component';

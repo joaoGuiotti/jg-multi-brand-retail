@@ -21,20 +21,21 @@ model Tenant {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  users               User[]
-  products            Product[]
-  categories          Category[]
-  brands              Brand[]
-  suppliers           Supplier[]
-  sales               Sale[]
-  payments            Payment[]
-  conditionals        Conditional[]
-  inventory           InventoryMovement[]
-  auditLogs           AuditLog[]
+  users                   User[]
+  products                Product[]
+  categories              Category[]
+  brands                  Brand[]
+  suppliers               Supplier[]
+  sales                   Sale[]
+  payments                Payment[]
+  conditionals            Conditional[]
+  inventory               InventoryMovement[]
+  auditLogs               AuditLog[]
   customers               Customer[]
   passwordResetTokens     PasswordResetToken[]
   notifications           Notification[]
   notificationPreferences NotificationPreference[]
+  returnOrders            ReturnOrder[]
 
   @@map("tenants")
 }
@@ -58,14 +59,16 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  tenant              Tenant               @relation(fields: [tenantId], references: [id])
-  sales               Sale[]
-  conditionals        Conditional[]
-  inventory           InventoryMovement[]
+  tenant                  Tenant                   @relation(fields: [tenantId], references: [id])
+  sales                   Sale[]
+  conditionals            Conditional[]
+  inventory               InventoryMovement[]
   auditLogs               AuditLog[]
   passwordResetTokens     PasswordResetToken[]
   notifications           Notification[]
   notificationPreferences NotificationPreference[]
+  createdReturns          ReturnOrder[]            @relation("CreatedReturns")
+  approvedReturns         ReturnOrder[]            @relation("ApprovedReturns")
 
   @@index([tenantId])
   @@map("users")
@@ -146,6 +149,7 @@ model Product {
   saleItems        SaleItem[]
   conditionalItems ConditionalItem[]
   inventory        InventoryMovement[]
+  returnItems      ReturnItem[]
 
   @@unique([tenantId, sku])
   @@index([tenantId])
@@ -160,6 +164,8 @@ model Product {
 enum SaleStatus {
   PENDING
   COMPLETED
+  RETURN_REQUESTED
+  RETURNED
   CANCELLED
 }
 
@@ -176,11 +182,12 @@ model Sale {
   createdAt     DateTime   @default(now()) @map("created_at")
   updatedAt     DateTime   @updatedAt @map("updated_at")
 
-  tenant   Tenant     @relation(fields: [tenantId], references: [id])
-  user     User       @relation(fields: [userId], references: [id])
-  customer Customer?  @relation(fields: [customerId], references: [id])
-  items    SaleItem[]
-  payments Payment[]
+  tenant       Tenant        @relation(fields: [tenantId], references: [id])
+  user         User          @relation(fields: [userId], references: [id])
+  customer     Customer?     @relation(fields: [customerId], references: [id])
+  items        SaleItem[]
+  payments     Payment[]
+  returnOrders ReturnOrder[]
 
   @@index([tenantId])
   @@index([createdAt])
@@ -375,6 +382,7 @@ model Customer {
   tenant       Tenant        @relation(fields: [tenantId], references: [id])
   conditionals Conditional[]
   sales        Sale[]
+  returnOrders ReturnOrder[]
 
   @@index([tenantId])
   @@index([email])
@@ -412,6 +420,8 @@ enum NotificationType {
   GOAL_ACHIEVED
   RETURN_PENDING
   RETURN_APPROVED
+  RETURN_REJECTED
+  RETURN_REFUNDED
   PROMOTION_EXPIRING
   SALE_COMPLETED
   COMMISSION_CALCULATED
@@ -433,8 +443,8 @@ model Notification {
   priority  NotificationPriority @default(MEDIUM)
   title     String
   message   String
-  data      Json?                
-  actionUrl String?              @map("action_url") 
+  data      Json?
+  actionUrl String?              @map("action_url")
   readAt    DateTime?            @map("read_at")
   createdAt DateTime             @default(now()) @map("created_at")
 
@@ -460,4 +470,64 @@ model NotificationPreference {
 
   @@unique([userId, type])
   @@map("notification_preferences")
+}
+
+// =====================
+// RETURNS & EXCHANGES (RMA)
+// =====================
+
+enum ReturnStatus {
+  REQUESTED
+  APPROVED
+  REFUNDED
+  REJECTED
+}
+
+enum RefundType {
+  STORE_CREDIT
+  CASH_REFUND
+  EXCHANGE
+}
+
+model ReturnOrder {
+  id          String       @id @default(uuid())
+  tenantId    String       @map("tenant_id")
+  saleId      String       @map("sale_id")
+  userId      String       @map("user_id")
+  customerId  String?      @map("customer_id")
+  status      ReturnStatus @default(REQUESTED)
+  refundType  RefundType   @map("refund_type")
+  reason      String?
+  totalRefund Decimal      @map("total_refund") @db.Decimal(10, 2)
+  approvedBy  String?      @map("approved_by")
+  approvedAt  DateTime?    @map("approved_at")
+  processedAt DateTime?    @map("processed_at")
+  createdAt   DateTime     @default(now()) @map("created_at")
+
+  tenant   Tenant       @relation(fields: [tenantId], references: [id])
+  sale     Sale         @relation(fields: [saleId], references: [id])
+  user     User         @relation(fields: [userId], references: [id], name: "CreatedReturns")
+  approver User?        @relation(fields: [approvedBy], references: [id], name: "ApprovedReturns")
+  customer Customer?    @relation(fields: [customerId], references: [id])
+  items    ReturnItem[]
+
+  @@index([tenantId])
+  @@index([saleId])
+  @@map("return_orders")
+}
+
+model ReturnItem {
+  id            String  @id @default(uuid())
+  returnOrderId String  @map("return_order_id")
+  productId     String  @map("product_id")
+  quantity      Int
+  unitPrice     Decimal @map("unit_price") @db.Decimal(10, 2)
+  total         Decimal @db.Decimal(10, 2)
+  condition     String  @default("GOOD") // "GOOD" | "DAMAGED" | "DEFECTIVE"
+
+  returnOrder ReturnOrder @relation(fields: [returnOrderId], references: [id], onDelete: Cascade)
+  product     Product     @relation(fields: [productId], references: [id])
+
+  @@index([returnOrderId])
+  @@map("return_items")
 }

@@ -26,6 +26,23 @@ export class SaleItemDto {
   discount?: number;
 }
 
+export class CreateSalePaymentDto {
+  @IsString()
+  method: string;
+
+  @IsNumber()
+  @Min(0)
+  amount: number;
+
+  @IsNumber()
+  @IsOptional()
+  installments?: number;
+
+  @IsNumber()
+  @IsOptional()
+  fee?: number;
+}
+
 export class CreateSaleDto {
   @IsArray()
   @ValidateNested({ each: true })
@@ -40,4 +57,10 @@ export class CreateSaleDto {
   @Min(0)
   @IsOptional()
   discount?: number;
+
+  @IsArray()
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => CreateSalePaymentDto)
+  payments?: CreateSalePaymentDto[];
 }

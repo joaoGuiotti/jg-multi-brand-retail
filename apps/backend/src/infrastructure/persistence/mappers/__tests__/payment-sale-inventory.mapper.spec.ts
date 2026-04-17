@@ -9,7 +9,9 @@ import { InventoryMapper } from '../inventory.mapper';
 import { PaymentMapper } from '../payment.mapper';
 import { SaleMapper } from '../sale.mapper';
 
-// ------------------- PaymentMapper tests -------------------
+// ─────────────────────────────────────────────────────────────────────────────
+// PaymentMapper tests
+// ─────────────────────────────────────────────────────────────────────────────
 
 const makeRawPayment = (overrides: any = {}) => ({
   id: '550e8400-e29b-41d4-a716-446655440010',
@@ -51,7 +53,9 @@ describe('PaymentMapper', () => {
   });
 });
 
-// ------------------- SaleMapper tests -------------------
+// ─────────────────────────────────────────────────────────────────────────────
+// SaleMapper tests
+// ─────────────────────────────────────────────────────────────────────────────
 
 const makeRawSale = (overrides: any = {}) => ({
   id: '550e8400-e29b-41d4-a716-446655440020',
@@ -106,6 +110,18 @@ describe('SaleMapper', () => {
     expect(sale.customerName).toBe('John Doe');
   });
 
+  it('toDomain should map RETURN_REQUESTED status correctly', () => {
+    const raw = makeRawSale({ status: 'RETURN_REQUESTED' });
+    const sale = SaleMapper.toDomain(raw);
+    expect(sale.status).toBe('RETURN_REQUESTED');
+  });
+
+  it('toDomain should map RETURNED status correctly', () => {
+    const raw = makeRawSale({ status: 'RETURNED' });
+    const sale = SaleMapper.toDomain(raw);
+    expect(sale.status).toBe('RETURNED');
+  });
+
   it('toPersistence should convert a Sale to a plain object', () => {
     const sale = Sale.create({
       userId: 'user-1',
@@ -122,6 +138,18 @@ describe('SaleMapper', () => {
     expect(raw.customerId).toBe('cust-1');
   });
 
+  it('toPersistence should preserve RETURN_REQUESTED status', () => {
+    const sale = Sale.create({ userId: 'u1', subtotal: 10, discount: 0, total: 10, status: 'RETURN_REQUESTED', items: [] });
+    const raw = SaleMapper.toPersistence(sale);
+    expect(raw.status).toBe('RETURN_REQUESTED');
+  });
+
+  it('toPersistence should preserve RETURNED status', () => {
+    const sale = Sale.create({ userId: 'u1', subtotal: 10, discount: 0, total: 10, status: 'RETURNED', items: [] });
+    const raw = SaleMapper.toPersistence(sale);
+    expect(raw.status).toBe('RETURNED');
+  });
+
   it('toPersistenceItem should convert a SaleItem to a plain object', () => {
     const item = SaleItem.create({
       productId: 'p1',
@@ -136,7 +164,9 @@ describe('SaleMapper', () => {
   });
 });
 
-// ------------------- InventoryMapper tests -------------------
+// ─────────────────────────────────────────────────────────────────────────────
+// InventoryMapper tests
+// ─────────────────────────────────────────────────────────────────────────────
 
 const makeRawMovement = (overrides: any = {}) => ({
   id: '550e8400-e29b-41d4-a716-446655440040',

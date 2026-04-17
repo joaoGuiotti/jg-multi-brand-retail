@@ -1,5 +1,7 @@
 import { UseCase } from '@common/application/use-case.interface';
+import { Payment, PaymentMethod } from '@domain/entities/payments/payment.entity';
 import { Sale, SaleItem } from '@domain/entities/sales/sale.entity';
+import { PaymentRepository } from '@domain/repositories/payment-repository';
 import { ProductRepository } from '@domain/repositories/product-repository';
 import { SaleRepository } from '@domain/repositories/sale-repository';
 import { PrismaService } from '@infrastructure/persistence/prisma/prisma.service';
@@ -23,6 +25,12 @@ export type CreateSaleInput = {
   customerId?: string;
   items: CreateSaleItemInput[];
   discount?: number;
+  payments?: {
+    method: string;
+    amount: number;
+    installments?: number;
+    fee?: number;
+  }[];
 };
 
 @Injectable()
@@ -30,6 +38,7 @@ export class CreateSaleUseCase implements UseCase<CreateSaleInput, SaleOutput> {
   constructor(
     private saleRepository: SaleRepository,
     private productRepository: ProductRepository,
+    private paymentRepository: PaymentRepository,
     private prisma: PrismaService,
   ) {}
 
@@ -105,7 +114,46 @@ export class CreateSaleUseCase implements UseCase<CreateSaleInput, SaleOutput> {
       items,
     });
 
-    const created = await this.saleRepository.create(tenantId, sale);
+    // Handle payments and status
+    let totalCashPaid = 0;
+    const paymentsToCreate: Payment[] = [];
+
+    if (input.payments && input.payments.length > 0) {
+      for (const p of input.payments) {
+        const payment = Payment.create({
+          saleId: sale.id.toString(),
+          method: p.method as PaymentMethod,
+          amount: p.amount,
+          installments: p.installments || 1,
+          fee: p.fee || 0,
+          status: 'PAID',
+        });
+        paymentsToCreate.push(payment);
+
+        if (payment.method === 'CASH') {
+          totalCashPaid += payment.amount;
+        }
+      }
+
+      const hasOnlyCashPayments = input.payments.every(
+        (p) => p.method === 'CASH',
+      );
+
+      if (hasOnlyCashPayments && totalCashPaid >= total) {
+        sale.complete(totalCashPaid);
+      }
+    }
+
+    const created = await this.prisma.$transaction(async (tx) => {
+      const createdSale = await this.saleRepository.create(tenantId, sale);
+
+      for (const payment of paymentsToCreate) {
+        await this.paymentRepository.create(tenantId, payment);
+      }
+
+      return createdSale;
+    });
+
     return SaleOutputMapper.toOutput(created, tenantId);
   }
 }

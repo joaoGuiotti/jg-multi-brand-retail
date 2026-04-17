@@ -49,8 +49,8 @@ export class PrismaNotificationsRepository implements INotificationsRepository {
         id: notification.id.toString(),
         tenantId: notification.tenantId,
         userId: notification.userId,
-        type: notification.type,
-        priority: notification.priority,
+        type: notification.type as any,
+        priority: notification.priority as any,
         title: notification.title,
         message: notification.message,
         data: notification.data ?? undefined,
@@ -153,14 +153,14 @@ export class PrismaNotificationsRepository implements INotificationsRepository {
       where: {
         userId_type: {
           userId: preference.userId,
-          type: preference.type,
+          type: preference.type as any,
         },
       },
       create: {
         id: preference.id,
         tenantId: preference.tenantId,
         userId: preference.userId,
-        type: preference.type,
+        type: preference.type as any,
         enabled: preference.enabled,
         sound: preference.sound,
       },
@@ -181,7 +181,7 @@ export class PrismaNotificationsRepository implements INotificationsRepository {
       where: {
         userId_type: {
           userId,
-          type,
+          type: type as any,
         },
       },
     });

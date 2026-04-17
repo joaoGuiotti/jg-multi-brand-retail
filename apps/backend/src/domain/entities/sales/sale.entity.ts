@@ -2,7 +2,12 @@ import { AggregateRoot } from '../../../common/domain/aggregate-root';
 import { Entity } from '../../../common/domain/entity';
 import { UniqueEntityID } from '../../../common/domain/unique-entity-id';
 
-export type SaleStatus = 'PENDING' | 'COMPLETED' | 'CANCELLED';
+export type SaleStatus =
+  | 'PENDING'
+  | 'COMPLETED'
+  | 'RETURN_REQUESTED'
+  | 'RETURNED'
+  | 'CANCELLED';
 
 export interface SaleItemProps {
   productId: string;
@@ -65,7 +70,7 @@ export class Sale extends AggregateRoot<SaleProps> {
   }
 
   public static create(props: SaleProps, id?: UniqueEntityID): Sale {
-    const sale = new Sale(
+    return new Sale(
       {
         ...props,
         status: props.status ?? 'PENDING',
@@ -74,8 +79,6 @@ export class Sale extends AggregateRoot<SaleProps> {
       },
       id,
     );
-
-    return sale;
   }
 
   get userId(): string {
@@ -112,17 +115,9 @@ export class Sale extends AggregateRoot<SaleProps> {
     return this.props.updatedAt;
   }
 
-  public cancel(): void {
-    if (this.props.status === 'CANCELLED') {
-      throw new Error('Sale already cancelled');
-    }
-    if (this.props.status === 'COMPLETED') {
-      throw new Error('Cannot cancel a completed sale');
-    }
-    this.props.status = 'CANCELLED';
-    this.props.updatedAt = new Date();
-  }
+  // ── FSM transitions ──────────────────────────────────────────
 
+  /** PENDING → COMPLETED. Requires totalPaid >= sale total. */
   public complete(totalPaid: number): void {
     if (this.props.status === 'CANCELLED') {
       throw new Error('Cannot complete a cancelled sale');
@@ -133,6 +128,55 @@ export class Sale extends AggregateRoot<SaleProps> {
     if (totalPaid < this.props.total) {
       throw new Error(
         `Insufficient payments. Required: ${this.props.total}, Paid: ${totalPaid}`,
+      );
+    }
+    this.props.status = 'COMPLETED';
+    this.props.updatedAt = new Date();
+  }
+
+  /** PENDING → CANCELLED. Completed/returning/returned sales cannot be cancelled. */
+  public cancel(): void {
+    if (this.props.status === 'CANCELLED') {
+      throw new Error('Sale already cancelled');
+    }
+    if (
+      this.props.status === 'COMPLETED' ||
+      this.props.status === 'RETURN_REQUESTED' ||
+      this.props.status === 'RETURNED'
+    ) {
+      throw new Error(`Cannot cancel a sale with status: ${this.props.status}`);
+    }
+    this.props.status = 'CANCELLED';
+    this.props.updatedAt = new Date();
+  }
+
+  /** COMPLETED → RETURN_REQUESTED. Called when a return is initiated by the customer. */
+  public requestReturn(): void {
+    if (this.props.status !== 'COMPLETED') {
+      throw new Error(
+        `Can only request a return for a COMPLETED sale. Current: ${this.props.status}`,
+      );
+    }
+    this.props.status = 'RETURN_REQUESTED';
+    this.props.updatedAt = new Date();
+  }
+
+  /** RETURN_REQUESTED → RETURNED. Called when the refund is processed by an admin. */
+  public completeReturn(): void {
+    if (this.props.status !== 'RETURN_REQUESTED') {
+      throw new Error(
+        `Can only complete return for a RETURN_REQUESTED sale. Current: ${this.props.status}`,
+      );
+    }
+    this.props.status = 'RETURNED';
+    this.props.updatedAt = new Date();
+  }
+
+  /** RETURN_REQUESTED → COMPLETED. Called when a return is rejected by an admin. */
+  public rejectReturn(): void {
+    if (this.props.status !== 'RETURN_REQUESTED') {
+      throw new Error(
+        `Can only reject return for a RETURN_REQUESTED sale. Current: ${this.props.status}`,
       );
     }
     this.props.status = 'COMPLETED';

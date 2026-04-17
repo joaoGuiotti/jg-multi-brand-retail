@@ -6,7 +6,7 @@ export interface Sale {
     subtotal: number;
     discount: number;
     total: number;
-    status: 'PENDING' | 'COMPLETED' | 'CANCELLED';
+    status: 'PENDING' | 'COMPLETED' | 'RETURN_REQUESTED' | 'RETURNED' | 'CANCELLED';
     items: SaleItem[];
     payments: Payment[];
     userId: string;
@@ -69,7 +69,7 @@ export interface SaleListResponse extends IResponse<Sale[]> {
 }
 
 export interface SaleFilter {
-    status?: 'PENDING' | 'COMPLETED' | 'CANCELLED';
+    status?: 'PENDING' | 'COMPLETED' | 'RETURN_REQUESTED' | 'RETURNED' | 'CANCELLED';
     startDate?: string;
     endDate?: string;
     sortBy?: string;

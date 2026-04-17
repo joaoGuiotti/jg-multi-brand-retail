@@ -8,8 +8,11 @@ import {
   SalePresenter,
 } from '../sale.presenter';
 
-// --------- Sale Presenters ---------
-const makeSaleItemOutput = (overrides: any = {}) => ({
+// ─────────────────────────────────────────────────────────────────────────────
+// Sale Presenters
+// ─────────────────────────────────────────────────────────────────────────────
+
+const makeSaleItemOutput = (overrides: any = {}): any => ({
   id: 'item-1',
   productId: 'p1',
   quantity: 2,
@@ -19,7 +22,7 @@ const makeSaleItemOutput = (overrides: any = {}) => ({
   ...overrides,
 });
 
-const makeSaleOutput = (overrides: any = {}) => ({
+const makeSaleOutput = (overrides: any = {}): any => ({
   id: 'sale-1',
   tenantId: 'tenant-1',
   userId: 'user-1',
@@ -56,6 +59,32 @@ describe('SalePresenter', () => {
     expect(presenter.invoiceNumber).toBeNull();
     expect(presenter.customerName).toBe('John Doe');
   });
+
+  it('should expose COMPLETED status', () => {
+    const presenter = new SalePresenter(
+      makeSaleOutput({ status: 'COMPLETED' }),
+    );
+    expect(presenter.status).toBe('COMPLETED');
+  });
+
+  it('should expose RETURN_REQUESTED status', () => {
+    const presenter = new SalePresenter(
+      makeSaleOutput({ status: 'RETURN_REQUESTED' }),
+    );
+    expect(presenter.status).toBe('RETURN_REQUESTED');
+  });
+
+  it('should expose RETURNED status', () => {
+    const presenter = new SalePresenter(makeSaleOutput({ status: 'RETURNED' }));
+    expect(presenter.status).toBe('RETURNED');
+  });
+
+  it('should expose CANCELLED status', () => {
+    const presenter = new SalePresenter(
+      makeSaleOutput({ status: 'CANCELLED' }),
+    );
+    expect(presenter.status).toBe('CANCELLED');
+  });
 });
 
 describe('SaleCollectionPresenter', () => {
@@ -67,10 +96,27 @@ describe('SaleCollectionPresenter', () => {
     expect(presenter.data).toHaveLength(2);
     expect(presenter.meta.total).toBe(2);
   });
+
+  it('should correctly map mixed statuses across sales', () => {
+    const presenter = new SaleCollectionPresenter({
+      data: [
+        makeSaleOutput({ status: 'COMPLETED' }),
+        makeSaleOutput({ id: 'sale-2', status: 'RETURN_REQUESTED' }),
+        makeSaleOutput({ id: 'sale-3', status: 'RETURNED' }),
+      ],
+      meta: { total: 3, page: 1, limit: 10, totalPages: 1 },
+    });
+    expect(presenter.data[0].status).toBe('COMPLETED');
+    expect(presenter.data[1].status).toBe('RETURN_REQUESTED');
+    expect(presenter.data[2].status).toBe('RETURNED');
+  });
 });
 
-// --------- Payment Presenters ---------
-const makePaymentOutput = (overrides: any = {}) => ({
+// ─────────────────────────────────────────────────────────────────────────────
+// Payment Presenters
+// ─────────────────────────────────────────────────────────────────────────────
+
+const makePaymentOutput = (overrides: any = {}): any => ({
   id: 'pay-1',
   tenantId: 'tenant-1',
   saleId: 'sale-1',

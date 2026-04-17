@@ -26,7 +26,7 @@ export class SalesHistoryComponent implements OnInit {
     pageSize = 10;
 
     // Filters
-    selectedStatus = signal<'PENDING' | 'COMPLETED' | 'CANCELLED' | ''>('');
+    selectedStatus = signal<'PENDING' | 'COMPLETED' | 'RETURN_REQUESTED' | 'RETURNED' | 'CANCELLED' | ''>('');
     startDate = signal('');
     endDate = signal('');
     currentSort = signal<TableSort | null>(null);
@@ -139,6 +139,8 @@ export class SalesHistoryComponent implements OnInit {
         switch (status) {
             case 'COMPLETED': return 'success';
             case 'PENDING': return 'warning';
+            case 'RETURN_REQUESTED': return 'warning';
+            case 'RETURNED': return 'info';
             case 'CANCELLED': return 'error';
             default: return 'default';
         }

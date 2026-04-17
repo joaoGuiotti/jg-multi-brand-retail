@@ -1,4 +1,7 @@
-import { ReturnOrder, ReturnStatus } from '../../entities/returns/return-order.entity';
+import {
+  ReturnOrder,
+  ReturnStatus,
+} from '../../entities/returns/return-order.entity';
 
 export interface ReturnFilters {
   status?: ReturnStatus;
@@ -26,5 +29,8 @@ export abstract class ReturnsRepository {
     tenantId: string,
     filters: ReturnFilters,
   ): Promise<ReturnSearchResult>;
-  abstract findBySaleId(tenantId: string, saleId: string): Promise<ReturnOrder[]>;
+  abstract findBySaleId(
+    tenantId: string,
+    saleId: string,
+  ): Promise<ReturnOrder[]>;
 }

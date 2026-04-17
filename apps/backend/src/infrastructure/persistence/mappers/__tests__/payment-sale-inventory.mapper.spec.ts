@@ -13,7 +13,7 @@ import { SaleMapper } from '../sale.mapper';
 // PaymentMapper tests
 // ─────────────────────────────────────────────────────────────────────────────
 
-const makeRawPayment = (overrides: any = {}) => ({
+const makeRawPayment = (overrides: any = {}): any => ({
   id: '550e8400-e29b-41d4-a716-446655440010',
   tenantId: 'tenant-1',
   saleId: 'sale-1',
@@ -57,7 +57,7 @@ describe('PaymentMapper', () => {
 // SaleMapper tests
 // ─────────────────────────────────────────────────────────────────────────────
 
-const makeRawSale = (overrides: any = {}) => ({
+const makeRawSale = (overrides: any = {}): any => ({
   id: '550e8400-e29b-41d4-a716-446655440020',
   tenantId: 'tenant-1',
   userId: 'user-1',
@@ -73,7 +73,7 @@ const makeRawSale = (overrides: any = {}) => ({
   ...overrides,
 });
 
-const makeRawSaleItem = (overrides: any = {}) => ({
+const makeRawSaleItem = (overrides: any = {}): any => ({
   id: '550e8400-e29b-41d4-a716-446655440030',
   saleId: '550e8400-e29b-41d4-a716-446655440020',
   productId: 'p1',
@@ -139,13 +139,27 @@ describe('SaleMapper', () => {
   });
 
   it('toPersistence should preserve RETURN_REQUESTED status', () => {
-    const sale = Sale.create({ userId: 'u1', subtotal: 10, discount: 0, total: 10, status: 'RETURN_REQUESTED', items: [] });
+    const sale = Sale.create({
+      userId: 'u1',
+      subtotal: 10,
+      discount: 0,
+      total: 10,
+      status: 'RETURN_REQUESTED',
+      items: [],
+    });
     const raw = SaleMapper.toPersistence(sale);
     expect(raw.status).toBe('RETURN_REQUESTED');
   });
 
   it('toPersistence should preserve RETURNED status', () => {
-    const sale = Sale.create({ userId: 'u1', subtotal: 10, discount: 0, total: 10, status: 'RETURNED', items: [] });
+    const sale = Sale.create({
+      userId: 'u1',
+      subtotal: 10,
+      discount: 0,
+      total: 10,
+      status: 'RETURNED',
+      items: [],
+    });
     const raw = SaleMapper.toPersistence(sale);
     expect(raw.status).toBe('RETURNED');
   });
@@ -168,7 +182,7 @@ describe('SaleMapper', () => {
 // InventoryMapper tests
 // ─────────────────────────────────────────────────────────────────────────────
 
-const makeRawMovement = (overrides: any = {}) => ({
+const makeRawMovement = (overrides: any = {}): any => ({
   id: '550e8400-e29b-41d4-a716-446655440040',
   tenantId: 'tenant-1',
   productId: 'p1',

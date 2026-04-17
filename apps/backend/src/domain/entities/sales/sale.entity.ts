@@ -144,9 +144,7 @@ export class Sale extends AggregateRoot<SaleProps> {
       this.props.status === 'RETURN_REQUESTED' ||
       this.props.status === 'RETURNED'
     ) {
-      throw new Error(
-        `Cannot cancel a sale with status: ${this.props.status}`,
-      );
+      throw new Error(`Cannot cancel a sale with status: ${this.props.status}`);
     }
     this.props.status = 'CANCELLED';
     this.props.updatedAt = new Date();

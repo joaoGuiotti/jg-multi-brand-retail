@@ -5,7 +5,13 @@ import { CreateReturnUseCase } from '../create-return.use-case';
 // ─── Factories ────────────────────────────────────────────────────────────────
 
 const makeSaleItem = (productId = 'prod-1') =>
-  SaleItem.create({ productId, quantity: 3, unitPrice: 50, discount: 0, total: 150 });
+  SaleItem.create({
+    productId,
+    quantity: 3,
+    unitPrice: 50,
+    discount: 0,
+    total: 150,
+  });
 
 const makeSale = (status: any = 'COMPLETED') =>
   Sale.create({
@@ -17,7 +23,7 @@ const makeSale = (status: any = 'COMPLETED') =>
     items: [makeSaleItem()],
   });
 
-const makeDto = (overrides: any = {}) => ({
+const makeDto = (overrides: any = {}): any => ({
   saleId: 'sale-1',
   refundType: 'CASH_REFUND' as any,
   reason: 'Produto com defeito',
@@ -25,50 +31,36 @@ const makeDto = (overrides: any = {}) => ({
   ...overrides,
 });
 
-const makeReturnOrder = (overrides: any = {}) => ({
-  id: { toString: () => 'return-1' },
-  tenantId: 'tenant-1',
-  saleId: 'sale-1',
-  userId: 'user-1',
-  customerId: null,
-  status: 'REQUESTED',
-  refundType: 'CASH_REFUND',
-  reason: 'Defeito',
-  totalRefund: 50,
-  approvedBy: null,
-  approvedAt: null,
-  processedAt: null,
-  createdAt: new Date(),
-  items: [],
-  ...overrides,
-});
-
 // ─── Mocks ────────────────────────────────────────────────────────────────────
 
-const makeReturnsRepo = () => ({
-  save: jest.fn().mockResolvedValue(undefined),
-  findBySaleId: jest.fn().mockResolvedValue([]),
-  findById: jest.fn(),
-  findAll: jest.fn(),
-});
+const makeReturnsRepo = () =>
+  ({
+    save: jest.fn().mockResolvedValue(undefined),
+    findBySaleId: jest.fn().mockResolvedValue([]),
+    findById: jest.fn(),
+    findAll: jest.fn(),
+  }) as any;
 
-const makeSaleRepo = () => ({
-  findById: jest.fn(),
-  update: jest.fn().mockResolvedValue(undefined),
-  create: jest.fn(),
-  findAll: jest.fn(),
-  getDailyRevenue: jest.fn(),
-});
+const makeSaleRepo = () =>
+  ({
+    findById: jest.fn(),
+    update: jest.fn().mockResolvedValue(undefined),
+    create: jest.fn(),
+    findAll: jest.fn(),
+    getDailyRevenue: jest.fn(),
+  }) as any;
 
-const makeUserRepo = () => ({
-  findAllByTenant: jest.fn().mockResolvedValue([]),
-  findById: jest.fn(),
-  findByEmail: jest.fn(),
-});
+const makeUserRepo = () =>
+  ({
+    findAllByTenant: jest.fn().mockResolvedValue([]),
+    findById: jest.fn(),
+    findByEmail: jest.fn(),
+  }) as any;
 
-const makeNotification = () => ({
-  execute: jest.fn().mockResolvedValue(undefined),
-});
+const makeNotification = () =>
+  ({
+    execute: jest.fn().mockResolvedValue(undefined),
+  }) as any;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -77,7 +69,12 @@ const makeUseCase = (deps: any = {}) => {
   const saleRepo = deps.saleRepo ?? makeSaleRepo();
   const userRepo = deps.userRepo ?? makeUserRepo();
   const notification = deps.notification ?? makeNotification();
-  const useCase = new CreateReturnUseCase(returnsRepo, saleRepo, userRepo, notification);
+  const useCase = new CreateReturnUseCase(
+    returnsRepo,
+    saleRepo,
+    userRepo,
+    notification,
+  );
   return { useCase, returnsRepo, saleRepo, userRepo, notification };
 };
 
@@ -135,7 +132,13 @@ describe('CreateReturnUseCase', () => {
       saleRepo.findById.mockResolvedValue(makeSale('COMPLETED'));
 
       await expect(
-        useCase.execute('tenant-1', 'user-1', makeDto({ items: [{ productId: 'unknown', quantity: 1, condition: 'GOOD' }] })),
+        useCase.execute(
+          'tenant-1',
+          'user-1',
+          makeDto({
+            items: [{ productId: 'unknown', quantity: 1, condition: 'GOOD' }],
+          }),
+        ),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -144,7 +147,13 @@ describe('CreateReturnUseCase', () => {
       saleRepo.findById.mockResolvedValue(makeSale('COMPLETED'));
 
       await expect(
-        useCase.execute('tenant-1', 'user-1', makeDto({ items: [{ productId: 'prod-1', quantity: 99, condition: 'GOOD' }] })),
+        useCase.execute(
+          'tenant-1',
+          'user-1',
+          makeDto({
+            items: [{ productId: 'prod-1', quantity: 99, condition: 'GOOD' }],
+          }),
+        ),
       ).rejects.toThrow(BadRequestException);
     });
   });
@@ -188,9 +197,13 @@ describe('CreateReturnUseCase', () => {
       saleRepo.findById.mockResolvedValue(sale);
 
       // 2 units × R$50 = R$100
-      const result = await useCase.execute('tenant-1', 'user-1', makeDto({
-        items: [{ productId: 'prod-1', quantity: 2, condition: 'GOOD' }],
-      }));
+      const result = await useCase.execute(
+        'tenant-1',
+        'user-1',
+        makeDto({
+          items: [{ productId: 'prod-1', quantity: 2, condition: 'GOOD' }],
+        }),
+      );
 
       expect(result.totalRefund).toBe(100);
     });

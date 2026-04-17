@@ -12,7 +12,15 @@ const makeSale = (status: any = 'RETURN_REQUESTED') =>
     discount: 0,
     total: 100,
     status,
-    items: [SaleItem.create({ productId: 'p1', quantity: 1, unitPrice: 100, discount: 0, total: 100 })],
+    items: [
+      SaleItem.create({
+        productId: 'p1',
+        quantity: 1,
+        unitPrice: 100,
+        discount: 0,
+        total: 100,
+      }),
+    ],
   });
 
 const makeReturnOrder = (status: any = 'REQUESTED') =>
@@ -39,13 +47,19 @@ const makeSaleRepo = (sale: any = null) => ({
   update: jest.fn().mockResolvedValue(undefined),
 });
 
-const makeNotification = () => ({ execute: jest.fn().mockResolvedValue(undefined) });
+const makeNotification = () => ({
+  execute: jest.fn().mockResolvedValue(undefined),
+});
 
 const makeUseCase = (order: any, sale: any = null) => {
   const returnsRepo = makeReturnsRepo(order);
   const saleRepo = makeSaleRepo(sale);
   const notification = makeNotification();
-  const useCase = new UpdateReturnStatusUseCase(returnsRepo, saleRepo, notification);
+  const useCase = new UpdateReturnStatusUseCase(
+    returnsRepo,
+    saleRepo,
+    notification,
+  );
   return { useCase, returnsRepo, saleRepo, notification };
 };
 
@@ -58,7 +72,9 @@ describe('UpdateReturnStatusUseCase', () => {
       returnsRepo.findById.mockResolvedValue(null);
 
       await expect(
-        useCase.execute('tenant-1', 'admin-1', 'return-1', { status: 'APPROVED' as any }),
+        useCase.execute('tenant-1', 'admin-1', 'return-1', {
+          status: 'APPROVED' as any,
+        }),
       ).rejects.toThrow(NotFoundException);
     });
 
@@ -67,7 +83,9 @@ describe('UpdateReturnStatusUseCase', () => {
       const { useCase } = makeUseCase(order);
 
       await expect(
-        useCase.execute('tenant-1', 'admin-1', 'return-1', { status: 'REJECTED' as any }),
+        useCase.execute('tenant-1', 'admin-1', 'return-1', {
+          status: 'REJECTED' as any,
+        }),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -76,7 +94,9 @@ describe('UpdateReturnStatusUseCase', () => {
       const { useCase } = makeUseCase(order);
 
       await expect(
-        useCase.execute('tenant-1', 'admin-1', 'return-1', { status: 'REFUNDED' as any }),
+        useCase.execute('tenant-1', 'admin-1', 'return-1', {
+          status: 'REFUNDED' as any,
+        }),
       ).rejects.toThrow(BadRequestException);
     });
   });
@@ -101,7 +121,9 @@ describe('UpdateReturnStatusUseCase', () => {
       const order = makeReturnOrder('REQUESTED');
       const { useCase, notification } = makeUseCase(order);
 
-      await useCase.execute('tenant-1', 'admin-1', 'return-1', { status: 'APPROVED' as any });
+      await useCase.execute('tenant-1', 'admin-1', 'return-1', {
+        status: 'APPROVED' as any,
+      });
 
       expect(notification.execute).toHaveBeenCalledWith(
         'tenant-1',
@@ -133,7 +155,9 @@ describe('UpdateReturnStatusUseCase', () => {
       const { useCase, saleRepo } = makeUseCase(order, null);
 
       await expect(
-        useCase.execute('tenant-1', 'admin-1', 'return-1', { status: 'REJECTED' as any }),
+        useCase.execute('tenant-1', 'admin-1', 'return-1', {
+          status: 'REJECTED' as any,
+        }),
       ).resolves.toBeDefined();
 
       expect(saleRepo.update).not.toHaveBeenCalled();

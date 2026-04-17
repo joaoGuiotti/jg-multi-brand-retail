@@ -12,7 +12,7 @@ import {
 // Sale Presenters
 // ─────────────────────────────────────────────────────────────────────────────
 
-const makeSaleItemOutput = (overrides: any = {}) => ({
+const makeSaleItemOutput = (overrides: any = {}): any => ({
   id: 'item-1',
   productId: 'p1',
   quantity: 2,
@@ -22,7 +22,7 @@ const makeSaleItemOutput = (overrides: any = {}) => ({
   ...overrides,
 });
 
-const makeSaleOutput = (overrides: any = {}) => ({
+const makeSaleOutput = (overrides: any = {}): any => ({
   id: 'sale-1',
   tenantId: 'tenant-1',
   userId: 'user-1',
@@ -61,12 +61,16 @@ describe('SalePresenter', () => {
   });
 
   it('should expose COMPLETED status', () => {
-    const presenter = new SalePresenter(makeSaleOutput({ status: 'COMPLETED' }));
+    const presenter = new SalePresenter(
+      makeSaleOutput({ status: 'COMPLETED' }),
+    );
     expect(presenter.status).toBe('COMPLETED');
   });
 
   it('should expose RETURN_REQUESTED status', () => {
-    const presenter = new SalePresenter(makeSaleOutput({ status: 'RETURN_REQUESTED' }));
+    const presenter = new SalePresenter(
+      makeSaleOutput({ status: 'RETURN_REQUESTED' }),
+    );
     expect(presenter.status).toBe('RETURN_REQUESTED');
   });
 
@@ -76,7 +80,9 @@ describe('SalePresenter', () => {
   });
 
   it('should expose CANCELLED status', () => {
-    const presenter = new SalePresenter(makeSaleOutput({ status: 'CANCELLED' }));
+    const presenter = new SalePresenter(
+      makeSaleOutput({ status: 'CANCELLED' }),
+    );
     expect(presenter.status).toBe('CANCELLED');
   });
 });
@@ -110,7 +116,7 @@ describe('SaleCollectionPresenter', () => {
 // Payment Presenters
 // ─────────────────────────────────────────────────────────────────────────────
 
-const makePaymentOutput = (overrides: any = {}) => ({
+const makePaymentOutput = (overrides: any = {}): any => ({
   id: 'pay-1',
   tenantId: 'tenant-1',
   saleId: 'sale-1',

@@ -26,7 +26,10 @@ export class ReturnOrder extends AggregateRoot<ReturnOrderProps> {
     super(props, id);
   }
 
-  public static create(props: ReturnOrderProps, id?: UniqueEntityID): ReturnOrder {
+  public static create(
+    props: ReturnOrderProps,
+    id?: UniqueEntityID,
+  ): ReturnOrder {
     const returnOrder = new ReturnOrder(
       {
         ...props,

@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { ReturnsRepository, ReturnFilters } from '../../../domain/repositories/returns/returns.repository.interface';
+import {
+  ReturnsRepository,
+  ReturnFilters,
+} from '../../../domain/repositories/returns/returns.repository.interface';
 import { ReturnOutput } from './common/return-output';
 import { PaginationOutput } from '../../../common/application/pagination-output';
 
@@ -7,7 +10,10 @@ import { PaginationOutput } from '../../../common/application/pagination-output'
 export class ListReturnsUseCase {
   constructor(private readonly returnsRepository: ReturnsRepository) {}
 
-  async execute(tenantId: string, filters: ReturnFilters): Promise<PaginationOutput<ReturnOutput>> {
+  async execute(
+    tenantId: string,
+    filters: ReturnFilters,
+  ): Promise<PaginationOutput<ReturnOutput>> {
     const result = await this.returnsRepository.findAll(tenantId, filters);
 
     return {

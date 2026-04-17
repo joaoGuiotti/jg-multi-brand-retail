@@ -16,7 +16,10 @@ export class ReturnItem extends Entity<ReturnItemProps> {
     super(props, id);
   }
 
-  public static create(props: ReturnItemProps, id?: UniqueEntityID): ReturnItem {
+  public static create(
+    props: ReturnItemProps,
+    id?: UniqueEntityID,
+  ): ReturnItem {
     return new ReturnItem(
       {
         ...props,

@@ -1,9 +1,16 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { ReturnsRepository } from '../../../domain/repositories/returns/returns.repository.interface';
 import { SaleRepository } from '../../../domain/repositories/sale-repository';
 import { ReturnOutput } from './common/return-output';
 import { CreateNotificationUseCase } from '../notifications/create-notification.use-case';
-import { NotificationType, NotificationPriority } from '../../../domain/entities/notifications/notification.entity';
+import {
+  NotificationType,
+  NotificationPriority,
+} from '../../../domain/entities/notifications/notification.entity';
 
 @Injectable()
 export class ProcessRefundUseCase {

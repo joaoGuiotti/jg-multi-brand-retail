@@ -1,5 +1,8 @@
 import { UseCase } from '@common/application/use-case.interface';
-import { Payment, PaymentMethod } from '@domain/entities/payments/payment.entity';
+import {
+  Payment,
+  PaymentMethod,
+} from '@domain/entities/payments/payment.entity';
 import { Sale, SaleItem } from '@domain/entities/sales/sale.entity';
 import { PaymentRepository } from '@domain/repositories/payment-repository';
 import { ProductRepository } from '@domain/repositories/product-repository';

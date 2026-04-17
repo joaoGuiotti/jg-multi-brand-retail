@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { ReturnsRepository } from '../../../domain/repositories/returns/returns.repository.interface';
 import { SaleRepository } from '../../../domain/repositories/sale-repository';
 import { UserRepository } from '../../../domain/repositories/user-repository';
@@ -6,7 +10,7 @@ import { CreateReturnDto } from '../../../infrastructure/dtos/returns/create-ret
 import { ReturnOrder } from '../../../domain/entities/returns/return-order.entity';
 import { ReturnItem } from '../../../domain/entities/returns/return-item.entity';
 import { CreateNotificationUseCase } from '../notifications/create-notification.use-case';
-import { NotificationType, NotificationPriority } from '../../../domain/entities/notifications/notification.entity';
+import { NotificationPriority } from '../../../domain/entities/notifications/notification.entity';
 import { Role } from '@prisma/client';
 import { ReturnOutput } from './common/return-output';
 
@@ -19,7 +23,11 @@ export class CreateReturnUseCase {
     private readonly createNotificationUseCase: CreateNotificationUseCase,
   ) {}
 
-  async execute(tenantId: string, userId: string, dto: CreateReturnDto): Promise<ReturnOutput> {
+  async execute(
+    tenantId: string,
+    userId: string,
+    dto: CreateReturnDto,
+  ): Promise<ReturnOutput> {
     // 1. Verify sale exists and belongs to tenant
     const sale = await this.saleRepository.findById(tenantId, dto.saleId);
     if (!sale) {
@@ -40,13 +48,19 @@ export class CreateReturnUseCase {
     let totalRefund = 0;
 
     for (const itemDto of dto.items) {
-      const saleItem = sale.items.find((i) => i.productId === itemDto.productId);
+      const saleItem = sale.items.find(
+        (i) => i.productId === itemDto.productId,
+      );
       if (!saleItem) {
-        throw new BadRequestException(`Product ${itemDto.productId} not found in this sale`);
+        throw new BadRequestException(
+          `Product ${itemDto.productId} not found in this sale`,
+        );
       }
 
       if (itemDto.quantity > saleItem.quantity) {
-        throw new BadRequestException(`Quantity for product ${itemDto.productId} exceeds sale quantity`);
+        throw new BadRequestException(
+          `Quantity for product ${itemDto.productId} exceeds sale quantity`,
+        );
       }
 
       const itemTotal = itemDto.quantity * saleItem.unitPrice;
@@ -84,7 +98,9 @@ export class CreateReturnUseCase {
 
     // 6. Notify ADMINs
     const users = await this.userRepository.findAllByTenant(tenantId);
-    const admins = users.filter((u) => u.role === Role.ADMIN || u.role === Role.SUPER_ADMIN);
+    const admins = users.filter(
+      (u) => u.role === Role.ADMIN || u.role === Role.SUPER_ADMIN,
+    );
 
     for (const admin of admins) {
       await this.createNotificationUseCase.execute(tenantId, {
@@ -92,7 +108,7 @@ export class CreateReturnUseCase {
         type: 'RETURN_PENDING' as any,
         priority: NotificationPriority.HIGH,
         title: 'Nova Solicitação de Devolução',
-        message: `Uma nova solicitação de devolução foi criada para a venda #${sale.invoiceNumber ?? sale.id}.`,
+        message: `Uma nova solicitação de devolução foi criada para a venda #${sale.invoiceNumber ?? sale.id.toString()}.`,
         actionUrl: `/returns/${returnOrder.id.toString()}`,
       });
     }

@@ -12,7 +12,15 @@ const makeSale = (status: any = 'RETURN_REQUESTED') =>
     discount: 0,
     total: 100,
     status,
-    items: [SaleItem.create({ productId: 'p1', quantity: 1, unitPrice: 100, discount: 0, total: 100 })],
+    items: [
+      SaleItem.create({
+        productId: 'p1',
+        quantity: 1,
+        unitPrice: 100,
+        discount: 0,
+        total: 100,
+      }),
+    ],
   });
 
 const makeReturnOrder = (status: any = 'APPROVED') => {
@@ -50,7 +58,9 @@ const makeSaleRepo = (sale: any = null) => ({
   update: jest.fn().mockResolvedValue(undefined),
 });
 
-const makeNotification = () => ({ execute: jest.fn().mockResolvedValue(undefined) });
+const makeNotification = () => ({
+  execute: jest.fn().mockResolvedValue(undefined),
+});
 
 const makeUseCase = (order: any, sale: any = null) => {
   const returnsRepo = makeReturnsRepo(order);
@@ -68,21 +78,27 @@ describe('ProcessRefundUseCase', () => {
       const { useCase, returnsRepo } = makeUseCase(null);
       returnsRepo.findById.mockResolvedValue(null);
 
-      await expect(useCase.execute('tenant-1', 'return-1')).rejects.toThrow(NotFoundException);
+      await expect(useCase.execute('tenant-1', 'return-1')).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should throw BadRequestException when order is REQUESTED (not yet approved)', async () => {
       const order = makeReturnOrder('REQUESTED');
       const { useCase } = makeUseCase(order);
 
-      await expect(useCase.execute('tenant-1', 'return-1')).rejects.toThrow(BadRequestException);
+      await expect(useCase.execute('tenant-1', 'return-1')).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw BadRequestException when order is already REFUNDED', async () => {
       const order = makeReturnOrder('REFUNDED');
       const { useCase } = makeUseCase(order);
 
-      await expect(useCase.execute('tenant-1', 'return-1')).rejects.toThrow(BadRequestException);
+      await expect(useCase.execute('tenant-1', 'return-1')).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw BadRequestException when order is REJECTED', async () => {
@@ -99,7 +115,9 @@ describe('ProcessRefundUseCase', () => {
       rejected.reject('admin-1');
 
       const { useCase } = makeUseCase(rejected);
-      await expect(useCase.execute('tenant-1', 'return-1')).rejects.toThrow(BadRequestException);
+      await expect(useCase.execute('tenant-1', 'return-1')).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -124,7 +142,9 @@ describe('ProcessRefundUseCase', () => {
       const order = makeReturnOrder('APPROVED');
       const { useCase, saleRepo } = makeUseCase(order, null);
 
-      await expect(useCase.execute('tenant-1', 'return-1')).resolves.toBeDefined();
+      await expect(
+        useCase.execute('tenant-1', 'return-1'),
+      ).resolves.toBeDefined();
       expect(saleRepo.update).not.toHaveBeenCalled();
     });
 

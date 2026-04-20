@@ -19,10 +19,12 @@ const makeProduct = (overrides: any = {}) =>
 describe('UpdateStockUseCase', () => {
   let useCase: UpdateStockUseCase;
   let productRepository: any;
+  let eventPublisher: any;
 
   beforeEach(() => {
     productRepository = { findById: jest.fn(), update: jest.fn() };
-    useCase = new UpdateStockUseCase(productRepository);
+    eventPublisher = { publishEvents: jest.fn() };
+    useCase = new UpdateStockUseCase(productRepository, eventPublisher);
   });
 
   it('should throw NotFoundException if product not found', async () => {
@@ -46,10 +48,12 @@ describe('UpdateStockUseCase', () => {
 describe('AdjustStockUseCase', () => {
   let useCase: AdjustStockUseCase;
   let productRepository: any;
+  let eventPublisher: any;
 
   beforeEach(() => {
     productRepository = { findById: jest.fn(), update: jest.fn() };
-    useCase = new AdjustStockUseCase(productRepository);
+    eventPublisher = { publishEvents: jest.fn() };
+    useCase = new AdjustStockUseCase(productRepository, eventPublisher);
   });
 
   it('should throw NotFoundException if product not found', async () => {

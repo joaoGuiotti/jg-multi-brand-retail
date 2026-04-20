@@ -41,11 +41,13 @@ describe('CancelSaleUseCase', () => {
   let useCase: CancelSaleUseCase;
   let saleRepository: any;
   let productRepository: any;
+  let eventPublisher: any;
 
   beforeEach(() => {
     saleRepository = { findById: jest.fn(), update: jest.fn() };
     productRepository = { findById: jest.fn(), update: jest.fn() };
-    useCase = new CancelSaleUseCase(saleRepository, productRepository);
+    eventPublisher = { publishEvents: jest.fn() };
+    useCase = new CancelSaleUseCase(saleRepository, productRepository, eventPublisher);
   });
 
   it('should throw NotFoundException if sale not found', async () => {

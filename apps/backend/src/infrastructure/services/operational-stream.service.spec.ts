@@ -21,9 +21,10 @@ describe('OperationalStreamService', () => {
       .getStream(tenantId)
       .pipe(take(1))
       .subscribe((message) => {
-        expect(message.data.type).toBe(eventType);
-        expect(message.data.payload).toEqual(payload);
-        expect(message.data.timestamp).toBeDefined();
+        const data = message.data as any;
+        expect(data.type).toBe(eventType);
+        expect(data.payload).toEqual(payload);
+        expect(data.timestamp).toBeDefined();
         done();
       });
 

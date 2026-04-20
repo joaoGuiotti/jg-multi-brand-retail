@@ -12,6 +12,7 @@ import { ProductsModule } from './infrastructure/modules/products.module';
 import { SalesModule } from './infrastructure/modules/sales.module';
 
 import { NotificationsModule } from './infrastructure/modules/notifications.module';
+import { DashboardModule } from './infrastructure/modules/dashboard.module';
 import { ReturnsModule } from './infrastructure/modules/returns.module';
 
 const isDev = process.env.NODE_ENV !== 'production';
@@ -28,6 +29,7 @@ const isDev = process.env.NODE_ENV !== 'production';
     InventoryModule,
     CustomersModule,
     NotificationsModule,
+    DashboardModule,
     ReturnsModule,
     ...(isDev ? [DevModule] : []),
   ],

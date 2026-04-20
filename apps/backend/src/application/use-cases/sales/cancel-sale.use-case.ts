@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { UseCase } from '../../../common/application/use-case.interface';
+import { DomainEventPublisher } from '../../../common/application/domain-event-publisher';
 import { ProductRepository } from '../../../domain/repositories/product-repository';
 import { SaleRepository } from '../../../domain/repositories/sale-repository';
 import { SaleOutput, SaleOutputMapper } from './common/sale-output';
@@ -15,6 +16,7 @@ export class CancelSaleUseCase implements UseCase<CancelSaleInput, SaleOutput> {
   constructor(
     private saleRepository: SaleRepository,
     private productRepository: ProductRepository,
+    private eventPublisher: DomainEventPublisher,
   ) {}
 
   async execute(input: CancelSaleInput): Promise<SaleOutput> {
@@ -38,8 +40,9 @@ export class CancelSaleUseCase implements UseCase<CancelSaleInput, SaleOutput> {
         item.productId,
       );
       if (product) {
-        product.adjustStock(item.quantity);
+        product.adjustStock(item.quantity, tenantId, 'RETURN');
         await this.productRepository.update(tenantId, product);
+        await this.eventPublisher.publishEvents(product);
       }
     }
 

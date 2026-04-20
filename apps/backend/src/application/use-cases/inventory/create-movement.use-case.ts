@@ -6,11 +6,14 @@ import {
 import { InventoryMovement } from '@domain/entities/inventory/inventory-movement.entity';
 import { InventoryRepository } from '@domain/repositories/inventory-repository';
 import { ProductRepository } from '@domain/repositories/product-repository';
+import { DomainEventPublisher } from '@common/application/domain-event-publisher';
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { DashboardEventType } from '../dashboard/dashboard-event.types';
 import { MovementOutput, MovementOutputMapper } from './common/movement-output';
 
 export type CreateMovementInput = {
@@ -27,10 +30,13 @@ export class CreateMovementUseCase implements UseCase<
   CreateMovementInput,
   MovementOutput
 > {
+  private readonly logger = new Logger(CreateMovementUseCase.name);
+
   constructor(
     private inventoryRepository: InventoryRepository,
     private productRepository: ProductRepository,
-  ) {}
+    private eventPublisher: DomainEventPublisher,
+  ) { }
 
   async execute(input: CreateMovementInput): Promise<MovementOutput> {
     const { tenantId, userId, productId, type, quantity, reference } = input;
@@ -43,7 +49,7 @@ export class CreateMovementUseCase implements UseCase<
     switch (type) {
       case InventoryMovementTypes.ENTRY:
       case InventoryMovementTypes.RETURN:
-        product.adjustStock(quantity);
+        product.adjustStock(quantity, tenantId, type);
         break;
       case InventoryMovementTypes.EXIT:
         if (product.stockQuantity < quantity) {
@@ -51,10 +57,10 @@ export class CreateMovementUseCase implements UseCase<
             `Insufficient stock. Available: ${product.stockQuantity}, Requested: ${quantity}`,
           );
         }
-        product.adjustStock(-quantity);
+        product.adjustStock(-quantity, tenantId, type);
         break;
       case InventoryMovementTypes.ADJUSTMENT:
-        product.updateStock(quantity);
+        product.updateStock(quantity, tenantId);
         break;
     }
 
@@ -68,6 +74,9 @@ export class CreateMovementUseCase implements UseCase<
 
     await this.productRepository.update(tenantId, product);
     const created = await this.inventoryRepository.create(tenantId, movement);
+
+    await this.eventPublisher.publishEvents(product);
+
     return MovementOutputMapper.toOutput(created, tenantId);
   }
 }

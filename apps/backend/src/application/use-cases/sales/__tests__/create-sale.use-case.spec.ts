@@ -2,6 +2,7 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Product } from '../../../../domain/entities/products/product.entity';
 import { Sale, SaleItem } from '../../../../domain/entities/sales/sale.entity';
 import { CreateSaleUseCase } from '../create-sale.use-case';
+import { DashboardEventType } from '../../dashboard/dashboard-event.types';
 
 const makeProduct = (overrides: any = {}) =>
   Product.create({
@@ -41,6 +42,7 @@ describe('CreateSaleUseCase', () => {
   let productRepository: any;
   let paymentRepository: any;
   let prisma: any;
+  let eventPublisher: any;
 
   beforeEach(() => {
     saleRepository = { create: jest.fn() };
@@ -49,11 +51,13 @@ describe('CreateSaleUseCase', () => {
     prisma = {
       $transaction: jest.fn((callback) => callback(prisma)),
     };
+    eventPublisher = { publishEvents: jest.fn() };
     useCase = new CreateSaleUseCase(
       saleRepository,
       productRepository,
       paymentRepository,
       prisma,
+      eventPublisher,
     );
   });
 
@@ -158,6 +162,7 @@ describe('CreateSaleUseCase', () => {
 
     expect(result.status).toBe('COMPLETED');
     expect(paymentRepository.create).toHaveBeenCalled();
+    expect(eventPublisher.publishEvents).toHaveBeenCalled();
   });
 
   it('should remain PENDING if paid with CREDIT_CARD', async () => {

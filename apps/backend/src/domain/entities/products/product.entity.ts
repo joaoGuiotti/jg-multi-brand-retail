@@ -1,5 +1,6 @@
 import { AggregateRoot } from '../../../common/domain/aggregate-root';
 import { UniqueEntityID } from '../../../common/domain/unique-entity-id';
+import { StockChangedEvent } from '../../events/inventory/stock-changed.event';
 
 export interface ProductProps {
   name: string;
@@ -90,14 +91,24 @@ export class Product extends AggregateRoot<ProductProps> {
     return this.props.updatedAt;
   }
 
-  public updateStock(quantity: number): void {
+  public updateStock(quantity: number, tenantId: string): void {
+    const oldQuantity = this.props.stockQuantity;
+    const adjustment = quantity - oldQuantity;
     this.props.stockQuantity = quantity;
     this.props.updatedAt = new Date();
+    
+    this.applyEvent(
+      new StockChangedEvent(this, adjustment, 'MANUAL', tenantId)
+    );
   }
 
-  public adjustStock(adjustment: number): void {
+  public adjustStock(adjustment: number, tenantId: string, movementType: string): void {
     this.props.stockQuantity += adjustment;
     this.props.updatedAt = new Date();
+    
+    this.applyEvent(
+      new StockChangedEvent(this, adjustment, movementType, tenantId)
+    );
   }
 
   public updatePrices(costPrice: number, salePrice: number): void {

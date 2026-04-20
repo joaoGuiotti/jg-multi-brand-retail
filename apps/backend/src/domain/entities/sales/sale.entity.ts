@@ -1,6 +1,7 @@
 import { AggregateRoot } from '../../../common/domain/aggregate-root';
 import { Entity } from '../../../common/domain/entity';
 import { UniqueEntityID } from '../../../common/domain/unique-entity-id';
+import { SaleCompletedEvent } from '../../events/sales/sale-completed.event';
 
 export type SaleStatus =
   | 'PENDING'
@@ -118,7 +119,7 @@ export class Sale extends AggregateRoot<SaleProps> {
   // ── FSM transitions ──────────────────────────────────────────
 
   /** PENDING → COMPLETED. Requires totalPaid >= sale total. */
-  public complete(totalPaid: number): void {
+  public complete(totalPaid: number, tenantId: string): void {
     if (this.props.status === 'CANCELLED') {
       throw new Error('Cannot complete a cancelled sale');
     }
@@ -132,6 +133,8 @@ export class Sale extends AggregateRoot<SaleProps> {
     }
     this.props.status = 'COMPLETED';
     this.props.updatedAt = new Date();
+    
+    this.applyEvent(new SaleCompletedEvent(this, tenantId));
   }
 
   /** PENDING → CANCELLED. Completed/returning/returned sales cannot be cancelled. */

@@ -8,11 +8,14 @@ import { PaymentRepository } from '@domain/repositories/payment-repository';
 import { ProductRepository } from '@domain/repositories/product-repository';
 import { SaleRepository } from '@domain/repositories/sale-repository';
 import { PrismaService } from '@infrastructure/persistence/prisma/prisma.service';
+import { DomainEventPublisher } from '@common/application/domain-event-publisher';
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
+
 import { SaleOutput, SaleOutputMapper } from './common/sale-output';
 
 export type CreateSaleItemInput = {
@@ -38,12 +41,15 @@ export type CreateSaleInput = {
 
 @Injectable()
 export class CreateSaleUseCase implements UseCase<CreateSaleInput, SaleOutput> {
+  private readonly logger = new Logger(CreateSaleUseCase.name);
+
   constructor(
     private saleRepository: SaleRepository,
     private productRepository: ProductRepository,
     private paymentRepository: PaymentRepository,
     private prisma: PrismaService,
-  ) {}
+    private eventPublisher: DomainEventPublisher,
+  ) { }
 
   async execute(input: CreateSaleInput): Promise<SaleOutput> {
     const {
@@ -64,6 +70,7 @@ export class CreateSaleUseCase implements UseCase<CreateSaleInput, SaleOutput> {
     }
     const items: SaleItem[] = [];
     let subtotal = 0;
+    const modifiedProducts: any[] = [];
 
     for (const itemDto of itemsInput) {
       const product = await this.productRepository.findById(
@@ -100,8 +107,9 @@ export class CreateSaleUseCase implements UseCase<CreateSaleInput, SaleOutput> {
         }),
       );
 
-      product.adjustStock(-itemDto.quantity);
+      product.adjustStock(-itemDto.quantity, tenantId, 'EXIT');
       await this.productRepository.update(tenantId, product);
+      modifiedProducts.push(product);
     }
 
     const discount = saleDiscount || 0;
@@ -143,7 +151,7 @@ export class CreateSaleUseCase implements UseCase<CreateSaleInput, SaleOutput> {
       );
 
       if (hasOnlyCashPayments && totalCashPaid >= total) {
-        sale.complete(totalCashPaid);
+        sale.complete(totalCashPaid, tenantId);
       }
     }
 
@@ -156,6 +164,12 @@ export class CreateSaleUseCase implements UseCase<CreateSaleInput, SaleOutput> {
 
       return createdSale;
     });
+
+    // Publish domain events
+    for (const product of modifiedProducts) {
+      await this.eventPublisher.publishEvents(product);
+    }
+    await this.eventPublisher.publishEvents(sale);
 
     return SaleOutputMapper.toOutput(created, tenantId);
   }

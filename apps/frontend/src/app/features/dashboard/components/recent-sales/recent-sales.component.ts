@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { UiBadgeComponent, UiButtonComponent, UiCardComponent } from '@shared/ui';
-import { Sale } from '../../../../core/models/sale.model';
+import { DashboardRecentSale } from '../../../../core/models/dashboard.model';
 
 @Component({
     selector: 'app-recent-sales',
@@ -28,7 +28,7 @@ import { Sale } from '../../../../core/models/sale.model';
             @for (sale of recentSales; track sale.id) {
             <tr class="hover:bg-surface-alt/30 transition-colors">
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-content">#{{ sale.id.substring(0, 8) }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-content-secondary">{{ $any(sale).customerName || 'Walk-in Customer' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-content-secondary">{{ sale.customerId ? 'Customer ' + sale.customerId.substring(0,4) : 'Walk-in Customer' }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-content">{{ sale.total | currency:'BRL' }}</td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <ui-badge [variant]="getSaleStatusVariant(sale.status)">{{ sale.status }}</ui-badge>
@@ -48,10 +48,17 @@ import { Sale } from '../../../../core/models/sale.model';
     :host {
       display: block;
     }
+    @keyframes flashNew {
+      0% { background-color: rgba(74, 222, 128, 0.4); }
+      100% { background-color: transparent; }
+    }
+    tbody tr:first-child {
+      animation: flashNew 1.5s ease-out;
+    }
   `]
 })
 export class RecentSalesComponent {
-    @Input() recentSales: Sale[] = [];
+    @Input() recentSales: DashboardRecentSale[] = [];
     @Output() viewAll = new EventEmitter<void>();
 
     getSaleStatusVariant(status: string): 'success' | 'warning' | 'error' | 'default' {

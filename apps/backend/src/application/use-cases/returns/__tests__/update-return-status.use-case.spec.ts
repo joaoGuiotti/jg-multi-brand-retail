@@ -40,11 +40,16 @@ const makeReturnOrder = (status: any = 'REQUESTED') =>
 const makeReturnsRepo = (order: any) => ({
   findById: jest.fn().mockResolvedValue(order),
   save: jest.fn().mockResolvedValue(undefined),
+  findAll: jest.fn().mockResolvedValue([]),
+  findBySaleId: jest.fn().mockResolvedValue([]),
 });
 
 const makeSaleRepo = (sale: any = null) => ({
   findById: jest.fn().mockResolvedValue(sale),
   update: jest.fn().mockResolvedValue(undefined),
+  create: jest.fn().mockResolvedValue(undefined),
+  findAll: jest.fn().mockResolvedValue([]),
+  getDailyRevenue: jest.fn().mockResolvedValue([]),
 });
 
 const makeNotification = () => ({
@@ -58,7 +63,7 @@ const makeUseCase = (order: any, sale: any = null) => {
   const useCase = new UpdateReturnStatusUseCase(
     returnsRepo,
     saleRepo,
-    notification,
+    notification as any,
   );
   return { useCase, returnsRepo, saleRepo, notification };
 };

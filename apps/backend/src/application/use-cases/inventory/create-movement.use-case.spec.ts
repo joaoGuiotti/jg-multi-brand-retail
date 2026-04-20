@@ -6,6 +6,7 @@ import {
 import { InventoryMovement } from '../../../domain/entities/inventory/inventory-movement.entity';
 import { Product } from '../../../domain/entities/products/product.entity';
 import { CreateMovementUseCase } from './create-movement.use-case';
+import { DashboardEventType } from '../dashboard/dashboard-event.types';
 
 const makeProduct = (overrides: any = {}) =>
   Product.create({
@@ -33,11 +34,17 @@ describe('CreateMovementUseCase', () => {
   let useCase: CreateMovementUseCase;
   let inventoryRepository: any;
   let productRepository: any;
+  let eventPublisher: any;
 
   beforeEach(() => {
     inventoryRepository = { create: jest.fn() };
     productRepository = { findById: jest.fn(), update: jest.fn() };
-    useCase = new CreateMovementUseCase(inventoryRepository, productRepository);
+    eventPublisher = { publishEvents: jest.fn() };
+    useCase = new CreateMovementUseCase(
+      inventoryRepository,
+      productRepository,
+      eventPublisher,
+    );
   });
 
   const baseInput = {
@@ -134,5 +141,6 @@ describe('CreateMovementUseCase', () => {
       'tenant-1',
       expect.any(Object),
     );
+    expect(eventPublisher.publishEvents).toHaveBeenCalledWith(product);
   });
 });

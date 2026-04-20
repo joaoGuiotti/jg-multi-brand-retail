@@ -12,9 +12,10 @@ import { PrismaTenantRepository } from '../persistence/repositories/prisma-tenan
 import { PdfService } from '../services/pdf';
 import { PrismaModule } from './prisma.module';
 import { ProductsModule } from './products.module';
+import { NotificationsModule } from './notifications.module';
 
 @Module({
-  imports: [PrismaModule, ProductsModule],
+  imports: [PrismaModule, ProductsModule, NotificationsModule],
   controllers: [InventoryController],
   providers: [
     {

@@ -10,9 +10,10 @@ import { ProductRepository } from '../../domain/repositories/product-repository'
 import { ProductsController } from '../controllers/products.controller';
 import { PrismaProductRepository } from '../persistence/repositories/prisma-product.repository';
 import { PrismaModule } from './prisma.module';
+import { NotificationsModule } from './notifications.module';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, NotificationsModule],
   controllers: [ProductsController],
   providers: [
     {

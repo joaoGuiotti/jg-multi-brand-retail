@@ -1,6 +1,7 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Sale, SaleItem } from '../../../../domain/entities/sales/sale.entity';
 import { CompleteSaleUseCase } from '../complete-sale.use-case';
+import { DashboardEventType } from '../../dashboard/dashboard-event.types';
 
 const makeItem = () =>
   SaleItem.create({
@@ -26,11 +27,17 @@ describe('CompleteSaleUseCase', () => {
   let useCase: CompleteSaleUseCase;
   let saleRepository: any;
   let prisma: any;
+  let eventPublisher: any;
 
   beforeEach(() => {
     saleRepository = { findById: jest.fn(), update: jest.fn() };
     prisma = { payment: { findMany: jest.fn() } };
-    useCase = new CompleteSaleUseCase(saleRepository, prisma);
+    eventPublisher = { publishEvents: jest.fn() };
+    useCase = new CompleteSaleUseCase(
+      saleRepository,
+      prisma,
+      eventPublisher,
+    );
   });
 
   it('should throw NotFoundException if sale not found', async () => {
@@ -68,5 +75,6 @@ describe('CompleteSaleUseCase', () => {
 
     const result = await useCase.execute({ tenantId: 'tenant-1', id: 's1' });
     expect(result.status).toBe('COMPLETED');
+    expect(eventPublisher.publishEvents).toHaveBeenCalledWith(sale);
   });
 });

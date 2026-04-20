@@ -64,14 +64,14 @@ describe('Product Entity', () => {
   describe('updateStock()', () => {
     it('should set the stock quantity absolutely', () => {
       const p = makeProduct({ stockQuantity: 10 });
-      p.updateStock(50);
+      p.updateStock(50, 'tenant-1');
       expect(p.stockQuantity).toBe(50);
     });
 
     it('should update updatedAt', () => {
       const p = makeProduct();
       const before = p.updatedAt;
-      p.updateStock(5);
+      p.updateStock(5, 'tenant-1');
       expect(p.updatedAt).not.toBe(before);
     });
   });
@@ -79,20 +79,20 @@ describe('Product Entity', () => {
   describe('adjustStock()', () => {
     it('should increase stock by the given amount', () => {
       const p = makeProduct({ stockQuantity: 10 });
-      p.adjustStock(5);
+      p.adjustStock(5, 'tenant-1', 'ENTRY');
       expect(p.stockQuantity).toBe(15);
     });
 
     it('should decrease stock with a negative amount', () => {
       const p = makeProduct({ stockQuantity: 10 });
-      p.adjustStock(-3);
+      p.adjustStock(-3, 'tenant-1', 'EXIT');
       expect(p.stockQuantity).toBe(7);
     });
 
     it('should update updatedAt', () => {
       const p = makeProduct();
       const before = p.updatedAt;
-      p.adjustStock(1);
+      p.adjustStock(1, 'tenant-1', 'ENTRY');
       expect(p.updatedAt).not.toBe(before);
     });
   });

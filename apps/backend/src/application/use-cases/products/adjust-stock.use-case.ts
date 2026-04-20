@@ -1,7 +1,8 @@
 import { UseCase } from '@common/application/use-case.interface';
 import { Product } from '@domain/entities/products/product.entity';
-import { ProductRepository } from '@domain/repositories/product-repository';
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { DomainEventPublisher } from '@common/application/domain-event-publisher';
+import { ProductRepository } from '@domain/repositories/product-repository';
 
 export type AdjustStockInput = {
   tenantId: string;
@@ -11,7 +12,10 @@ export type AdjustStockInput = {
 
 @Injectable()
 export class AdjustStockUseCase implements UseCase<AdjustStockInput, Product> {
-  constructor(private productRepository: ProductRepository) {}
+  constructor(
+    private productRepository: ProductRepository,
+    private eventPublisher: DomainEventPublisher
+  ) {}
 
   async execute(input: AdjustStockInput): Promise<Product> {
     const { tenantId, id, adjustment } = input;
@@ -21,8 +25,12 @@ export class AdjustStockUseCase implements UseCase<AdjustStockInput, Product> {
       throw new NotFoundException('Product not found');
     }
 
-    product.adjustStock(adjustment);
+    const type = adjustment >= 0 ? 'ENTRY' : 'EXIT';
+    product.adjustStock(adjustment, tenantId, type);
 
-    return this.productRepository.update(tenantId, product);
+    const updated = await this.productRepository.update(tenantId, product);
+    await this.eventPublisher.publishEvents(product);
+    
+    return updated;
   }
 }

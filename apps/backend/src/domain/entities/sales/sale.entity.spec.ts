@@ -82,35 +82,35 @@ describe('Sale Entity — creation', () => {
 describe('Sale Entity — complete()', () => {
   it('should transition PENDING → COMPLETED when fully paid', () => {
     const sale = makeSale({ total: 20 });
-    sale.complete(20);
+    sale.complete(20, 'tenant-tst');
     expect(sale.status).toBe('COMPLETED');
   });
 
   it('should allow overpayment (>=)', () => {
     const sale = makeSale({ total: 20 });
-    sale.complete(25);
+    sale.complete(25, 'tenant-tst');
     expect(sale.status).toBe('COMPLETED');
   });
 
   it('should throw if sale is already COMPLETED', () => {
     const sale = makeSale({ status: 'COMPLETED' });
-    expect(() => sale.complete(20)).toThrow('Sale already completed');
+    expect(() => sale.complete(20, 'tenant-tst')).toThrow('Sale already completed');
   });
 
   it('should throw if sale is CANCELLED', () => {
     const sale = makeSale({ status: 'CANCELLED' });
-    expect(() => sale.complete(20)).toThrow('Cannot complete a cancelled sale');
+    expect(() => sale.complete(20, 'tenant-tst')).toThrow('Cannot complete a cancelled sale');
   });
 
   it('should throw if totalPaid is less than sale total', () => {
     const sale = makeSale({ total: 100 });
-    expect(() => sale.complete(50)).toThrow('Insufficient payments');
+    expect(() => sale.complete(50, 'tenant-tst')).toThrow('Insufficient payments');
   });
 
   it('should update updatedAt on completion', () => {
     const sale = makeSale({ total: 20 });
     const before = sale.updatedAt!.getTime();
-    sale.complete(20);
+    sale.complete(20, 'tenant-tst');
     expect(sale.updatedAt!.getTime()).toBeGreaterThanOrEqual(before);
   });
 });
@@ -256,7 +256,7 @@ describe('Sale Entity — rejectReturn()', () => {
 describe('Sale Entity — full FSM happy paths', () => {
   it('PENDING → COMPLETED → RETURN_REQUESTED → RETURNED (full return flow)', () => {
     const sale = makeSale({ total: 20 });
-    sale.complete(20);
+    sale.complete(20, 'tenant-tst');
     expect(sale.status).toBe('COMPLETED');
     sale.requestReturn();
     expect(sale.status).toBe('RETURN_REQUESTED');
@@ -266,7 +266,7 @@ describe('Sale Entity — full FSM happy paths', () => {
 
   it('PENDING → COMPLETED → RETURN_REQUESTED → COMPLETED (rejected return)', () => {
     const sale = makeSale({ total: 20 });
-    sale.complete(20);
+    sale.complete(20, 'tenant-tst');
     sale.requestReturn();
     sale.rejectReturn();
     expect(sale.status).toBe('COMPLETED');

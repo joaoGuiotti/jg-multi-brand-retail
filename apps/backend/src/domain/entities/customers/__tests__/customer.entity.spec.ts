@@ -84,6 +84,7 @@ describe('Customer Entity', () => {
         lastName: 'Doe',
         phone: '123456789',
         email: 'john.doe@example.com',
+        document: '12345678901',
         address: Address.create({
           street: '123 Main St',
           number: '123',

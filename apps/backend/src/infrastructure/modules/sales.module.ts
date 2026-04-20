@@ -14,11 +14,12 @@ import { PrismaSaleRepository } from '../persistence/repositories/prisma-sale.re
 import { PrismaTenantRepository } from '../persistence/repositories/prisma-tenant.repository';
 import { PdfService } from '../services/pdf';
 import { PaymentsModule } from './payments.module';
+import { NotificationsModule } from './notifications.module';
 import { PrismaModule } from './prisma.module';
 import { ProductsModule } from './products.module';
 
 @Module({
-  imports: [PrismaModule, ProductsModule, PaymentsModule],
+  imports: [PrismaModule, ProductsModule, PaymentsModule, NotificationsModule],
   controllers: [SalesController],
   providers: [
     {

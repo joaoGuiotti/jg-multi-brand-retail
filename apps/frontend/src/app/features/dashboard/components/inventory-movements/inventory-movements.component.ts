@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { UiBadgeComponent, UiButtonComponent, UiCardComponent } from '@shared/ui';
-import { InventoryMovement, MovementType } from '../../../../core/models/inventory.model';
+import { DashboardRecentMovement } from '../../../../core/models/dashboard.model';
 
 @Component({
     selector: 'app-inventory-movements',
@@ -31,7 +31,7 @@ import { InventoryMovement, MovementType } from '../../../../core/models/invento
                 </svg>
               </div>
               <div>
-                <p class="text-sm font-medium text-content">{{ $any(movement).productName || 'Product ID: ' + movement.productId.substring(0, 8) }}</p>
+                <p class="text-sm font-medium text-content">{{ movement.productName || 'Product ID: ' + movement.productId.substring(0, 8) }}</p>
                 <p class="text-xs text-content-secondary">{{ movement.quantity }} units • {{ formatDate(movement.createdAt) }}</p>
               </div>
             </div>
@@ -48,10 +48,17 @@ import { InventoryMovement, MovementType } from '../../../../core/models/invento
     :host {
       display: block;
     }
+    @keyframes flashNew {
+      0% { background-color: rgba(74, 222, 128, 0.4); }
+      100% { background-color: transparent; }
+    }
+    .divide-y > div:first-child {
+      animation: flashNew 1.5s ease-out;
+    }
   `]
 })
 export class InventoryMovementsComponent {
-    @Input() recentMovements: InventoryMovement[] = [];
+    @Input() recentMovements: DashboardRecentMovement[] = [];
     @Output() viewAll = new EventEmitter<void>();
 
     formatDate(dateString: string): string {
@@ -63,12 +70,13 @@ export class InventoryMovementsComponent {
         );
     }
 
-    getMovementVariant(type: MovementType): 'success' | 'error' | 'warning' | 'info' {
+    getMovementVariant(type: string): 'success' | 'error' | 'warning' | 'info' {
         switch (type) {
             case 'ENTRY': return 'success';
             case 'EXIT': return 'error';
             case 'ADJUSTMENT': return 'warning';
             case 'RETURN': return 'info';
+            default: return 'info';
         }
     }
 }

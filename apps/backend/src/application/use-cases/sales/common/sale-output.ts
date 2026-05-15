@@ -13,6 +13,22 @@ export type SaleItemOutput = {
   total: number;
 };
 
+export type PaymentOutput = {
+  id: string;
+  method: string;
+  amount: number;
+  status: string;
+  installments?: number | null;
+  createdAt?: Date;
+};
+
+export type ReturnSummaryOutput = {
+  id: string;
+  status: string;
+  total: number;
+  createdAt?: Date;
+};
+
 export type SaleOutput = {
   id: string;
   tenantId: string;
@@ -25,6 +41,8 @@ export type SaleOutput = {
   total: number;
   status: string;
   items: SaleItemOutput[];
+  payments: PaymentOutput[];
+  returns: ReturnSummaryOutput[];
   createdAt?: Date;
   updatedAt?: Date;
 };
@@ -57,6 +75,20 @@ export class SaleOutputMapper {
       total: entity.total,
       status: entity.status,
       items: entity.items.map(SaleItemOutputMapper.toOutput),
+      payments: entity.payments.map((p) => ({
+        id: p.id.toString(),
+        method: p.method,
+        amount: Number(p.amount),
+        status: p.status,
+        installments: p.installments,
+        createdAt: p.createdAt,
+      })),
+      returns: entity.returns.map((r) => ({
+        id: r.id.toString(),
+        status: r.status,
+        total: Number(r.totalRefund || r.total),
+        createdAt: r.createdAt,
+      })),
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     };

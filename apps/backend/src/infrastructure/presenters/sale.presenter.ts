@@ -1,6 +1,8 @@
 import {
   SaleItemOutput,
   SaleOutput,
+  PaymentOutput,
+  ReturnSummaryOutput,
 } from '@application/use-cases/sales/common/sale-output';
 import { PaginationOutput } from '@common/application/pagination-output';
 import { CollectionPresenter } from '@common/presenters/collection.presenter';
@@ -30,6 +32,42 @@ export class SaleItemPresenter {
   }
 }
 
+export class PaymentPresenter {
+  id: string;
+  method: string;
+  amount: number;
+  status: string;
+  installments?: number | null;
+
+  @Transform(({ value }) => value?.toISOString())
+  createdAt: Date | undefined;
+
+  constructor(output: PaymentOutput) {
+    this.id = output.id;
+    this.method = output.method;
+    this.amount = output.amount;
+    this.status = output.status;
+    this.installments = output.installments;
+    this.createdAt = output.createdAt;
+  }
+}
+
+export class ReturnSummaryPresenter {
+  id: string;
+  status: string;
+  total: number;
+
+  @Transform(({ value }) => value?.toISOString())
+  createdAt: Date | undefined;
+
+  constructor(output: ReturnSummaryOutput) {
+    this.id = output.id;
+    this.status = output.status;
+    this.total = output.total;
+    this.createdAt = output.createdAt;
+  }
+}
+
 export class SalePresenter {
   id: string;
   tenantId: string;
@@ -42,6 +80,8 @@ export class SalePresenter {
   total: number;
   status: string;
   items: SaleItemPresenter[];
+  payments: PaymentPresenter[];
+  returns: ReturnSummaryPresenter[];
 
   @Transform(({ value }) => value?.toISOString())
   createdAt: Date | undefined;
@@ -61,6 +101,8 @@ export class SalePresenter {
     this.total = output.total;
     this.status = output.status;
     this.items = output.items.map((i) => new SaleItemPresenter(i));
+    this.payments = (output.payments || []).map((p) => new PaymentPresenter(p));
+    this.returns = (output.returns || []).map((r) => new ReturnSummaryPresenter(r));
     this.createdAt = output.createdAt;
     this.updatedAt = output.updatedAt;
   }

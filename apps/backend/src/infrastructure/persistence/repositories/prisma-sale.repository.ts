@@ -67,6 +67,15 @@ export class PrismaSaleRepository implements SaleRepository {
             },
           },
         },
+        payments: true,
+        returnOrders: {
+          select: {
+            id: true,
+            status: true,
+            createdAt: true,
+            totalRefund: true,
+          },
+        },
       },
     });
 

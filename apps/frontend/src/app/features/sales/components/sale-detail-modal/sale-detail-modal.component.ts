@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { MODAL_DATA, MODAL_REF, ModalRef, TableColumn, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiNumberPipe, UiTableColumnDirective, UiTableComponent } from '@shared/ui';
 import { finalize } from 'rxjs';
 import { Sale } from '../../../../core/models/sale.model';
@@ -23,6 +24,7 @@ export class SaleDetailModalComponent implements OnInit {
     private modalRef = inject(MODAL_REF) as ModalRef<void>;
     readonly saleId = inject(MODAL_DATA) as string;
     private salesService = inject(SalesService);
+    private router = inject(Router);
 
     sale = signal<Sale | null>(null);
     isLoading = signal(true);
@@ -74,6 +76,19 @@ export class SaleDetailModalComponent implements OnInit {
 
     close(): void {
         this.modalRef.close();
+    }
+
+    hasPendingReturns(): boolean {
+        const sale = this.sale();
+        if (!sale || !sale.returns) return false;
+        return sale.returns.some(r => ['REQUESTED', 'APPROVED'].includes(r.status));
+    }
+
+    initiateReturn(): void {
+        const sale = this.sale();
+        if (!sale) return;
+        this.close();
+        this.router.navigate(['/returns/new'], { queryParams: { saleId: sale.id } });
     }
 
     getStatusVariant(status: string): 'success' | 'warning' | 'error' | 'info' | 'default' {

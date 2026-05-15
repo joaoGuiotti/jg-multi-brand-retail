@@ -9,6 +9,8 @@ export class SaleMapper {
         product?: { name: string; sku: string } | null;
       })[];
       customer?: { firstName: string; lastName: string } | null;
+      payments?: any[];
+      returnOrders?: any[];
     },
   ): Sale {
     const items = (raw.items || []).map((item) =>
@@ -40,6 +42,8 @@ export class SaleMapper {
         items,
         createdAt: raw.createdAt,
         updatedAt: raw.updatedAt,
+        payments: raw.payments,
+        returns: raw.returnOrders,
       },
       new UniqueEntityID(raw.id),
     );

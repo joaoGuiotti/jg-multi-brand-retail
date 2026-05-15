@@ -142,7 +142,43 @@
             </div>
         </div>
 
+        <!-- Returns Section -->
+        <div *ngIf="data.returns && data.returns.length > 0">
+            <h3 class="text-lg font-bold text-content mb-4 flex items-center gap-2">
+                <span class="w-1.5 h-6 bg-warning rounded-full"></span>
+                Associated Returns
+            </h3>
+            <div class="grid grid-cols-1 gap-3">
+                <ui-card *ngFor="let r of data.returns" padding="sm" [shadow]="false" class="border-outline">
+                    <div class="flex items-center justify-between">
+                        <div class="flex gap-4 items-center">
+                            <div class="w-10 h-10 rounded-full bg-warning/10 flex items-center justify-center text-warning">
+                                <i class="text-lg i-lucide-arrow-left-right"></i>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-sm font-bold text-content">Return #{{ r.id.substring(0, 8) }}</span>
+                                <span class="text-xs text-content-secondary">{{ r.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-end gap-1">
+                            <span class="font-bold text-content">{{ r.total | uiNumber: { decimalPlaces: 2, prefix: 'R$ ' } }}</span>
+                            <ui-badge [variant]="r.status === 'REFUNDED' ? 'success' : (r.status === 'REJECTED' ? 'error' : 'warning')" size="sm">{{ r.status }}</ui-badge>
+                        </div>
+                    </div>
+                </ui-card>
+            </div>
+        </div>
+
         <div class="flex justify-end gap-3 pt-6 border-t border-outline">
+            <div class="flex-1" *ngIf="data.status === 'COMPLETED'">
+                <ui-button 
+                    variant="secondary" 
+                    [disabled]="hasPendingReturns()" 
+                    [title]="hasPendingReturns() ? 'There is already a return in progress for this sale.' : ''"
+                    (clicked)="initiateReturn()">
+                    Iniciar Devolução
+                </ui-button>
+            </div>
             <ui-button variant="secondary" (clicked)="close()">Dismiss</ui-button>
             <ui-button variant="primary" (clicked)="onPrint()">Print Receipt</ui-button>
         </div>

@@ -9,6 +9,7 @@ export interface Sale {
     status: 'PENDING' | 'COMPLETED' | 'RETURN_REQUESTED' | 'RETURNED' | 'CANCELLED';
     items: SaleItem[];
     payments: Payment[];
+    returns?: ReturnSummary[];
     userId: string;
     tenantId: string;
     customerId?: string;
@@ -40,6 +41,13 @@ export interface Payment {
     fee?: number;
     status: 'PENDING' | 'PAID' | 'CANCELLED';
     metadata?: Record<string, any>;
+    createdAt: string;
+}
+
+export interface ReturnSummary {
+    id: string;
+    status: 'REQUESTED' | 'APPROVED' | 'REJECTED' | 'REFUNDED';
+    total: number;
     createdAt: string;
 }
 

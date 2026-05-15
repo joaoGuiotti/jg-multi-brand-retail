@@ -63,6 +63,8 @@ export interface SaleProps {
   items: SaleItem[];
   createdAt?: Date;
   updatedAt?: Date;
+  payments?: any[];
+  returns?: any[];
 }
 
 export class Sale extends AggregateRoot<SaleProps> {
@@ -77,6 +79,8 @@ export class Sale extends AggregateRoot<SaleProps> {
         status: props.status ?? 'PENDING',
         createdAt: props.createdAt ?? new Date(),
         updatedAt: props.updatedAt ?? new Date(),
+        payments: props.payments ?? [],
+        returns: props.returns ?? [],
       },
       id,
     );
@@ -114,6 +118,12 @@ export class Sale extends AggregateRoot<SaleProps> {
   }
   get updatedAt(): Date | undefined {
     return this.props.updatedAt;
+  }
+  get payments(): any[] {
+    return this.props.payments || [];
+  }
+  get returns(): any[] {
+    return this.props.returns || [];
   }
 
   // ── FSM transitions ──────────────────────────────────────────

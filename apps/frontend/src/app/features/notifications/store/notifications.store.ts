@@ -50,7 +50,11 @@ export class NotificationsStore {
     return prefs.every(p => p.sound);
   });
 
+  private initialized = false;
+
   init() {
+    if (this.initialized) return;
+    this.initialized = true;
     this.loadInitialData();
     this.listenToRealtimeEvents();
   }

@@ -61,6 +61,19 @@ describe('Sale Entity — creation', () => {
     expect(sale.customerName).toBe('John Doe');
     expect(sale.createdAt).toBeDefined();
     expect(sale.updatedAt).toBeDefined();
+    expect(sale.payments).toEqual([]);
+    expect(sale.returns).toEqual([]);
+  });
+
+  it('should expose payments and returns if provided', () => {
+    const sale = makeSale({
+      payments: [{ id: 'p1' }],
+      returns: [{ id: 'r1' }],
+    });
+    expect(sale.payments).toHaveLength(1);
+    expect(sale.payments[0].id).toBe('p1');
+    expect(sale.returns).toHaveLength(1);
+    expect(sale.returns[0].id).toBe('r1');
   });
 
   it('should default status to PENDING when not provided', () => {

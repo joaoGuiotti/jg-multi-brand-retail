@@ -116,6 +116,18 @@ describe('SaleMapper', () => {
     expect(sale.status).toBe('RETURN_REQUESTED');
   });
 
+  it('toDomain should map payments and returns if present', () => {
+    const raw = makeRawSale({
+      payments: [{ id: 'pay-1', method: 'CASH', amount: 10 }],
+      returnOrders: [{ id: 'ret-1', status: 'REQUESTED' }]
+    });
+    const sale = SaleMapper.toDomain(raw);
+    expect(sale.payments).toHaveLength(1);
+    expect(sale.payments[0].id).toBe('pay-1');
+    expect(sale.returns).toHaveLength(1);
+    expect(sale.returns[0].id).toBe('ret-1');
+  });
+
   it('toDomain should map RETURNED status correctly', () => {
     const raw = makeRawSale({ status: 'RETURNED' });
     const sale = SaleMapper.toDomain(raw);

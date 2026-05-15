@@ -85,6 +85,19 @@ describe('SalePresenter', () => {
     );
     expect(presenter.status).toBe('CANCELLED');
   });
+
+  it('should expose payments and returns', () => {
+    const presenter = new SalePresenter(
+      makeSaleOutput({
+        payments: [{ id: 'pay-1', method: 'CASH', amount: 10, status: 'PAID' }],
+        returns: [{ id: 'ret-1', status: 'REQUESTED', total: 10 }]
+      }),
+    );
+    expect(presenter.payments).toHaveLength(1);
+    expect(presenter.payments[0].id).toBe('pay-1');
+    expect(presenter.returns).toHaveLength(1);
+    expect(presenter.returns[0].id).toBe('ret-1');
+  });
 });
 
 describe('SaleCollectionPresenter', () => {

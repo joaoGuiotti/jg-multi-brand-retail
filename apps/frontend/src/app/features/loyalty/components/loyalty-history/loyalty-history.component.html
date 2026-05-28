@@ -1,0 +1,179 @@
+<div class="space-y-6">
+  <!-- Loyalty Account Overview Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <!-- Active points balance -->
+    <div class="p-5 bg-gradient-to-br from-amber-500/10 to-yellow-500/5 border border-amber-500/20 rounded-2xl relative overflow-hidden shadow-sm">
+      <div class="absolute -right-6 -bottom-6 text-amber-500/10 scale-150 select-none">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-20 h-20">
+          <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <span class="block text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Saldo de Cashback</span>
+      <span class="block text-3xl font-extrabold text-content-primary mt-1.5">{{ account()?.balance || 0 }} pts</span>
+      <span class="block text-xs text-content-tertiary mt-0.5">Disponível para resgate no PDV</span>
+    </div>
+
+    <!-- Total earned points -->
+    <div class="p-5 bg-surface-tertiary border border-outline rounded-2xl">
+      <span class="block text-xs font-bold text-content-tertiary uppercase tracking-wider">Histórico de Ganhos</span>
+      <span class="block text-2xl font-extrabold text-content-primary mt-1.5">{{ account()?.totalEarned || 0 }} pts</span>
+      <span class="block text-xs text-emerald-500 font-medium mt-0.5">Pontos acumulados na loja</span>
+    </div>
+
+    <!-- Total redeemed points -->
+    <div class="p-5 bg-surface-tertiary border border-outline rounded-2xl">
+      <span class="block text-xs font-bold text-content-tertiary uppercase tracking-wider">Histórico de Resgates</span>
+      <span class="block text-2xl font-extrabold text-content-primary mt-1.5">{{ account()?.totalRedeemed || 0 }} pts</span>
+      <span class="block text-xs text-amber-500 font-medium mt-0.5">Pontos revertidos em descontos</span>
+    </div>
+  </div>
+
+  <!-- Header audit bar & Admin Action -->
+  <div class="flex items-center justify-between gap-4 border-b border-outline pb-4">
+    <div>
+      <h3 class="text-base font-bold text-content-primary">Histórico de Movimentações</h3>
+      <p class="text-xs text-content-tertiary mt-0.5">Extrato imutável de acúmulos, resgates e ajustes de auditoria.</p>
+    </div>
+    
+    @if (isAdmin()) {
+      <ui-button 
+        [variant]="showAdjustForm() ? 'secondary' : 'primary'"
+        size="sm"
+        (click)="toggleAdjustForm()"
+      >
+        {{ showAdjustForm() ? 'Fechar Ajuste' : 'Ajustar Saldo' }}
+      </ui-button>
+    }
+  </div>
+
+  <!-- Sliding Adjustment Form (Admin only) -->
+  @if (showAdjustForm() && isAdmin()) {
+    <div class="p-5 bg-surface border border-outline rounded-2xl shadow-lg animate-slide-down">
+      <h4 class="text-sm font-bold text-content-primary mb-1">Ajuste Manual Administrativo</h4>
+      <p class="text-xs text-content-tertiary mb-5">Adicione ou remova pontos do cliente. A justificativa de auditoria é obrigatória e imutável.</p>
+      
+      <form [formGroup]="adjustForm" (ngSubmit)="submitAdjustment()" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Points -->
+          <div class="md:col-span-1">
+            <ui-input-field
+              label="Ajuste de Pontos"
+              type="text"
+              formControlName="points"
+              placeholder="Ex: 150 ou -100"
+              hint="Use valor positivo para crédito e negativo para débito."
+              [error]="adjustForm.get('points')?.touched && adjustForm.get('points')?.invalid ? 'Digite um número inteiro diferente de zero' : null"
+            ></ui-input-field>
+          </div>
+
+          <!-- Reason -->
+          <div class="md:col-span-2">
+            <ui-input-field
+              label="Justificativa da Auditoria"
+              type="text"
+              formControlName="reason"
+              placeholder="Descreva o motivo detalhado do ajuste..."
+              hint="Pelo menos 10 caracteres para auditoria."
+              [error]="adjustForm.get('reason')?.touched && adjustForm.get('reason')?.invalid ? 'Justificativa deve conter no mínimo 10 caracteres' : null"
+            ></ui-input-field>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-2">
+          <ui-button
+            type="button"
+            variant="ghost"
+            [outline]="true"
+            (click)="toggleAdjustForm()"
+          >
+            Cancelar
+          </ui-button>
+          
+          <ui-button
+            type="submit"
+            variant="primary"
+            [loading]="isAdjusting()"
+            [disabled]="isAdjusting()"
+          >
+            Confirmar Ajuste
+          </ui-button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <!-- Ledger Transactions Table -->
+  @if (isLoading()) {
+    <div class="flex flex-col items-center justify-center py-16 space-y-3">
+      <div class="w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+      <p class="text-xs font-semibold text-content-tertiary">Buscando extrato de fidelidade...</p>
+    </div>
+  } @else {
+    @if (!account()?.transactions || account()?.transactions?.length === 0) {
+      <div class="text-center py-12 border border-dashed border-outline rounded-2xl bg-surface-tertiary">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 text-content-tertiary mx-auto mb-3">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        </svg>
+        <span class="block text-sm font-semibold text-content-secondary">Sem movimentações</span>
+        <span class="block text-xs text-content-tertiary mt-1">Este cliente ainda não realizou transações de pontos de fidelidade.</span>
+      </div>
+    } @else {
+      <div class="overflow-x-auto border border-outline rounded-2xl shadow-sm bg-surface">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-surface-tertiary border-b border-outline text-xs font-bold text-content-secondary uppercase tracking-wider">
+              <th class="px-6 py-4">Data da Operação</th>
+              <th class="px-6 py-4">Operação</th>
+              <th class="px-6 py-4">Pontuação</th>
+              <th class="px-6 py-4">Justificativa / Detalhes</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-outline text-sm text-content-primary">
+            @for (tx of account()?.transactions; track tx.id) {
+              <tr class="hover:bg-surface-secondary/30 transition-colors">
+                <td class="px-6 py-4 text-xs text-content-secondary font-medium">
+                  {{ tx.createdAt | date:'dd/MM/yyyy HH:mm' }}
+                </td>
+                
+                <td class="px-6 py-4">
+                  @switch (tx.type) {
+                    @case ('EARN') {
+                      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                        Acúmulo
+                      </span>
+                    }
+                    @case ('REDEEM') {
+                      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                        <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                        Resgate
+                      </span>
+                    }
+                    @case ('ADJUST') {
+                      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                        <span class="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
+                        Ajuste
+                      </span>
+                    }
+                  }
+                </td>
+                
+                <td class="px-6 py-4 font-bold">
+                  @if (tx.points > 0) {
+                    <span class="text-emerald-500 font-extrabold">+{{ tx.points }} pts</span>
+                  } @else {
+                    <span class="text-amber-500 font-extrabold">{{ tx.points }} pts</span>
+                  }
+                </td>
+                
+                <td class="px-6 py-4 text-xs text-content-secondary max-w-xs truncate" [title]="tx.reason || ''">
+                  {{ tx.reason || 'Sem justificativa gravada' }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+</div>

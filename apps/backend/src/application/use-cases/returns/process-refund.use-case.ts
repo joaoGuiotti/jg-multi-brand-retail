@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { ReturnsRepository } from '../../../domain/repositories/returns/returns.repository.interface';
 import { SaleRepository } from '../../../domain/repositories/sale-repository';
@@ -11,13 +12,17 @@ import {
   NotificationType,
   NotificationPriority,
 } from '../../../domain/entities/notifications/notification.entity';
+import { EarnPointsUseCase } from '../loyalty/earn-points.use-case';
 
 @Injectable()
 export class ProcessRefundUseCase {
+  private readonly logger = new Logger(ProcessRefundUseCase.name);
+
   constructor(
     private readonly returnsRepository: ReturnsRepository,
     private readonly saleRepository: SaleRepository,
     private readonly createNotificationUseCase: CreateNotificationUseCase,
+    private readonly earnPointsUseCase: EarnPointsUseCase,
   ) {}
 
   async execute(tenantId: string, id: string): Promise<ReturnOutput> {
@@ -42,6 +47,22 @@ export class ProcessRefundUseCase {
     if (sale) {
       sale.completeReturn();
       await this.saleRepository.update(tenantId, sale);
+
+      // Reverter pontos se houver cliente associado
+      if (sale.customerId) {
+        try {
+          await this.earnPointsUseCase.reversePoints(
+            tenantId,
+            sale.customerId,
+            sale.id.toString(),
+          );
+        } catch (error) {
+          this.logger.error(
+            `Failed to reverse loyalty points for sale ${sale.id.toString()} of customer ${sale.customerId}:`,
+            error,
+          );
+        }
+      }
     }
 
     // Notify requesting user

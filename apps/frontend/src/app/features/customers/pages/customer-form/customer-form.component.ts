@@ -5,11 +5,19 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MaskitoOptions } from '@maskito/core';
 import { UI_DOCUMENT_MASK, UiButtonComponent, UiCardComponent, UiInputFieldComponent } from '@shared/ui';
 import { CustomersService } from '../../../../core/services/customers.service';
+import { LoyaltyHistoryComponent } from '../../../loyalty/components/loyalty-history/loyalty-history.component';
 
 @Component({
     selector: 'app-customer-form',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, UiButtonComponent, UiCardComponent, UiInputFieldComponent],
+    imports: [
+        CommonModule, 
+        ReactiveFormsModule, 
+        UiButtonComponent, 
+        UiCardComponent, 
+        UiInputFieldComponent,
+        LoyaltyHistoryComponent
+    ],
     templateUrl: './customer-form.component.html',
     styleUrl: './customer-form.component.scss'
 })

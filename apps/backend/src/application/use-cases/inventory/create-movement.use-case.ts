@@ -36,7 +36,7 @@ export class CreateMovementUseCase implements UseCase<
     private inventoryRepository: InventoryRepository,
     private productRepository: ProductRepository,
     private eventPublisher: DomainEventPublisher,
-  ) { }
+  ) {}
 
   async execute(input: CreateMovementInput): Promise<MovementOutput> {
     const { tenantId, userId, productId, type, quantity, reference } = input;

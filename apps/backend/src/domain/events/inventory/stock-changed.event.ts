@@ -11,7 +11,7 @@ export class StockChangedEvent implements IDomainEvent {
     public readonly product: Product,
     public readonly adjustment: number,
     public readonly movementType: string,
-    public readonly tenantId: string
+    public readonly tenantId: string,
   ) {
     this.id = new UniqueEntityID();
     this.occurredAt = new Date();

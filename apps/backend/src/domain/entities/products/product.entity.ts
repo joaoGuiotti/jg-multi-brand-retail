@@ -96,18 +96,22 @@ export class Product extends AggregateRoot<ProductProps> {
     const adjustment = quantity - oldQuantity;
     this.props.stockQuantity = quantity;
     this.props.updatedAt = new Date();
-    
+
     this.applyEvent(
-      new StockChangedEvent(this, adjustment, 'MANUAL', tenantId)
+      new StockChangedEvent(this, adjustment, 'MANUAL', tenantId),
     );
   }
 
-  public adjustStock(adjustment: number, tenantId: string, movementType: string): void {
+  public adjustStock(
+    adjustment: number,
+    tenantId: string,
+    movementType: string,
+  ): void {
     this.props.stockQuantity += adjustment;
     this.props.updatedAt = new Date();
-    
+
     this.applyEvent(
-      new StockChangedEvent(this, adjustment, movementType, tenantId)
+      new StockChangedEvent(this, adjustment, movementType, tenantId),
     );
   }
 

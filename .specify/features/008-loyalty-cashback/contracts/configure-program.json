@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ConfigureLoyaltyProgram",
+  "type": "object",
+  "properties": {
+    "pointsPerReal": {
+      "type": "number",
+      "minimum": 0.01,
+      "description": "Fator de pontos ganhos por cada 1 Real líquido gasto"
+    },
+    "redeemRatio": {
+      "type": "number",
+      "minimum": 0.0001,
+      "description": "Valor monetário em Reais de desconto equivalente a 1 Ponto de fidelidade"
+    },
+    "minRedeemPoints": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Mínimo de pontos acumulados que o cliente deve ter para poder resgatar no PDV"
+    },
+    "maxDiscountPct": {
+      "type": "number",
+      "minimum": 0.1,
+      "maximum": 100.0,
+      "description": "Porcentagem limite máxima de desconto que pode ser paga por fidelidade sobre o carrinho"
+    }
+  },
+  "required": ["pointsPerReal", "redeemRatio", "minRedeemPoints", "maxDiscountPct"],
+  "additionalProperties": false
+}

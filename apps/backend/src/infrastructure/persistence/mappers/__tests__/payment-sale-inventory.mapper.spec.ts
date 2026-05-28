@@ -119,7 +119,7 @@ describe('SaleMapper', () => {
   it('toDomain should map payments and returns if present', () => {
     const raw = makeRawSale({
       payments: [{ id: 'pay-1', method: 'CASH', amount: 10 }],
-      returnOrders: [{ id: 'ret-1', status: 'REQUESTED' }]
+      returnOrders: [{ id: 'ret-1', status: 'REQUESTED' }],
     });
     const sale = SaleMapper.toDomain(raw);
     expect(sale.payments).toHaveLength(1);

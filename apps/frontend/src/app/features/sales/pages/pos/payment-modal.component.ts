@@ -5,6 +5,7 @@ import { MODAL_DATA, MODAL_REF, ModalRef, UiButtonComponent, UiInputFieldCompone
 import { CreatePaymentDto } from '../../../../core/models/sale.model';
 import { SalesService } from '../../../../core/services/sales.service';
 import { CartStore } from '../../store/cart.store';
+import { LoyaltyStore } from '../../../loyalty/store/loyalty.store';
 
 export interface PaymentModalData {
     total: number;
@@ -28,6 +29,7 @@ export class PaymentModalComponent {
     // ── Services ──────────────────────────────────────────────────────────────
     private salesService = inject(SalesService);
     cartStore = inject(CartStore);
+    protected loyaltyStore = inject(LoyaltyStore);
 
     // ── State ─────────────────────────────────────────────────────────────────
     selectedPaymentMethod: 'CASH' | 'CREDIT_CARD' | 'DEBIT_CARD' | 'PIX' = 'CASH';
@@ -36,11 +38,13 @@ export class PaymentModalComponent {
     errorMessage = '';
 
     get change(): number {
-        return this.paymentAmount - this.cartStore.total();
+        const actualTotalToPay = Math.max(0, this.cartStore.total() - this.loyaltyStore.discountApplied());
+        return this.paymentAmount - actualTotalToPay;
     }
 
     processPayment(): void {
-        if (this.paymentAmount < this.cartStore.total()) {
+        const actualTotalToPay = Math.max(0, this.cartStore.total() - this.loyaltyStore.discountApplied());
+        if (this.paymentAmount < actualTotalToPay) {
             this.errorMessage = 'Payment amount is less than total';
             return;
         }
@@ -63,9 +67,28 @@ export class PaymentModalComponent {
             })
             .subscribe({
                 next: (response) => {
-                    this.cartStore.clearCart();
-                    this.isProcessing = false;
-                    this.modalRef.close({ invoiceNumber: response.data.invoiceNumber });
+                    const saleId = response.data.id;
+                    const points = this.loyaltyStore.pointsToRedeem();
+                    
+                    if (points > 0) {
+                        this.loyaltyStore.redeemActivePoints(
+                            saleId,
+                            () => {
+                                this.cartStore.clearCart();
+                                this.isProcessing = false;
+                                this.modalRef.close({ invoiceNumber: response.data.invoiceNumber });
+                            },
+                            (err) => {
+                                this.errorMessage = 'Venda criada, mas falhou ao resgatar pontos: ' + (err.error?.message || '');
+                                this.cartStore.clearCart();
+                                this.isProcessing = false;
+                            }
+                        );
+                    } else {
+                        this.cartStore.clearCart();
+                        this.isProcessing = false;
+                        this.modalRef.close({ invoiceNumber: response.data.invoiceNumber });
+                    }
                 },
                 error: (error) => {
                     this.errorMessage = error.error?.message || 'Failed to process sale';

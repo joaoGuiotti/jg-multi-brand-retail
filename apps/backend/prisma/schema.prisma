@@ -36,6 +36,9 @@ model Tenant {
   notifications           Notification[]
   notificationPreferences NotificationPreference[]
   returnOrders            ReturnOrder[]
+  loyaltyProgram          LoyaltyProgram?
+  loyaltyAccounts         LoyaltyAccount[]
+  loyaltyTransactions    LoyaltyTransaction[]
 
   @@map("tenants")
 }
@@ -188,6 +191,7 @@ model Sale {
   items        SaleItem[]
   payments     Payment[]
   returnOrders ReturnOrder[]
+  loyaltyTransactions LoyaltyTransaction[]
 
   @@index([tenantId])
   @@index([createdAt])
@@ -383,6 +387,7 @@ model Customer {
   conditionals Conditional[]
   sales        Sale[]
   returnOrders ReturnOrder[]
+  loyaltyAccount LoyaltyAccount?
 
   @@index([tenantId])
   @@index([email])
@@ -530,4 +535,72 @@ model ReturnItem {
 
   @@index([returnOrderId])
   @@map("return_items")
+}
+
+// ==========================================
+// PROGRAMA DE FIDELIDADE & CASHBACK (SPRINT 3)
+// ==========================================
+
+model LoyaltyProgram {
+  id              String   @id @default(uuid())
+  tenantId        String   @unique @map("tenant_id")
+  name            String   @default("Programa de Fidelidade")
+  pointsPerReal   Decimal  @default(1.00) @map("points_per_real") @db.Decimal(10, 2)
+  redeemRatio     Decimal  @default(0.0100) @map("redeem_ratio") @db.Decimal(10, 4)
+  minRedeemPoints Int      @default(100) @map("min_redeem_points")
+  maxDiscountPct  Decimal  @default(50.00) @map("max_discount_pct") @db.Decimal(5, 2)
+  expirationDays  Int?     @map("expiration_days") // v1: Sempre nulo (Never Expire)
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  tenant   Tenant           @relation(fields: [tenantId], references: [id])
+  accounts LoyaltyAccount[]
+
+  @@map("loyalty_programs")
+}
+
+model LoyaltyAccount {
+  id               String   @id @default(uuid())
+  tenantId         String   @map("tenant_id")
+  customerId       String   @unique @map("customer_id")
+  loyaltyProgramId String   @map("loyalty_program_id")
+  balance          Int      @default(0)
+  totalEarned      Int      @default(0) @map("total_earned")
+  totalRedeemed    Int      @default(0) @map("total_redeemed")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  tenant         Tenant               @relation(fields: [tenantId], references: [id])
+  customer       Customer             @relation(fields: [customerId], references: [id])
+  loyaltyProgram LoyaltyProgram       @relation(fields: [loyaltyProgramId], references: [id])
+  transactions   LoyaltyTransaction[]
+
+  @@unique([tenantId, customerId])
+  @@index([tenantId])
+  @@map("loyalty_accounts")
+}
+
+enum LoyaltyTransactionType {
+  EARN
+  REDEEM
+  ADJUST
+}
+
+model LoyaltyTransaction {
+  id        String                 @id @default(uuid())
+  tenantId  String                 @map("tenant_id")
+  accountId String                 @map("account_id")
+  type      LoyaltyTransactionType
+  points    Int                    // Positivo para EARN/ADJUST, Negativo para REDEEM/ADJUST (débito)
+  saleId    String?                @map("sale_id")
+  reason    String?                @db.Text // Justificativa obrigatória para ADJUST
+  createdAt DateTime               @default(now()) @map("created_at")
+
+  tenant  Tenant         @relation(fields: [tenantId], references: [id])
+  account LoyaltyAccount @relation(fields: [accountId], references: [id])
+  sale    Sale?          @relation(fields: [saleId], references: [id])
+
+  @@index([accountId])
+  @@index([tenantId])
+  @@map("loyalty_transactions")
 }

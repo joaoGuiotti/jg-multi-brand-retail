@@ -41,9 +41,10 @@ export interface GetDashboardSnapshotOutput {
 }
 
 @Injectable()
-export class GetDashboardSnapshotUseCase
-  implements UseCase<GetDashboardSnapshotInput, GetDashboardSnapshotOutput>
-{
+export class GetDashboardSnapshotUseCase implements UseCase<
+  GetDashboardSnapshotInput,
+  GetDashboardSnapshotOutput
+> {
   constructor(private readonly prisma: PrismaService) {}
 
   async execute(
@@ -141,7 +142,10 @@ export class GetDashboardSnapshotUseCase
     for (const sale of salesLast7Days) {
       const key = sale.createdAt.toISOString().split('T')[0];
       if (revenueByDate.has(key)) {
-        revenueByDate.set(key, (revenueByDate.get(key) ?? 0) + Number(sale.total));
+        revenueByDate.set(
+          key,
+          (revenueByDate.get(key) ?? 0) + Number(sale.total),
+        );
       }
     }
 

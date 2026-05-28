@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UiAutocompleteComponent, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiDocumentPipe, UiModalService, UiNumberPipe } from '@shared/ui';
@@ -8,12 +8,25 @@ import { Product } from '../../../../core/models/product.model';
 import { CustomersService } from '../../../../core/services/customers.service';
 import { ProductsService } from '../../../../core/services/products.service';
 import { CartStore } from '../../store/cart.store';
+import { LoyaltyStore } from '../../../loyalty/store/loyalty.store';
+import { LoyaltyBadgeComponent } from '../../../loyalty/components/loyalty-badge/loyalty-badge.component';
+import { RedeemDialogComponent } from '../../../loyalty/components/redeem-dialog/redeem-dialog.component';
 import { PaymentModalComponent, PaymentModalResult } from './payment-modal.component';
 
 @Component({
     selector: 'app-pos',
     standalone: true,
-    imports: [CommonModule, FormsModule, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiNumberPipe, UiDocumentPipe, UiAutocompleteComponent],
+    imports: [
+        CommonModule, 
+        FormsModule, 
+        UiBadgeComponent, 
+        UiButtonComponent, 
+        UiCardComponent, 
+        UiNumberPipe, 
+        UiDocumentPipe, 
+        UiAutocompleteComponent,
+        LoyaltyBadgeComponent
+    ],
     templateUrl: './pos.component.html',
     styleUrl: './pos.component.scss'
 })
@@ -23,6 +36,7 @@ export class PosComponent {
     private modalService = inject(UiModalService);
     private router = inject(Router);
     cartStore = inject(CartStore);
+    protected loyaltyStore = inject(LoyaltyStore);
 
     customerSearchTerm = '';
     customerSearchResults = signal<Customer[]>([]);
@@ -32,6 +46,19 @@ export class PosComponent {
     searchTerm = '';
     searchResults = signal<Product[]>([]);
     isSearching = signal(false);
+
+    constructor() {
+        this.loyaltyStore.loadConfig();
+
+        effect(() => {
+            const customer = this.selectedCustomer();
+            if (customer) {
+                this.loyaltyStore.loadCustomerAccount(customer.id);
+            } else {
+                this.loyaltyStore.clearCustomer();
+            }
+        });
+    }
 
     searchProducts(event?: { query: string }): void {
         const query = event ? event.query : this.searchTerm;
@@ -107,18 +134,50 @@ export class PosComponent {
         }
     }
 
+    openRedeemModal(): void {
+        const customer = this.selectedCustomer();
+        if (!customer) return;
+
+        const ref = this.modalService.open<any, number>(
+            RedeemDialogComponent,
+            {
+                title: 'Resgatar Cashback',
+                closable: true,
+                data: {
+                    cartSubtotal: this.cartStore.total(),
+                    customerId: customer.id
+                },
+                maxWidth: '480px',
+                zIndex: 1010
+            }
+        );
+
+        ref.afterClosed().subscribe((pointsToRedeem) => {
+            if (pointsToRedeem && pointsToRedeem > 0) {
+                this.loyaltyStore.setPointsToRedeem(pointsToRedeem);
+            }
+        });
+    }
+
+    get totalToPay(): number {
+        return Math.max(0, this.cartStore.total() - this.loyaltyStore.discountApplied());
+    }
+
     openPaymentModal(): void {
         if (this.cartStore.itemCount() === 0) {
             alert('Cart is empty');
             return;
         }
 
+        const discount = this.loyaltyStore.discountApplied();
+        const totalToPay = this.totalToPay;
+
         const ref = this.modalService.open<{ total: number }, PaymentModalResult>(
             PaymentModalComponent,
             {
                 title: 'Process Payment',
                 closable: true,
-                data: { total: this.cartStore.total() },
+                data: { total: totalToPay },
                 maxWidth: '480px',
                 zIndex: 1000,
             }
@@ -129,7 +188,7 @@ export class PosComponent {
         ref.afterClosed()
             .subscribe((result) => {
                 if (result?.invoiceNumber) {
-                    alert(`Sale completed! Invoice: ${result.invoiceNumber}`);
+                    alert(`Venda finalizada! Cupom: ${result.invoiceNumber}`);
                 }
             })
     }

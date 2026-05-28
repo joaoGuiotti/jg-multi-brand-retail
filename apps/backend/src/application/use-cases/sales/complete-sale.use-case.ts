@@ -23,7 +23,7 @@ export class CompleteSaleUseCase implements UseCase<
     private saleRepository: SaleRepository,
     private prisma: PrismaService,
     private eventPublisher: DomainEventPublisher,
-  ) { }
+  ) {}
 
   async execute(input: CompleteSaleInput): Promise<SaleOutput> {
     const { tenantId, id } = input;

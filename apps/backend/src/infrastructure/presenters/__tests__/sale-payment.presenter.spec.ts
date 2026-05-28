@@ -90,7 +90,7 @@ describe('SalePresenter', () => {
     const presenter = new SalePresenter(
       makeSaleOutput({
         payments: [{ id: 'pay-1', method: 'CASH', amount: 10, status: 'PAID' }],
-        returns: [{ id: 'ret-1', status: 'REQUESTED', total: 10 }]
+        returns: [{ id: 'ret-1', status: 'REQUESTED', total: 10 }],
       }),
     );
     expect(presenter.payments).toHaveLength(1);

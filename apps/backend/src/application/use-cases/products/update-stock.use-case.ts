@@ -14,7 +14,7 @@ export type UpdateStockInput = {
 export class UpdateStockUseCase implements UseCase<UpdateStockInput, Product> {
   constructor(
     private productRepository: ProductRepository,
-    private eventPublisher: DomainEventPublisher
+    private eventPublisher: DomainEventPublisher,
   ) {}
 
   async execute(input: UpdateStockInput): Promise<Product> {

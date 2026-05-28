@@ -41,11 +41,15 @@
 
 | Sprint | Feature | Dias | Status |
 |---|---|---|---|
-| Sprint 1 | **Notificações & Alertas em Tempo Real** | ~6 dias | 🔲 Pendente |
-| Sprint 2 | **Gestão de Devoluções & Trocas (RMA)** | ~4 dias | 🔲 Pendente |
-| Sprint 3 | **Programa de Fidelidade & Cashback** | ~5 dias | 🔲 Pendente |
+| Sprint 1 | **Notificações & Alertas em Tempo Real** | ~6 dias | ✅ Concluído |
+| Sprint 2 | **Gestão de Devoluções & Trocas (RMA)** | ~4 dias | ✅ Concluído |
+| Sprint 3 | **Programa de Fidelidade & Cashback** | ~5 dias | ⏳ Próxima Feature |
 | Sprint 4 | **Comissionamento Inteligente (% Fixa)** | ~4 dias | 🔲 Pendente |
 | Sprint 5-6 | **Cupons & Promoções Dinâmicas** | ~7 dias | 🔲 Pendente |
+| Sprint 7 | **Financeiro Completo & DRE** | ~5 dias | 🔲 Pendente |
+| Sprint 8 | **Inteligência Artificial (Gemini Flash)** | ~6 dias | 🔲 Pendente |
+| Sprint 9 | **Integração WhatsApp API** | ~4 dias | 🔲 Pendente |
+| Sprint 10 | **Billing & Assinaturas SaaS (Stripe/MP)** | ~5 dias | 🔲 Pendente |
 
 > [!NOTE]
 > Notificações são implementadas primeiro pois todos os outros módulos emitem triggers para ela. Isso evita retrofit posterior.
@@ -66,7 +70,7 @@
 
 # 📦 Módulo 1: Notificações & Alertas em Tempo Real
 
-> **Sprint 1 — Status: 🔲 Pendente**
+> **Sprint 1 — Status: ✅ Concluído**
 
 ## 🎯 Objetivo
 
@@ -368,7 +372,7 @@ src/app/features/notifications/
 
 # 📦 Módulo 2: Gestão de Devoluções & Trocas (RMA)
 
-> **Sprint 2 — Status: 🔲 Pendente** | *Depende de: Notificações (Sprint 1)*
+> **Sprint 2 — Status: ✅ Concluído** | *Depende de: Notificações (Sprint 1)*
 
 ## 🎯 Objetivo
 
@@ -587,7 +591,7 @@ src/app/features/returns/
 
 # 📦 Módulo 3: Programa de Fidelidade & Cashback
 
-> **Sprint 3 — Status: 🔲 Pendente** | *Depende de: Notificações (Sprint 1)*
+> **Sprint 3 — Status: ⏳ Próxima Feature** | *Depende de: Notificações (Sprint 1)*
 
 ## 🎯 Objetivo
 
@@ -1285,23 +1289,125 @@ src/app/features/promotions/
 ---
 ---
 
+# 📦 Módulo 6: Financeiro Completo & DRE Simplificada
+
+> **Sprint 7 — Status: 🔲 Pendente** | *Depende de: PDV e Vendas (Core)*
+
+## 🎯 Objetivo
+Implementar um controle completo de contas a pagar e contas a receber (para vendas em boleto ou crediário próprio) e gerar o relatório visual DRE (Demonstração do Resultado do Exercício) e fluxo de caixa simplificados.
+
+## 🧱 Backend (NestJS)
+### Novas Tabelas Prisma:
+```prisma
+enum AccountStatus {
+  PENDING
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+model FinancialAccount {
+  id          String        @id @default(uuid())
+  tenantId    String        @map("tenant_id")
+  type        String        // "PAYABLE" | "RECEIVABLE"
+  description String
+  amount      Decimal       @db.Decimal(10, 2)
+  dueDate     DateTime      @map("due_date")
+  paidAt      DateTime?     @map("paid_at")
+  status      AccountStatus @default(PENDING)
+  category    String        // "SUPPLIER" | "RENT" | "UTILITIES" | "SALARIES" | "TAXES" | "SALE"
+  saleId      String?       @map("sale_id") // Se for contas a receber de uma venda
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([status])
+  @@map("financial_accounts")
+}
+```
+
+### Use Cases:
+- `CreatePayable` / `CreateReceivable` — registro manual ou automático (ao gerar venda a prazo).
+- `PayAccount` / `ReceiveAccount` — quita a conta com data e forma de pagamento.
+- `GetCashFlow` — agrega entradas e saídas diárias/mensais.
+- `GetDRE` — calcula Receita Bruta, CMV (Custo de Mercadorias Vendidas baseado nos preços de custo de produtos), Despesas Operacionais e Lucro Líquido.
+
+---
+
+# 📦 Módulo 7: Cadastro Inteligente & IA Operacional (Gemini Flash)
+
+> **Sprint 8 — Status: 🔲 Pendente** | *Depende de: Cadastro de Produtos (Core)*
+
+## 🎯 Objetivo
+Integrar o Google Gemini 2.5 Flash para permitir que o lojista cadastre produtos tirando apenas uma foto da etiqueta/NF, e receba insights operacionais semanais em linguagem natural baseados nas vendas e no estoque.
+
+## 🧱 Backend (NestJS)
+### Serviços & Use Cases:
+- Instalar `@google/generative-ai`
+- `AnalyzeProductImage` — recebe buffer de imagem, chama Gemini estruturando retorno com JSON Schema (Name, Description, suggestedCategory, SKU sugerido, Margem sugerida).
+- `GenerateOperationalInsights` — job BullMQ que roda semanalmente, lê dados agregados do Tenant e gera insights textuais de demanda, inventário e metas.
+
+## 🎨 Frontend (Angular)
+- `ProductForm` com dropzone para foto e botão "Cadastrar por Foto (IA)". Ao clicar, auto-completa os campos para revisão.
+- Card "Insights da IA" no topo do Dashboard com carrossel dinâmico de previsões operacionais.
+
+---
+
+# 📦 Módulo 8: Integração WhatsApp API
+
+> **Sprint 9 — Status: 🔲 Pendente** | *Depende de: Notificações (Sprint 1)*
+
+## 🎯 Objetivo
+Automatizar a comunicação com o cliente enviando comprovantes em PDF, cupons de cashback, alertas de estoque crítico para gerentes e lembretes de cobrança automáticos via WhatsApp API.
+
+## 🧱 Backend (NestJS)
+### Serviços:
+- `WhatsAppService` — cliente genérico para disparar requisições REST para gateways integradores (Evolution API, Z-API ou Cloud API oficial).
+- `WhatsAppNotificationHandler` — intercepta triggers do `NotificationDispatcherService` e direciona alertas críticos direto para os números configurados de administradores ou clientes.
+
+---
+
+# 📦 Módulo 9: Billing & Monetização SaaS (Recorrência)
+
+> **Sprint 10 — Status: 🔲 Pendente** | *Depende de: Multi-Tenant (Core)*
+
+## 🎯 Objetivo
+Cobrar mensalidades dos Tenants via checkout recorrente integrado ao Stripe ou Mercado Pago, aplicando travas de recursos baseados no plano ativo (Starter, Pro, Business).
+
+## 🧱 Backend (NestJS)
+- `StripeWebhookController` — processa eventos de assinatura (paga, atrasada, cancelada).
+- `PlanEnforcerMiddleware` — intercepta requisições e bloqueia caso o tenant exceda cotas de usuários ou produtos do plano contratado.
+
+---
+---
+
 # 📊 Resumo Executivo
 
 ## Totais por Sprint
 
-| Sprint | Feature | Estimativa |
-|---|---|---|
-| Sprint 1 | Notificações & Alertas em Tempo Real | ~39h (~6 dias) |
-| Sprint 2 | Gestão de Devoluções & Trocas (RMA) | ~28h (~4 dias) |
-| Sprint 3 | Programa de Fidelidade & Cashback | ~36h (~5 dias) |
-| Sprint 4 | Comissionamento Inteligente (% Fixa) | ~29h (~4 dias) |
-| Sprint 5-6 | Cupons & Promoções Dinâmicas | ~51h (~7 dias) |
-| **TOTAL** | | **~183h (~26 dias úteis)** |
+| Sprint | Feature | Estimativa | Status |
+|---|---|---|---|
+| Sprint 1 | Notificações & Alertas em Tempo Real | ~39h (~6 dias) | ✅ Concluído |
+| Sprint 2 | Gestão de Devoluções & Trocas (RMA) | ~28h (~4 dias) | ✅ Concluído |
+| Sprint 3 | Programa de Fidelidade & Cashback | ~36h (~5 dias) | ⏳ Próxima Feature |
+| Sprint 4 | Comissionamento Inteligente (% Fixa) | ~29h (~4 dias) | 🔲 Pendente |
+| Sprint 5-6 | Cupons & Promoções Dinâmicas | ~51h (~7 dias) | 🔲 Pendente |
+| Sprint 7 | Financeiro Completo & DRE | ~36h (~5 dias) | 🔲 Pendente |
+| Sprint 8 | Inteligência Artificial (Gemini Flash) | ~40h (~6 dias) | 🔲 Pendente |
+| Sprint 9 | Integração WhatsApp API | ~24h (~3 dias) | 🔲 Pendente |
+| Sprint 10 | Billing & Assinaturas SaaS | ~36h (~5 dias) | 🔲 Pendente |
+| **TOTAL** | | **~319h (~45 dias úteis)** | |
 
 ## Progresso do Roadmap
 
-- Sprint 1 — Notificações: 🔲 Pendente
-- Sprint 2 — Devoluções: 🔲 Pendente
-- Sprint 3 — Fidelidade: 🔲 Pendente
+- Sprint 1 — Notificações: ✅ Concluído
+- Sprint 2 — Devoluções: ✅ Concluído
+- Sprint 3 — Fidelidade: ⏳ Próxima Feature
 - Sprint 4 — Comissões: 🔲 Pendente
 - Sprint 5-6 — Promoções: 🔲 Pendente
+- Sprint 7 — Financeiro: 🔲 Pendente
+- Sprint 8 — Inteligência Artificial: 🔲 Pendente
+- Sprint 9 — WhatsApp API: 🔲 Pendente
+- Sprint 10 — Billing SaaS: 🔲 Pendente

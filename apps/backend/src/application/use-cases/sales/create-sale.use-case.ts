@@ -49,7 +49,7 @@ export class CreateSaleUseCase implements UseCase<CreateSaleInput, SaleOutput> {
     private paymentRepository: PaymentRepository,
     private prisma: PrismaService,
     private eventPublisher: DomainEventPublisher,
-  ) { }
+  ) {}
 
   async execute(input: CreateSaleInput): Promise<SaleOutput> {
     const {

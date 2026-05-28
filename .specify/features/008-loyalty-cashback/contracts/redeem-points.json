@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RedeemPointsRequest",
+  "type": "object",
+  "properties": {
+    "customerId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "ID único do cliente portador dos pontos"
+    },
+    "pointsToRedeem": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Número de pontos a serem debitados"
+    },
+    "saleId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "ID da venda no PDV onde o desconto de cashback está sendo aplicado"
+    }
+  },
+  "required": ["customerId", "pointsToRedeem", "saleId"],
+  "additionalProperties": false
+}

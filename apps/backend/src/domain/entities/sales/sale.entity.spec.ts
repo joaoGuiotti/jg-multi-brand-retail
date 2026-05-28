@@ -107,17 +107,23 @@ describe('Sale Entity — complete()', () => {
 
   it('should throw if sale is already COMPLETED', () => {
     const sale = makeSale({ status: 'COMPLETED' });
-    expect(() => sale.complete(20, 'tenant-tst')).toThrow('Sale already completed');
+    expect(() => sale.complete(20, 'tenant-tst')).toThrow(
+      'Sale already completed',
+    );
   });
 
   it('should throw if sale is CANCELLED', () => {
     const sale = makeSale({ status: 'CANCELLED' });
-    expect(() => sale.complete(20, 'tenant-tst')).toThrow('Cannot complete a cancelled sale');
+    expect(() => sale.complete(20, 'tenant-tst')).toThrow(
+      'Cannot complete a cancelled sale',
+    );
   });
 
   it('should throw if totalPaid is less than sale total', () => {
     const sale = makeSale({ total: 100 });
-    expect(() => sale.complete(50, 'tenant-tst')).toThrow('Insufficient payments');
+    expect(() => sale.complete(50, 'tenant-tst')).toThrow(
+      'Insufficient payments',
+    );
   });
 
   it('should update updatedAt on completion', () => {

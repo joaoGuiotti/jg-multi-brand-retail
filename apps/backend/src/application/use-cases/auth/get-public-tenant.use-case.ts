@@ -20,11 +20,15 @@ export class GetPublicTenantUseCase implements UseCase<
     const tenant = await this.tenantRepository.findBySlug(input.slug);
 
     if (!tenant) {
-      this.logger.warn(`Tenant resolution failed: slug '${input.slug}' not found`);
+      this.logger.warn(
+        `Tenant resolution failed: slug '${input.slug}' not found`,
+      );
       throw new NotFoundException(`Tenant with slug '${input.slug}' not found`);
     }
 
-    this.logger.log(`Tenant resolved successfully: slug '${input.slug}' (active: ${tenant.active})`);
+    this.logger.log(
+      `Tenant resolved successfully: slug '${input.slug}' (active: ${tenant.active})`,
+    );
 
     const settings = tenant.settings || {};
     const theme = settings.theme || {};
@@ -37,7 +41,7 @@ export class GetPublicTenantUseCase implements UseCase<
       active: tenant.active,
       theme: {
         primaryColor: theme.primaryColor || '#3b82f6', // Default Blue-500
-        accentColor: theme.accentColor || '#1d4ed8',   // Default Blue-700
+        accentColor: theme.accentColor || '#1d4ed8', // Default Blue-700
       },
     };
   }

@@ -14,6 +14,7 @@ import { SalesModule } from './infrastructure/modules/sales.module';
 import { NotificationsModule } from './infrastructure/modules/notifications.module';
 import { DashboardModule } from './infrastructure/modules/dashboard.module';
 import { ReturnsModule } from './infrastructure/modules/returns.module';
+import { LoyaltyModule } from './infrastructure/modules/loyalty.module';
 
 const isDev = process.env.NODE_ENV !== 'production';
 
@@ -31,6 +32,7 @@ const isDev = process.env.NODE_ENV !== 'production';
     NotificationsModule,
     DashboardModule,
     ReturnsModule,
+    LoyaltyModule,
     ...(isDev ? [DevModule] : []),
   ],
   controllers: [],

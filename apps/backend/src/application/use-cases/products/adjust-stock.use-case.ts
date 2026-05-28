@@ -14,7 +14,7 @@ export type AdjustStockInput = {
 export class AdjustStockUseCase implements UseCase<AdjustStockInput, Product> {
   constructor(
     private productRepository: ProductRepository,
-    private eventPublisher: DomainEventPublisher
+    private eventPublisher: DomainEventPublisher,
   ) {}
 
   async execute(input: AdjustStockInput): Promise<Product> {
@@ -30,7 +30,7 @@ export class AdjustStockUseCase implements UseCase<AdjustStockInput, Product> {
 
     const updated = await this.productRepository.update(tenantId, product);
     await this.eventPublisher.publishEvents(product);
-    
+
     return updated;
   }
 }

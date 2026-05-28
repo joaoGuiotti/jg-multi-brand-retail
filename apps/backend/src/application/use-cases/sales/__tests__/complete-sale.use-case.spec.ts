@@ -33,11 +33,7 @@ describe('CompleteSaleUseCase', () => {
     saleRepository = { findById: jest.fn(), update: jest.fn() };
     prisma = { payment: { findMany: jest.fn() } };
     eventPublisher = { publishEvents: jest.fn() };
-    useCase = new CompleteSaleUseCase(
-      saleRepository,
-      prisma,
-      eventPublisher,
-    );
+    useCase = new CompleteSaleUseCase(saleRepository, prisma, eventPublisher);
   });
 
   it('should throw NotFoundException if sale not found', async () => {

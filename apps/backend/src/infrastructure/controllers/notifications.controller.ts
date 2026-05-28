@@ -9,8 +9,18 @@ import {
   Headers,
   Inject,
   UseGuards,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiHeader,
+} from '@nestjs/swagger';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { AuthenticatedUser } from '../decorators/authenticated-user.interface';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
@@ -26,9 +36,14 @@ import type { INotificationsRepository } from '../../domain/repositories/notific
 import { CreateNotificationUseCase } from '../../application/use-cases/notifications/create-notification.use-case';
 import { CreateNotificationDto } from '../dtos/notifications/create-notification.dto';
 import { NotificationCollectionPresenter } from '../presenters/notification.presenter';
+import {
+  NotFoundResponseDto,
+  UnauthorizedResponseDto,
+  ValidationErrorResponseDto,
+} from '../dtos/common/api-responses.dto';
 
 @ApiTags('notifications')
-@ApiBearerAuth()
+@ApiBearerAuth('JWT')
 @Controller('api/v1/notifications')
 export class NotificationsController {
   constructor(
@@ -44,6 +59,42 @@ export class NotificationsController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Listar notificações do usuário',
+    description:
+      'Retorna a lista paginada de notificações do usuário autenticado com suporte a filtros por status de leitura e tipo.',
+    operationId: 'notifications_findAll',
+  })
+  @ApiQuery({
+    name: 'unreadOnly',
+    required: false,
+    description: 'Se `true`, retorna apenas as notificações não lidas',
+    type: Boolean,
+    example: false,
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'Número da página (padrão: 1)',
+    type: Number,
+    example: 1,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'Itens por página (padrão: 20)',
+    type: Number,
+    example: 20,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de notificações retornada com sucesso',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Token JWT ausente ou inválido',
+    type: UnauthorizedResponseDto,
+  })
   async findAll(
     @CurrentUser() user: AuthenticatedUser,
     @Query() filters: NotificationFiltersDto,
@@ -58,12 +109,47 @@ export class NotificationsController {
 
   @Get('preferences')
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Obter preferências de notificação',
+    description:
+      'Retorna as preferências de notificação do usuário: quais tipos de eventos geram notificações e por quais canais (in-app, e-mail, etc.).',
+    operationId: 'notifications_getPreferences',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Preferências de notificação retornadas com sucesso',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Token JWT ausente ou inválido',
+    type: UnauthorizedResponseDto,
+  })
   async getPreferences(@CurrentUser() user: AuthenticatedUser) {
     return this.getUserPreferencesUseCase.execute(user.tenantId, user.id);
   }
 
   @Patch('preferences')
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Atualizar preferências de notificação',
+    description:
+      'Atualiza as preferências de notificação do usuário para um tipo específico de evento.',
+    operationId: 'notifications_updatePreference',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Preferência atualizada com sucesso',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Token JWT ausente ou inválido',
+    type: UnauthorizedResponseDto,
+  })
+  @ApiResponse({
+    status: 422,
+    description: 'Dados inválidos',
+    type: ValidationErrorResponseDto,
+  })
   async updatePreference(
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: UpdatePreferenceDto,
@@ -73,6 +159,24 @@ export class NotificationsController {
 
   @Get('unread-count')
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Contar notificações não lidas',
+    description:
+      'Retorna a quantidade de notificações não lidas do usuário autenticado. Ideal para exibir o badge no sino de notificações.',
+    operationId: 'notifications_getUnreadCount',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Contagem retornada com sucesso',
+    schema: {
+      example: { count: 7 },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Token JWT ausente ou inválido',
+    type: UnauthorizedResponseDto,
+  })
   async getUnreadCount(@CurrentUser() user: AuthenticatedUser) {
     const count = await this.notificationsRepository.getUnreadCount(
       user.tenantId,
@@ -83,6 +187,31 @@ export class NotificationsController {
 
   @Patch(':id/read')
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Marcar notificação como lida',
+    description: 'Marca uma notificação específica como lida pelo usuário autenticado.',
+    operationId: 'notifications_markAsRead',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'UUID da notificação',
+    format: 'uuid',
+    example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Notificação marcada como lida com sucesso',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Token JWT ausente ou inválido',
+    type: UnauthorizedResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Notificação não encontrada',
+    type: NotFoundResponseDto,
+  })
   async markAsRead(
     @CurrentUser() user: AuthenticatedUser,
     @Param('id') id: string,
@@ -92,6 +221,24 @@ export class NotificationsController {
 
   @Patch('read-all')
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Marcar todas as notificações como lidas',
+    description:
+      'Marca todas as notificações não lidas do usuário autenticado como lidas de uma só vez.',
+    operationId: 'notifications_markAllAsRead',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Notificações marcadas como lidas com sucesso',
+    schema: {
+      example: { count: 12 },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Token JWT ausente ou inválido',
+    type: UnauthorizedResponseDto,
+  })
   async markAllAsRead(@CurrentUser() user: AuthenticatedUser) {
     const count = await this.markAllAsReadUseCase.execute(
       user.tenantId,
@@ -101,6 +248,31 @@ export class NotificationsController {
   }
 
   @Post('test-dispatch')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: '[Interno] Disparar notificação de teste',
+    description:
+      '**Endpoint interno** para simular o disparo de uma notificação via Use Case. Não deve ser exposto em produção. Requer o header `x-tenant-id` em vez de JWT.',
+    operationId: 'notifications_testDispatch',
+  })
+  @ApiHeader({
+    name: 'x-tenant-id',
+    description: 'UUID do Tenant para o qual a notificação será disparada',
+    required: true,
+    example: 'd3b07384-d113-4956-a5cc-e435987114e9',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Notificação disparada com sucesso',
+    schema: {
+      example: { success: true },
+    },
+  })
+  @ApiResponse({
+    status: 422,
+    description: 'Dados inválidos',
+    type: ValidationErrorResponseDto,
+  })
   async testDispatch(
     @Headers('x-tenant-id') tenantId: string,
     @Body() dto: CreateNotificationDto,

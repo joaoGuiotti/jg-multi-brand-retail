@@ -1,5 +1,5 @@
-import { NotificationsController } from './notifications.controller';
-import { AuthenticatedUser } from '../decorators/authenticated-user.interface';
+import { NotificationsController } from '../notifications.controller';
+import { AuthenticatedUser } from '../../decorators/authenticated-user.interface';
 
 describe('NotificationsController', () => {
   let controller: NotificationsController;

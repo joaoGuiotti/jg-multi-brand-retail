@@ -12,7 +12,7 @@ import { PdfService } from '../services/pdf';
  * Dev-only controller to test PDF generation.
  * Registered only when NODE_ENV !== 'production'.
  */
-@ApiTags('🧪 dev — PDF')
+@ApiTags('🧪 Dev — PDF')
 @Controller('dev/pdf')
 export class PdfDevController {
   constructor(private pdfService: PdfService) {}

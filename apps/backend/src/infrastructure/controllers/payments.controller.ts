@@ -20,7 +20,14 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { Role } from '@prisma/client';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { Roles } from '../decorators/roles.decorator';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
@@ -29,14 +36,15 @@ import {
   PaymentCollectionPresenter,
   PaymentPresenter,
 } from '../presenters/payment.presenter';
-
-enum Role {
-  SUPER_ADMIN = 'SUPER_ADMIN',
-  ADMIN = 'ADMIN',
-  USER = 'USER',
-}
+import {
+  ForbiddenResponseDto,
+  NotFoundResponseDto,
+  UnauthorizedResponseDto,
+  ValidationErrorResponseDto,
+} from '../dtos/common/api-responses.dto';
 
 @ApiTags('payments')
+@ApiBearerAuth('JWT')
 @Controller('payments')
 @UseGuards(JwtAuthGuard)
 export class PaymentsController {
@@ -54,6 +62,36 @@ export class PaymentsController {
   @Post()
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.USER)
+  @ApiOperation({
+    summary: 'Registrar pagamento',
+    description:
+      'Registra um pagamento para uma venda. Múltiplos pagamentos podem ser associados à mesma venda (ex: cartão + dinheiro). O método de pagamento é definido pelo campo `method`.',
+    operationId: 'payments_create',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Pagamento registrado com sucesso',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Token JWT ausente ou inválido',
+    type: UnauthorizedResponseDto,
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Perfil sem permissão',
+    type: ForbiddenResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Venda não encontrada',
+    type: NotFoundResponseDto,
+  })
+  @ApiResponse({
+    status: 422,
+    description: 'Dados inválidos ou venda já finalizada',
+    type: ValidationErrorResponseDto,
+  })
   async create(@CurrentUser() user: any, @Body() dto: CreatePaymentDto) {
     const output = await this.createPaymentUseCase.execute({
       tenantId: user.tenantId,
@@ -63,6 +101,21 @@ export class PaymentsController {
   }
 
   @Get()
+  @ApiOperation({
+    summary: 'Listar pagamentos',
+    description:
+      'Retorna a lista paginada de pagamentos do Tenant com suporte a filtros por método, status e período.',
+    operationId: 'payments_findAll',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de pagamentos retornada com sucesso',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Token JWT ausente ou inválido',
+    type: UnauthorizedResponseDto,
+  })
   async findAll(@CurrentUser() user: any, @Query() query: QueryPaymentDto) {
     const output = await this.listPaymentsUseCase.execute({
       tenantId: user.tenantId,
@@ -72,6 +125,32 @@ export class PaymentsController {
   }
 
   @Get('sale/:saleId')
+  @ApiOperation({
+    summary: 'Buscar pagamentos de uma venda',
+    description:
+      'Retorna todos os pagamentos vinculados a uma venda específica.',
+    operationId: 'payments_findBySale',
+  })
+  @ApiParam({
+    name: 'saleId',
+    description: 'UUID da venda',
+    format: 'uuid',
+    example: 'e5f5f190-b184-48de-8ef7-111166669999',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Pagamentos da venda retornados com sucesso',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Token JWT ausente ou inválido',
+    type: UnauthorizedResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Venda não encontrada',
+    type: NotFoundResponseDto,
+  })
   async findBySale(@CurrentUser() user: any, @Param('saleId') saleId: string) {
     const output = await this.getSalePaymentsUseCase.execute({
       tenantId: user.tenantId,
@@ -81,6 +160,31 @@ export class PaymentsController {
   }
 
   @Get(':id')
+  @ApiOperation({
+    summary: 'Buscar pagamento por ID',
+    description: 'Retorna os detalhes de um pagamento específico.',
+    operationId: 'payments_findOne',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'UUID do pagamento',
+    format: 'uuid',
+    example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Pagamento encontrado com sucesso',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Token JWT ausente ou inválido',
+    type: UnauthorizedResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Pagamento não encontrado',
+    type: NotFoundResponseDto,
+  })
   async findOne(@CurrentUser() user: any, @Param('id') id: string) {
     const output = await this.getPaymentUseCase.execute({
       tenantId: user.tenantId,
@@ -93,6 +197,42 @@ export class PaymentsController {
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Cancelar pagamento',
+    description:
+      'Cancela um pagamento pendente. Pagamentos confirmados não podem ser cancelados diretamente — use o fluxo de devolução.',
+    operationId: 'payments_cancel',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'UUID do pagamento a ser cancelado',
+    format: 'uuid',
+    example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Pagamento cancelado com sucesso',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Token JWT ausente ou inválido',
+    type: UnauthorizedResponseDto,
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Apenas perfil ADMIN pode cancelar pagamentos',
+    type: ForbiddenResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Pagamento não encontrado',
+    type: NotFoundResponseDto,
+  })
+  @ApiResponse({
+    status: 422,
+    description: 'Pagamento não pode ser cancelado no status atual',
+    type: ValidationErrorResponseDto,
+  })
   async cancel(@CurrentUser() user: any, @Param('id') id: string) {
     const output = await this.cancelPaymentUseCase.execute({
       tenantId: user.tenantId,

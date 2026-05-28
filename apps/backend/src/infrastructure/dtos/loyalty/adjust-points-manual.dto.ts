@@ -5,14 +5,17 @@ export class AdjustPointsManualDto {
   @ApiProperty({
     description: 'ID único do cliente cujos pontos serão ajustados',
     example: 'd3b07384-d113-4956-a5cc-e435987114e9',
+    type: String,
+    format: 'uuid',
   })
   @IsUUID()
   customerId: string;
 
   @ApiProperty({
     description:
-      'Pontos movimentados (positivo para crédito administrativo, negativo para débito)',
+      'Pontos movimentados (positivo para crédito administrativo, negativo para débito). Não pode ser zero.',
     example: 100,
+    type: Number,
   })
   @IsInt()
   @NotEquals(0, {
@@ -22,8 +25,10 @@ export class AdjustPointsManualDto {
 
   @ApiProperty({
     description:
-      'Justificativa obrigatória da operação administrativa para fins de auditoria',
+      'Justificativa obrigatória da operação administrativa para fins de auditoria (mínimo 10 caracteres)',
     example: 'Cliente esqueceu de se identificar na compra anterior',
+    type: String,
+    minLength: 10,
   })
   @IsString()
   @MinLength(10, {

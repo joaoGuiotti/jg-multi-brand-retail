@@ -5,6 +5,8 @@ export class ConfigureLoyaltyProgramDto {
   @ApiProperty({
     description: 'Fator de pontos obtidos por cada 1 Real líquido gasto',
     example: 1.0,
+    type: Number,
+    minimum: 0.01,
   })
   @IsNumber({ maxDecimalPlaces: 2 })
   @IsPositive()
@@ -14,6 +16,8 @@ export class ConfigureLoyaltyProgramDto {
   @ApiProperty({
     description: 'Valor monetário em Reais de desconto equivalente a 1 Ponto',
     example: 0.01,
+    type: Number,
+    minimum: 0.0001,
   })
   @IsNumber({ maxDecimalPlaces: 4 })
   @IsPositive()
@@ -24,6 +28,8 @@ export class ConfigureLoyaltyProgramDto {
     description:
       'Mínimo de pontos acumulados exigido para o cliente poder resgatar no PDV',
     example: 100,
+    type: Number,
+    minimum: 1,
   })
   @IsInt()
   @IsPositive()
@@ -34,6 +40,9 @@ export class ConfigureLoyaltyProgramDto {
     description:
       'Porcentagem limite máxima de desconto por fidelidade sobre a venda',
     example: 50.0,
+    type: Number,
+    minimum: 0.1,
+    maximum: 100.0,
   })
   @IsNumber({ maxDecimalPlaces: 2 })
   @IsPositive()
@@ -44,6 +53,7 @@ export class ConfigureLoyaltyProgramDto {
   @ApiProperty({
     description: 'Indica se o programa de fidelidade está ativo',
     example: true,
+    type: Boolean,
   })
   @IsBoolean()
   active: boolean;

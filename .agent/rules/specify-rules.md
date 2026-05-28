@@ -1,6 +1,6 @@
 # antigravity-test-app-01 Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2026-05-27
+Auto-generated from all feature plans. Last updated: 2026-05-28
 
 ## Active Technologies
 

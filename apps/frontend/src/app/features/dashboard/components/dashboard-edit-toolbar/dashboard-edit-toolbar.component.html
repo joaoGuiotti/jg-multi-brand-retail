@@ -1,0 +1,46 @@
+<div class="edit-toolbar bg-primary text-primary-content px-4 py-3 rounded-lg shadow-md flex items-center justify-between mb-6 animate-fade-in">
+  <div class="flex items-center gap-3">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+    </svg>
+    <span class="font-medium text-lg">Modo de Edição</span>
+    <span class="text-primary-content/80 text-sm hidden sm:inline ml-2">Arraste os itens para reorganizar seu dashboard.</span>
+  </div>
+
+  <div class="flex items-center gap-2">
+    <!-- Reset Section -->
+    @if (showResetConfirm()) {
+      <div class="flex items-center gap-2 mr-2 animate-fade-in">
+        <span class="text-sm font-medium">Restaurar padrão?</span>
+        <ui-button size="sm" variant="danger" (clicked)="onResetConfirmed()">Sim</ui-button>
+        <ui-button size="sm" variant="ghost" (clicked)="onResetCancelled()">Não</ui-button>
+      </div>
+    } @else {
+      <ui-button 
+        size="sm" 
+        variant="ghost" 
+        class="hidden md:inline-flex"
+        title="Restaurar layout padrão"
+        (clicked)="onResetInitiated()">
+        Restaurar Padrão
+      </ui-button>
+    }
+
+    <!-- Actions -->
+    <ui-button 
+      size="sm" 
+      variant="ghost" 
+      [disabled]="isSaving" 
+      (clicked)="onCancel()">
+      Cancelar
+    </ui-button>
+    
+    <ui-button 
+      size="sm" 
+      variant="secondary"
+      [loading]="isSaving" 
+      (clicked)="onSave()">
+      Salvar Layout
+    </ui-button>
+  </div>
+</div>

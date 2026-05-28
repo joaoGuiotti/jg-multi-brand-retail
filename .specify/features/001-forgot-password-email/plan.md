@@ -1,7 +1,7 @@
 # Implementation Plan: Forgot Password — Email Recovery
 
 **Branch**: `001-forgot-password-email` | **Date**: 2026-04-06 | **Spec**: [spec.md](./spec.md)
-**Input**: Feature specification from `/specs/001-forgot-password-email/spec.md`
+**Input**: Feature specification from `.specify/feature/001-forgot-password-email/spec.md`
 
 ---
 

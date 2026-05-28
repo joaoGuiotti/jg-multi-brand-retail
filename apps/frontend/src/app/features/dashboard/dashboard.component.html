@@ -3,7 +3,7 @@
     <!-- Header -->
     <ui-page-header title="Dashboard" subtitle="Visão geral das operações em tempo real.">
         <ng-template #actions>
-          <div class="text-sm font-medium" aria-live="polite">
+          <div class="text-sm font-medium flex items-center gap-4" aria-live="polite">
             @if (isLoading()) {
               <span class="text-content-secondary animate-pulse">Carregando...</span>
             } @else {
@@ -37,33 +37,76 @@
                 }
               }
             }
+            
+            @if (!isEditMode()) {
+              <ui-button (clicked)="enterEditMode()" variant="ghost" size="sm" class="hidden lg:inline-flex text-content-secondary hover:text-primary font-normal" title="Personalizar layout">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                </svg>
+                Personalizar
+              </ui-button>
+            }
           </div>
         </ng-template>
     </ui-page-header>
 
-    <!-- Quick Actions (Moved to TOP) -->
-    <app-quick-actions
-        (action)="navigateTo($event === 'pos' ? '/pos' : $event === 'products' ? '/products/new' : $event === 'inventory' ? '/inventory' : '/sales')">
-    </app-quick-actions>
+    @if (isEditMode()) {
+      <app-dashboard-edit-toolbar 
+        [isSaving]="isSaving()" 
+        (save)="saveLayout()" 
+        (cancel)="cancelEditMode()"
+        (reset)="resetLayout()">
+      </app-dashboard-edit-toolbar>
+    }
 
-    <!-- KPI Cards -->
-    <app-kpi-cards [revenueToday]="revenueToday()" [salesToday]="salesToday()" [totalProducts]="totalProducts()"
-        [lowStock]="lowStock()" [outOfStock]="outOfStock()">
-    </app-kpi-cards>
+    <div 
+      cdkDropList 
+      [cdkDropListDisabled]="!isEditMode()"
+      (cdkDropListDropped)="onDrop($event)"
+      class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full"
+      aria-label="Lista de widgets do dashboard"
+      [attr.aria-label]="isEditMode() ? 'Lista de widgets do dashboard — modo de edição ativo' : 'Lista de widgets do dashboard'">
+      
+      @for (widgetId of widgetOrder(); track widgetId) {
+        <div 
+          cdkDrag 
+          [class.is-editing]="isEditMode()" 
+          [class.lg:col-span-2]="widgetId === 'quick-actions' || widgetId === 'kpi-cards' || widgetId === 'revenue-chart'"
+          class="widget-container bg-base-100 rounded-xl"
+          [attr.aria-grabbed]="isEditMode() ? 'false' : null">
+          
+          @if (isEditMode()) {
+            <div cdkDragHandle class="drag-handle cursor-grab active:cursor-grabbing p-2 text-base-content/30 hover:text-base-content/60 flex justify-center w-full" aria-label="Arrastar widget">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
+              </svg>
+            </div>
+          }
 
-    <!-- Revenue Chart -->
-    <app-revenue-chart [chartOptions]="chartOptions()">
-    </app-revenue-chart>
-
-    <!-- Main Content Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <!-- Recent Sales -->
-        <app-recent-sales [recentSales]="recentSales()" (viewAll)="navigateTo('/sales')">
-        </app-recent-sales>
-
-        <!-- Recent Inventory Movements -->
-        <app-inventory-movements [recentMovements]="recentMovements()" (viewAll)="navigateTo('/inventory')">
-        </app-inventory-movements>
+          <div class="widget-content" [class.pointer-events-none]="isEditMode()">
+            @switch (widgetId) {
+              @case ('quick-actions') {
+                <app-quick-actions
+                    (action)="navigateTo($event === 'pos' ? '/pos' : $event === 'products' ? '/products/new' : $event === 'inventory' ? '/inventory' : '/sales')">
+                </app-quick-actions>
+              }
+              @case ('kpi-cards') {
+                <app-kpi-cards [revenueToday]="revenueToday()" [salesToday]="salesToday()" [totalProducts]="totalProducts()"
+                    [lowStock]="lowStock()" [outOfStock]="outOfStock()">
+                </app-kpi-cards>
+              }
+              @case ('revenue-chart') {
+                <app-revenue-chart [chartOptions]="chartOptions()"></app-revenue-chart>
+              }
+              @case ('recent-sales') {
+                <app-recent-sales [recentSales]="recentSales()" (viewAll)="navigateTo('/sales')"></app-recent-sales>
+              }
+              @case ('inventory-movements') {
+                <app-inventory-movements [recentMovements]="recentMovements()" (viewAll)="navigateTo('/inventory')"></app-inventory-movements>
+              }
+            }
+          </div>
+        </div>
+      }
     </div>
-
 </div>

@@ -15,6 +15,7 @@ import {
   RegisterDto,
   ResetPasswordDto,
 } from '@infrastructure/dtos/auth';
+import { GetPublicTenantUseCase } from '@application/use-cases/auth/get-public-tenant.use-case';
 import { RolesGuard } from '@infrastructure/guards/roles.guard';
 import {
   Body,
@@ -22,6 +23,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -46,7 +48,13 @@ export class AuthController {
     private readonly listUsersUseCase: ListUsersUseCase,
     private readonly forgotPasswordUseCase: ForgotPasswordUseCase,
     private readonly resetPasswordUseCase: ResetPasswordUseCase,
+    private readonly getPublicTenantUseCase: GetPublicTenantUseCase,
   ) {}
+
+  @Get('tenants/by-slug/:slug')
+  async getPublicTenant(@Param('slug') slug: string) {
+    return this.getPublicTenantUseCase.execute({ slug });
+  }
 
   @Post('register')
   async register(@Body() dto: RegisterDto) {

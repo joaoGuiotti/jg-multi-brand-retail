@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { LoginRequest, LoginResponse, RegisterRequest, User } from '../models/auth.model';
+import { LoginRequest, LoginResponse, RegisterRequest, User, PublicTenant } from '../models/auth.model';
 import { IResponse } from '../models/response-base';
 import { JwtHelperService } from '@auth0/angular-jwt';
 
@@ -50,6 +50,10 @@ export class AuthService {
 
     createUser(data: Partial<User> & { password?: string }): Observable<IResponse<User>> {
         return this.http.post<IResponse<User>>(`${this.API_URL}/auth/users`, data);
+    }
+
+    getPublicTenant(slug: string): Observable<IResponse<PublicTenant>> {
+        return this.http.get<IResponse<PublicTenant>>(`${this.API_URL}/auth/tenants/by-slug/${slug}`);
     }
 
     forgotPassword(email: string): Observable<{ message: string }> {

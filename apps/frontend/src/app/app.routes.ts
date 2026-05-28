@@ -54,6 +54,7 @@ export const routes: Routes = [
             { path: 'users/new', loadComponent: () => import('./features/users/pages/user-form/user-form.component').then(m => m.UserFormComponent) },
             { path: 'returns', loadComponent: () => import('./features/returns/pages/return-list/return-list.component').then(m => m.ReturnListComponent) },
             { path: 'returns/new', loadComponent: () => import('./features/returns/pages/return-form/return-form.component').then(m => m.ReturnFormComponent) },
+            { path: 'loyalty/config', loadComponent: () => import('./features/loyalty/pages/loyalty-config/loyalty-config.component').then(m => m.LoyaltyConfigComponent) },
         ],
     },
     { path: 'access-denied', loadComponent: () => import('./features/errors/pages/access-denied/access-denied.component').then(m => m.AccessDeniedComponent) },

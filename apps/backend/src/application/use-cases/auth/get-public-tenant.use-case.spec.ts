@@ -16,9 +16,9 @@ describe('GetPublicTenantUseCase', () => {
 
   it('should throw NotFoundException if tenant not found by slug', async () => {
     tenantRepository.findBySlug.mockResolvedValue(null);
-    await expect(
-      useCase.execute({ slug: 'invalid-slug' }),
-    ).rejects.toThrow(NotFoundException);
+    await expect(useCase.execute({ slug: 'invalid-slug' })).rejects.toThrow(
+      NotFoundException,
+    );
   });
 
   it('should return public details of tenant with custom colors from settings', async () => {

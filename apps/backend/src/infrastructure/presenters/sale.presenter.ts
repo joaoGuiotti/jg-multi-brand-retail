@@ -102,7 +102,9 @@ export class SalePresenter {
     this.status = output.status;
     this.items = output.items.map((i) => new SaleItemPresenter(i));
     this.payments = (output.payments || []).map((p) => new PaymentPresenter(p));
-    this.returns = (output.returns || []).map((r) => new ReturnSummaryPresenter(r));
+    this.returns = (output.returns || []).map(
+      (r) => new ReturnSummaryPresenter(r),
+    );
     this.createdAt = output.createdAt;
     this.updatedAt = output.updatedAt;
   }

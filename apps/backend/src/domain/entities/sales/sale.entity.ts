@@ -143,7 +143,7 @@ export class Sale extends AggregateRoot<SaleProps> {
     }
     this.props.status = 'COMPLETED';
     this.props.updatedAt = new Date();
-    
+
     this.applyEvent(new SaleCompletedEvent(this, tenantId));
   }
 

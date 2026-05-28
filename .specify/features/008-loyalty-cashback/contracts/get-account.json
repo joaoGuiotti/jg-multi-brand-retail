@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GetLoyaltyAccountResponse",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "customerId": { "type": "string", "format": "uuid" },
+    "balance": { "type": "integer", "minimum": 0, "description": "Saldo atual de pontos utilizáveis do cliente" },
+    "totalEarned": { "type": "integer", "minimum": 0, "description": "Acumulado histórico total de pontos ganhos pelo cliente" },
+    "totalRedeemed": { "type": "integer", "minimum": 0, "description": "Acumulado histórico total de pontos gastos pelo cliente" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "transactions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "type": { "type": "string", "enum": ["EARN", "REDEEM", "ADJUST"] },
+          "points": { "type": "integer", "description": "Pontos movimentados (positivo para ganho/ajuste, negativo para débito)" },
+          "saleId": { "type": ["string", "null"], "format": "uuid" },
+          "reason": { "type": ["string", "null"] },
+          "createdAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "type", "points", "saleId", "reason", "createdAt"]
+      }
+    }
+  },
+  "required": ["id", "customerId", "balance", "totalEarned", "totalRedeemed", "createdAt", "transactions"],
+  "additionalProperties": false
+}

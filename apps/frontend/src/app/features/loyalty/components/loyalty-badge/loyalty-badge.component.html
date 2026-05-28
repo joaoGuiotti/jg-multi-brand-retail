@@ -1,0 +1,46 @@
+@if (store.account() && store.isProgramActive()) {
+  <div class="flex items-center gap-3 p-3 bg-gradient-to-r from-amber-500/10 to-yellow-500/5 border border-amber-500/20 rounded-xl animate-fade-in shadow-sm">
+    <!-- Star Icon with pulsing ambient background -->
+    <div class="relative flex-shrink-0 flex items-center justify-center h-9 w-9 rounded-full bg-amber-500/20 text-amber-500">
+      <span class="absolute inline-flex h-full w-full rounded-full bg-amber-500/10 animate-ping opacity-75"></span>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+        <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" />
+      </svg>
+    </div>
+
+    <!-- Info Column -->
+    <div class="flex-grow min-w-0">
+      <span class="block text-xs font-bold text-amber-600 dark:text-amber-400 tracking-wide uppercase">
+        Fidelidade Retail OS
+      </span>
+      <div class="flex items-baseline gap-1.5 mt-0.5">
+        <span class="text-base font-extrabold text-content-primary">
+          {{ store.currentBalance() | number:'1.0-0' }} pts
+        </span>
+        <span class="text-xs text-content-tertiary">
+          (R$ {{ (store.currentBalance() * (store.config()?.redeemRatio || 0)) | number:'1.2-2' }})
+        </span>
+      </div>
+    </div>
+
+    <!-- Redeem Button -->
+    <div class="flex-shrink-0">
+      @if (store.canRedeem()) {
+        <ui-button 
+          variant="warning" 
+          size="sm"
+          (click)="onRedeem()"
+        >
+          Resgatar
+        </ui-button>
+      } @else {
+        <div 
+          class="px-2.5 py-1.5 rounded-lg bg-content-tertiary/10 text-content-tertiary border border-outline/30 text-[10px] font-semibold text-center leading-tight max-w-[100px]"
+          title="Saldo inferior ao resgate mínimo de {{ store.config()?.minRedeemPoints }} pontos."
+        >
+          Mín. {{ store.config()?.minRedeemPoints }} pts
+        </div>
+      }
+    </div>
+  </div>
+}

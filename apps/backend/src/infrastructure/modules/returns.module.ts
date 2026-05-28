@@ -13,9 +13,10 @@ import { PrismaSaleRepository } from '../persistence/repositories/prisma-sale.re
 import { UserRepository } from '../../domain/repositories/user-repository';
 import { PrismaUserRepository } from '../persistence/repositories/prisma-user.repository';
 import { NotificationsModule } from './notifications.module';
+import { LoyaltyModule } from './loyalty.module';
 
 @Module({
-  imports: [PrismaModule, NotificationsModule],
+  imports: [PrismaModule, NotificationsModule, LoyaltyModule],
   controllers: [ReturnsController],
   providers: [
     {

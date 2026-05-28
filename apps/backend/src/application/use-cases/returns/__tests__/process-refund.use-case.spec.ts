@@ -5,9 +5,13 @@ import { ProcessRefundUseCase } from '../process-refund.use-case';
 
 // ─── Factories ────────────────────────────────────────────────────────────────
 
-const makeSale = (status: any = 'RETURN_REQUESTED') =>
+const makeSale = (
+  status: any = 'RETURN_REQUESTED',
+  customerId: string | null = null,
+) =>
   Sale.create({
     userId: 'user-1',
+    customerId,
     subtotal: 100,
     discount: 0,
     total: 100,
@@ -67,12 +71,22 @@ const makeNotification = () => ({
   execute: jest.fn().mockResolvedValue(undefined),
 });
 
+const makeEarnPointsUseCase = () => ({
+  reversePoints: jest.fn().mockResolvedValue(undefined),
+});
+
 const makeUseCase = (order: any, sale: any = null) => {
   const returnsRepo = makeReturnsRepo(order);
   const saleRepo = makeSaleRepo(sale);
   const notification = makeNotification();
-  const useCase = new ProcessRefundUseCase(returnsRepo, saleRepo, notification as any);
-  return { useCase, returnsRepo, saleRepo, notification };
+  const earnPointsUseCase = makeEarnPointsUseCase();
+  const useCase = new ProcessRefundUseCase(
+    returnsRepo,
+    saleRepo,
+    notification as any,
+    earnPointsUseCase as any,
+  );
+  return { useCase, returnsRepo, saleRepo, notification, earnPointsUseCase };
 };
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
@@ -173,6 +187,30 @@ describe('ProcessRefundUseCase', () => {
 
       expect(result.processedAt).toBeDefined();
       expect(result.processedAt).not.toBeNull();
+    });
+
+    it('should trigger points reversal if the sale has an identified customer', async () => {
+      const order = makeReturnOrder('APPROVED');
+      const sale = makeSale('RETURN_REQUESTED', 'customer-123');
+      const { useCase, earnPointsUseCase } = makeUseCase(order, sale);
+
+      await useCase.execute('tenant-1', 'return-1');
+
+      expect(earnPointsUseCase.reversePoints).toHaveBeenCalledWith(
+        'tenant-1',
+        'customer-123',
+        sale.id.toString(),
+      );
+    });
+
+    it('should not trigger points reversal if the sale has no customer', async () => {
+      const order = makeReturnOrder('APPROVED');
+      const sale = makeSale('RETURN_REQUESTED', null);
+      const { useCase, earnPointsUseCase } = makeUseCase(order, sale);
+
+      await useCase.execute('tenant-1', 'return-1');
+
+      expect(earnPointsUseCase.reversePoints).not.toHaveBeenCalled();
     });
   });
 });

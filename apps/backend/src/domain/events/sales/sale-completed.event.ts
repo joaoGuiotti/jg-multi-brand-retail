@@ -9,7 +9,7 @@ export class SaleCompletedEvent implements IDomainEvent {
 
   constructor(
     public readonly sale: Sale,
-    public readonly tenantId: string
+    public readonly tenantId: string,
   ) {
     this.id = new UniqueEntityID();
     this.occurredAt = new Date();

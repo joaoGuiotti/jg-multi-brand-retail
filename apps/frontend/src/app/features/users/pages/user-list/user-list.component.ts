@@ -11,7 +11,8 @@ import {
   UiCardComponent, 
   UiTableColumnDirective, 
   UiTableComponent,
-  UiTooltipDirective
+  UiTooltipDirective,
+  UiPageHeaderComponent
 } from '@shared/ui';
 
 @Component({
@@ -25,7 +26,8 @@ import {
     UiBadgeComponent, 
     UiTableComponent, 
     UiTableColumnDirective,
-    UiTooltipDirective
+    UiTooltipDirective,
+    UiPageHeaderComponent
   ],
   templateUrl: './user-list.component.html',
   styleUrl: './user-list.component.scss'

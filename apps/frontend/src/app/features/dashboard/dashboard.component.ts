@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, effect, inject, signal, untracked } from '@angular/core';
 import { Router } from '@angular/router';
-import { ThemeService } from '@shared/ui';
+import { ThemeService, UiPageHeaderComponent } from '@shared/ui';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { DashboardService } from '../../core/services/dashboard.service';
 import { InventoryMovementsComponent } from './components/inventory-movements/inventory-movements.component';
@@ -20,7 +20,8 @@ import { RevenueChartComponent } from './components/revenue-chart/revenue-chart.
     KpiCardsComponent,
     RevenueChartComponent,
     RecentSalesComponent,
-    InventoryMovementsComponent
+    InventoryMovementsComponent,
+    UiPageHeaderComponent
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',

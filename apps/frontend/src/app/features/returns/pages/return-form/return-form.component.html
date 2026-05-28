@@ -1,18 +1,14 @@
 <div class="container mx-auto p-6 max-w-4xl">
-  <!-- Header -->
-  <div class="mb-8 flex items-center justify-between">
-    <div>
-      <h1 class="text-3xl font-bold text-content">Iniciar Devolução</h1>
-      <p class="text-content-secondary mt-1">Siga os passos abaixo para registrar uma solicitação de devolução ou troca.
-      </p>
-    </div>
-    <ui-button routerLink="/sales" variant="secondary" size="md">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-      </svg>
-      Voltar para Vendas
-    </ui-button>
-  </div>
+  <ui-page-header title="Iniciar Devolução" subtitle="Siga os passos abaixo para registrar uma solicitação de devolução ou troca.">
+    <ng-template #actions>
+      <ui-button routerLink="/sales" variant="secondary" size="md">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        Voltar para Vendas
+      </ui-button>
+    </ng-template>
+  </ui-page-header>
 
   <!-- Content Card -->
   <ui-card class="min-h-[500px] flex flex-col" padding="none">

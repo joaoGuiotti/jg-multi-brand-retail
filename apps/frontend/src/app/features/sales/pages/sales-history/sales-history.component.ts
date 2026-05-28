@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { TableColumn, TableConfig, TableSort, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiModalService, UiNumberPipe, UiTableColumnDirective, UiTableComponent } from '@shared/ui';
+import { TableColumn, TableConfig, TableSort, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiModalService, UiNumberPipe, UiTableColumnDirective, UiTableComponent, UiPageHeaderComponent } from '@shared/ui';
 import { Sale, SaleFilter } from '../../../../core/models/sale.model';
 import { SalesService } from '../../../../core/services/sales.service';
 import { SaleDetailModalComponent } from '../../components/sale-detail-modal/sale-detail-modal.component';
@@ -10,7 +10,7 @@ import { SaleDetailModalComponent } from '../../components/sale-detail-modal/sal
 @Component({
     selector: 'app-sales-history',
     standalone: true,
-    imports: [CommonModule, RouterModule, FormsModule, UiButtonComponent, UiBadgeComponent, UiCardComponent, UiTableComponent, UiTableColumnDirective, UiNumberPipe],
+    imports: [CommonModule, RouterModule, FormsModule, UiButtonComponent, UiBadgeComponent, UiCardComponent, UiTableComponent, UiTableColumnDirective, UiNumberPipe, UiPageHeaderComponent],
     templateUrl: './sales-history.component.html',
     styleUrl: './sales-history.component.scss'
 })

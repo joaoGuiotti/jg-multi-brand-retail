@@ -2,14 +2,14 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { TableColumn, TableConfig, TableSort, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiDocumentPipe, UiInputFieldComponent, UiPhonePipe, UiTableColumnDirective, UiTableComponent, UiHasRoleDirective } from '@shared/ui';
+import { TableColumn, TableConfig, TableSort, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiDocumentPipe, UiInputFieldComponent, UiPhonePipe, UiTableColumnDirective, UiTableComponent, UiHasRoleDirective, UiPageHeaderComponent } from '@shared/ui';
 import { Customer, CustomerFilter, CustomerListResponse } from '../../../../core/models/customer.model';
 import { CustomersService } from '../../../../core/services/customers.service';
 
 @Component({
     selector: 'app-customer-list',
     standalone: true,
-    imports: [CommonModule, RouterModule, FormsModule, UiButtonComponent, UiCardComponent, UiBadgeComponent, UiTableComponent, UiTableColumnDirective, UiDocumentPipe, UiPhonePipe, UiInputFieldComponent, UiHasRoleDirective],
+    imports: [CommonModule, RouterModule, FormsModule, UiButtonComponent, UiCardComponent, UiBadgeComponent, UiTableComponent, UiTableColumnDirective, UiDocumentPipe, UiPhonePipe, UiInputFieldComponent, UiHasRoleDirective, UiPageHeaderComponent],
     templateUrl: './customer-list.component.html',
     styleUrl: './customer-list.component.scss'
 })

@@ -1,14 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, effect, inject, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ThemeService, UiCardComponent, UiButtonComponent } from '@shared/ui';
+import { ThemeService, UiCardComponent, UiButtonComponent, UiPageHeaderComponent } from '@shared/ui';
 import { ApexOptions, NgApexchartsModule } from 'ng-apexcharts';
 import { SalesService } from '../../../../core/services/sales.service';
 
 @Component({
     selector: 'app-reports-list',
     standalone: true,
-    imports: [CommonModule, UiCardComponent, NgApexchartsModule, FormsModule, UiButtonComponent],
+    imports: [CommonModule, UiCardComponent, NgApexchartsModule, FormsModule, UiButtonComponent, UiPageHeaderComponent],
     templateUrl: './reports-list.component.html',
     styleUrl: './reports-list.component.scss'
 })

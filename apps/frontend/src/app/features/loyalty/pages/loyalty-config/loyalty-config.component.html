@@ -1,16 +1,7 @@
 <div class="space-y-6 animate-fade-in">
   <!-- Page Header -->
-  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-outline pb-5">
-    <div>
-      <h1 class="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-        Fidelidade & Cashback
-      </h1>
-      <p class="text-content-tertiary mt-1">
-        Configure as regras de pontuação, taxa de resgate e limites de cashback para as vendas do seu estabelecimento.
-      </p>
-    </div>
-    
-    <div class="flex items-center gap-3">
+  <ui-page-header title="Fidelidade &amp; Cashback" subtitle="Configure as regras de pontuação, taxa de resgate e limites de cashback para as vendas do seu estabelecimento.">
+    <ng-template #actions>
       @if (configForm.get('active')?.value) {
         <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
           <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -22,8 +13,8 @@
           Programa Inativo
         </span>
       }
-    </div>
-  </div>
+    </ng-template>
+  </ui-page-header>
 
   @if (isLoading()) {
     <div class="flex flex-col items-center justify-center min-h-[350px] space-y-4">

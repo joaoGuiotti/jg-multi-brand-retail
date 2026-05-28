@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { UiButtonComponent, UiCardComponent, UiStepComponent, UiStepperComponent } from '@shared/ui';
+import { UiButtonComponent, UiCardComponent, UiPageHeaderComponent, UiStepComponent, UiStepperComponent } from '@shared/ui';
 import { IResponse } from '../../../../core/models/response-base';
 import { RefundType, ReturnOrder } from '../../../../core/models/return.model';
 import { Sale } from '../../../../core/models/sale.model';
@@ -23,6 +23,7 @@ import { ReturnsStore } from '../../store/returns.store';
     ReturnSummaryComponent,
     UiButtonComponent,
     UiCardComponent,
+    UiPageHeaderComponent,
     UiStepperComponent,
     UiStepComponent,
   ],

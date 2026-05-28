@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MaskitoOptions } from '@maskito/core';
-import { UI_DOCUMENT_MASK, UiButtonComponent, UiCardComponent, UiInputFieldComponent } from '@shared/ui';
+import { UI_DOCUMENT_MASK, UiButtonComponent, UiCardComponent, UiInputFieldComponent, UiPageHeaderComponent } from '@shared/ui';
 import { CustomersService } from '../../../../core/services/customers.service';
 import { LoyaltyHistoryComponent } from '../../../loyalty/components/loyalty-history/loyalty-history.component';
 
@@ -16,7 +16,8 @@ import { LoyaltyHistoryComponent } from '../../../loyalty/components/loyalty-his
         UiButtonComponent, 
         UiCardComponent, 
         UiInputFieldComponent,
-        LoyaltyHistoryComponent
+        LoyaltyHistoryComponent,
+        UiPageHeaderComponent
     ],
     templateUrl: './customer-form.component.html',
     styleUrl: './customer-form.component.scss'

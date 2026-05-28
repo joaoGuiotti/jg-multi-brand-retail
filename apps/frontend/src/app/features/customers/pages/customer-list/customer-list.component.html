@@ -1,10 +1,11 @@
-<div class="max-w-7xl mx-auto">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold text-content">Customers</h1>
-        <ui-button variant="primary" icon="M12 4v16m8-8H4" [routerLink]="['/customers/new']">
-            Add Customer
-        </ui-button>
-    </div>
+<div class="mx-auto">
+    <ui-page-header title="Clientes" subtitle="Gerencie a base de clientes da loja.">
+        <ng-template #actions>
+            <ui-button variant="primary" icon="M12 4v16m8-8H4" [routerLink]="['/customers/new']">
+                Novo Cliente
+            </ui-button>
+        </ng-template>
+    </ui-page-header>
 
     <div class="flex flex-col gap-4">
         <!-- Filters -->

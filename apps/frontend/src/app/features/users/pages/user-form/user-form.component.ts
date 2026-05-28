@@ -6,7 +6,8 @@ import { AuthService } from '@core/services/auth.service';
 import { 
   UiButtonComponent, 
   UiCardComponent, 
-  UiInputFieldComponent 
+  UiInputFieldComponent,
+  UiPageHeaderComponent
 } from '@shared/ui';
 
 @Component({
@@ -18,7 +19,8 @@ import {
     RouterModule, 
     UiInputFieldComponent, 
     UiButtonComponent, 
-    UiCardComponent
+    UiCardComponent,
+    UiPageHeaderComponent
   ],
   templateUrl: './user-form.component.html',
   styleUrl: './user-form.component.scss'

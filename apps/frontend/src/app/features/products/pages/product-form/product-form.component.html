@@ -1,9 +1,9 @@
-<div class="max-w-3xl mx-auto">
+<div class="mx-auto">
 
     @if(!isModal) {
-    <div class="mb-6">
-        <h1 class="text-3xl font-bold text-content">{{ isEditMode ? 'Edit Product' : 'New Product' }}</h1>
-    </div>
+    <ui-page-header [title]="isEditMode ? 'Editar Produto' : 'Novo Produto'"
+        [subtitle]="isEditMode ? 'Atualize as informações do produto.' : 'Preencha os dados para cadastrar um novo produto.'">
+    </ui-page-header>
     }
 
     <!-- Loading State -->

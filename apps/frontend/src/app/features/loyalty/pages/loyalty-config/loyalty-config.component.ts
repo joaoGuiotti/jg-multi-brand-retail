@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { LoyaltyService } from '../../services/loyalty.service';
 import { LoyaltyProgram } from '../../models/loyalty.model';
 import { ToastService } from '../../../../shared/ui/services/toast/toast.service';
-import { UiButtonComponent, UiCardComponent, UiInputFieldComponent } from '@shared/ui';
+import { UiButtonComponent, UiCardComponent, UiInputFieldComponent, UiPageHeaderComponent } from '@shared/ui';
 
 @Component({
   selector: 'app-loyalty-config',
@@ -14,7 +14,8 @@ import { UiButtonComponent, UiCardComponent, UiInputFieldComponent } from '@shar
     ReactiveFormsModule,
     UiButtonComponent,
     UiCardComponent,
-    UiInputFieldComponent
+    UiInputFieldComponent,
+    UiPageHeaderComponent
   ],
   templateUrl: './loyalty-config.component.html',
   styleUrl: './loyalty-config.component.scss'

@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { BadgeVariant, TableColumn, TableConfig, TableSort, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiHasRoleDirective, UiModalService, UiNumberPipe, UiTableColumnDirective, UiTableComponent } from '@shared/ui';
+import { BadgeVariant, TableColumn, TableConfig, TableSort, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiHasRoleDirective, UiModalService, UiNumberPipe, UiPageHeaderComponent, UiTableColumnDirective, UiTableComponent } from '@shared/ui';
 import { IResponse } from 'src/app/core/models/response-base';
 import { Product, ProductFilter } from '../../../../core/models/product.model';
 import { ProductsService } from '../../../../core/services/products.service';
@@ -11,7 +11,7 @@ import { ProductFormComponent } from '../product-form/product-form.component';
 @Component({
     selector: 'app-product-list',
     standalone: true,
-    imports: [CommonModule, RouterModule, FormsModule, UiButtonComponent, UiCardComponent, UiBadgeComponent, UiNumberPipe, UiTableComponent, UiTableColumnDirective, UiHasRoleDirective],
+    imports: [CommonModule, RouterModule, FormsModule, UiButtonComponent, UiCardComponent, UiBadgeComponent, UiNumberPipe, UiTableComponent, UiTableColumnDirective, UiHasRoleDirective, UiPageHeaderComponent],
     templateUrl: './product-list.component.html',
     styleUrl: './product-list.component.scss'
 })

@@ -1,7 +1,5 @@
-<div class="max-w-7xl mx-auto">
-    <div class="flex items-center justify-between mb-6">
-        <h1 class="text-3xl font-bold text-content">Business Reports</h1>
-    </div>
+<div class="mx-auto">
+    <ui-page-header title="Relatórios" subtitle="Análises e exportações do negócio."></ui-page-header>
 
     <div class="grid grid-cols-1 gap-6">
         <!-- Revenue Chart -->
@@ -32,29 +30,24 @@
         <ui-card [shadow]="true" padding="md">
             <div class="mb-4">
                 <h2 class="text-xl font-semibold text-content">Sales History Report</h2>
-                <p class="text-sm text-content-secondary">Generate a detailed PDF report of all sales in the specified period</p>
+                <p class="text-sm text-content-secondary">Generate a detailed PDF report of all sales in the specified
+                    period</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                 <div class="w-full">
                     <label class="block text-sm font-medium text-content-secondary mb-1">Start Date</label>
-                    <input type="date" 
-                           [ngModel]="startDate()" 
-                           (ngModelChange)="startDate.set($event)"
-                           class="w-full px-3 py-2 bg-surface border border-outline rounded-lg text-content focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors">
+                    <input type="date" [ngModel]="startDate()" (ngModelChange)="startDate.set($event)"
+                        class="w-full px-3 py-2 bg-surface border border-outline rounded-lg text-content focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors">
                 </div>
                 <div class="w-full">
                     <label class="block text-sm font-medium text-content-secondary mb-1">End Date</label>
-                    <input type="date" 
-                           [ngModel]="endDate()" 
-                           (ngModelChange)="endDate.set($event)"
-                           class="w-full px-3 py-2 bg-surface border border-outline rounded-lg text-content focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors">
+                    <input type="date" [ngModel]="endDate()" (ngModelChange)="endDate.set($event)"
+                        class="w-full px-3 py-2 bg-surface border border-outline rounded-lg text-content focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors">
                 </div>
                 <div class="flex">
-                    <ui-button (click)="downloadSalesReport()" 
-                               variant="primary" 
-                               [loading]="isDownloading()"
-                               class="w-full">
+                    <ui-button (click)="downloadSalesReport()" variant="primary" [loading]="isDownloading()"
+                        class="w-full">
                         Download PDF Report
                     </ui-button>
                 </div>

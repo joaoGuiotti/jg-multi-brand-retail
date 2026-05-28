@@ -1,23 +1,24 @@
-import { Component, OnInit, inject, signal, computed, EffectRef, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { 
-  ReturnsService 
-} from '../../../../core/services/returns.service';
-import { 
-  ReturnOrder, 
-  ReturnStatus,
-  ReturnFilter
-} from '../../../../core/models/return.model';
-import { 
-  UiTableComponent, 
-  UiTableColumnDirective, 
-  UiCardComponent, 
-  UiButtonComponent, 
+import {
   UiBadgeComponent,
+  UiButtonComponent,
+  UiCardComponent,
+  UiModalService,
   UiNumberPipe,
-  UiModalService
+  UiPageHeaderComponent,
+  UiTableColumnDirective,
+  UiTableComponent
 } from '@shared/ui';
+import {
+  ReturnFilter,
+  ReturnOrder,
+  ReturnStatus
+} from '../../../../core/models/return.model';
+import {
+  ReturnsService
+} from '../../../../core/services/returns.service';
 import { ReturnDetailsComponent } from '../../components/return-details/return-details.component';
 
 @Component({
@@ -31,16 +32,15 @@ import { ReturnDetailsComponent } from '../../components/return-details/return-d
     UiCardComponent,
     UiButtonComponent,
     UiBadgeComponent,
-    UiNumberPipe
+    UiNumberPipe,
+    UiPageHeaderComponent
   ],
   template: `
-    <div class="container mx-auto p-6 max-w-7xl">
-      <div class="flex items-center justify-between mb-8">
-        <div>
-          <h1 class="text-3xl font-bold text-content">Gerenciamento de Devoluções</h1>
-          <p class="text-content-secondary mt-1">Acompanhe e processe solicitações de devolução de clientes.</p>
-        </div>
-      </div>
+    <div class="mx-auto">
+      <ui-page-header 
+        title="Devoluções" 
+        subtitle="Gerencie devoluções, reembolsos e trocas de forma eficiente.">
+      </ui-page-header>
 
       <!-- Filters -->
       <ui-card [shadow]="true" padding="sm" class="mb-6">
@@ -132,7 +132,7 @@ export class ReturnListComponent implements OnInit {
   returns = signal<ReturnOrder[]>([]);
   totalItems = signal(0);
   loading = signal(false);
-  
+
   currentPage = signal(1);
   pageSize = signal(10);
   statusFilter = signal<ReturnStatus | ''>('');
@@ -170,8 +170,8 @@ export class ReturnListComponent implements OnInit {
     }
 
     this.returnsService.getReturns(
-      this.currentPage(), 
-      this.pageSize(), 
+      this.currentPage(),
+      this.pageSize(),
       filter
     ).subscribe({
       next: (res) => {

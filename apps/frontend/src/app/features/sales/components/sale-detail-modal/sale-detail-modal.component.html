@@ -1,4 +1,4 @@
-<div class="p-6 max-w-4xl min-w-[600px] flex justify-center items-center">
+<div class="p-6 min-w-[600px] flex justify-center items-center">
     <div *ngIf="isLoading()" class="flex justify-center items-center py-12">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
     </div>
@@ -152,17 +152,22 @@
                 <ui-card *ngFor="let r of data.returns" padding="sm" [shadow]="false" class="border-outline">
                     <div class="flex items-center justify-between">
                         <div class="flex gap-4 items-center">
-                            <div class="w-10 h-10 rounded-full bg-warning/10 flex items-center justify-center text-warning">
+                            <div
+                                class="w-10 h-10 rounded-full bg-warning/10 flex items-center justify-center text-warning">
                                 <i class="text-lg i-lucide-arrow-left-right"></i>
                             </div>
                             <div class="flex flex-col">
                                 <span class="text-sm font-bold text-content">Return #{{ r.id.substring(0, 8) }}</span>
-                                <span class="text-xs text-content-secondary">{{ r.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+                                <span class="text-xs text-content-secondary">{{ r.createdAt | date: 'dd/MM/yyyy HH:mm'
+                                    }}</span>
                             </div>
                         </div>
                         <div class="flex flex-col items-end gap-1">
-                            <span class="font-bold text-content">{{ r.total | uiNumber: { decimalPlaces: 2, prefix: 'R$ ' } }}</span>
-                            <ui-badge [variant]="r.status === 'REFUNDED' ? 'success' : (r.status === 'REJECTED' ? 'error' : 'warning')" size="sm">{{ r.status }}</ui-badge>
+                            <span class="font-bold text-content">{{ r.total | uiNumber: { decimalPlaces: 2, prefix: 'R$
+                                ' } }}</span>
+                            <ui-badge
+                                [variant]="r.status === 'REFUNDED' ? 'success' : (r.status === 'REJECTED' ? 'error' : 'warning')"
+                                size="sm">{{ r.status }}</ui-badge>
                         </div>
                     </div>
                 </ui-card>
@@ -171,9 +176,7 @@
 
         <div class="flex justify-end gap-3 pt-6 border-t border-outline">
             <div class="flex-1" *ngIf="data.status === 'COMPLETED'">
-                <ui-button 
-                    variant="secondary" 
-                    [disabled]="hasPendingReturns()" 
+                <ui-button variant="secondary" [disabled]="hasPendingReturns()"
                     [title]="hasPendingReturns() ? 'There is already a return in progress for this sale.' : ''"
                     (clicked)="initiateReturn()">
                     Iniciar Devolução

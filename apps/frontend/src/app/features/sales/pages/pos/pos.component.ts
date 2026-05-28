@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, signal, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { UiAutocompleteComponent, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiDocumentPipe, UiModalService, UiNumberPipe } from '@shared/ui';
+import { UiAutocompleteComponent, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiDocumentPipe, UiModalService, UiNumberPipe, UiPageHeaderComponent } from '@shared/ui';
 import { Customer } from '../../../../core/models/customer.model';
 import { Product } from '../../../../core/models/product.model';
 import { CustomersService } from '../../../../core/services/customers.service';
@@ -25,7 +25,8 @@ import { PaymentModalComponent, PaymentModalResult } from './payment-modal.compo
         UiNumberPipe, 
         UiDocumentPipe, 
         UiAutocompleteComponent,
-        LoyaltyBadgeComponent
+        LoyaltyBadgeComponent,
+        UiPageHeaderComponent
     ],
     templateUrl: './pos.component.html',
     styleUrl: './pos.component.scss'

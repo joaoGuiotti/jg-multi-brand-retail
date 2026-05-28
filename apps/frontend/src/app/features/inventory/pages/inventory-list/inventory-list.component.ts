@@ -9,7 +9,6 @@ import {
     UiButtonComponent,
     UiCardComponent,
     UiModalService,
-    UiPageHeaderComponent,
     UiTableColumnDirective,
     UiTableComponent,
 } from '@shared/ui';
@@ -30,7 +29,6 @@ import { AddMovementModalComponent } from '../../components/add-movement-modal/a
         UiCardComponent,
         UiTableComponent,
         UiTableColumnDirective,
-        UiPageHeaderComponent,
     ],
     templateUrl: './inventory-list.component.html',
     styleUrl: './inventory-list.component.scss',

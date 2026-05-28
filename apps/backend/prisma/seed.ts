@@ -19,6 +19,11 @@ async function main() {
   console.log('🌱 Seeding database...');
 
   // Limpar dados existentes (cuidado em produção!)
+  await prisma.returnItem.deleteMany();
+  await prisma.returnOrder.deleteMany();
+  await prisma.notificationPreference.deleteMany();
+  await prisma.notification.deleteMany();
+  await prisma.passwordResetToken.deleteMany();
   await prisma.auditLog.deleteMany();
   await prisma.inventoryMovement.deleteMany();
   await prisma.conditionalItem.deleteMany();
@@ -49,6 +54,10 @@ async function main() {
         features: {
           conditionals: true,
           inventory: true,
+        },
+        theme: {
+          primaryColor: '#10b981', // Emerald-500
+          accentColor: '#047857',  // Emerald-700
         },
       },
     },

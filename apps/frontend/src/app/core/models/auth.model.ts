@@ -30,3 +30,15 @@ export enum EUserRole {
     ADMIN = 'ADMIN',
     USER = 'USER'
 }
+
+export interface PublicTenant {
+    id: string;
+    name: string;
+    slug: string;
+    logoUrl: string | null;
+    active: boolean;
+    theme: {
+        primaryColor: string;
+        accentColor: string;
+    };
+}

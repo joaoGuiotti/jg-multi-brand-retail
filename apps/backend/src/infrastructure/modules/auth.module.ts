@@ -14,6 +14,7 @@ import { ListUsersUseCase } from '../../application/use-cases/auth/list-users.us
 import { RefreshTokenUseCase } from '../../application/use-cases/auth/refresh-token.use-case';
 import { RegisterUseCase } from '../../application/use-cases/auth/register.use-case';
 import { ResetPasswordUseCase } from '../../application/use-cases/auth/reset-password.use-case';
+import { GetPublicTenantUseCase } from '../../application/use-cases/auth/get-public-tenant.use-case';
 import { TenantRepository } from '../../domain/repositories/tenant-repository';
 import { UserRepository } from '../../domain/repositories/user-repository';
 import { PasswordResetTokenRepository } from '../../domain/repositories/password-reset-token-repository';
@@ -80,6 +81,7 @@ import { PrismaModule } from './prisma.module';
     ListUsersUseCase,
     ForgotPasswordUseCase,
     ResetPasswordUseCase,
+    GetPublicTenantUseCase,
     JwtStrategy,
     MailService,
   ],
@@ -95,6 +97,7 @@ import { PrismaModule } from './prisma.module';
     ListUsersUseCase,
     ForgotPasswordUseCase,
     ResetPasswordUseCase,
+    GetPublicTenantUseCase,
     MailService,
   ],
 })

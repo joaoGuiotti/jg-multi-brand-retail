@@ -1,5 +1,13 @@
 @import '@angular/cdk/overlay-prebuilt.css';
 
+:root {
+  --tenant-primary-color: #3b82f6; /* Default Blue-500 */
+  --tenant-accent-color: #1d4ed8;  /* Default Blue-700 */
+  
+  --color-primary: var(--tenant-primary-color);
+  --color-primary-hover: var(--tenant-accent-color);
+}
+
 /* Design tokens are loaded globally via angular.json styles array from @shared/ui */
 
 @tailwind base;

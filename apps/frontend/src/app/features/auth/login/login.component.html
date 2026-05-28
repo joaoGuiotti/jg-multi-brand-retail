@@ -2,13 +2,25 @@
   <div class="max-w-md w-full">
     <!-- Logo/Brand -->
     <div class="text-center mb-8">
-      <h1 class="text-4xl font-bold text-content mb-2">Retail POS</h1>
+      @if (tenantLogoUrl) {
+        <img [src]="tenantLogoUrl" [alt]="tenantName" class="mx-auto h-20 w-auto mb-4 object-contain rounded-lg" />
+      } @else {
+        <h1 class="text-4xl font-bold text-content mb-2">{{ tenantName }}</h1>
+      }
       <p class="text-content-secondary">Sign in to your account</p>
     </div>
 
     <!-- Login Card -->
     <ui-card padding="lg" [shadow]="true">
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <!-- Inactive Tenant Warning -->
+        @if (!tenantActive) {
+        <div class="mb-6 p-4 bg-error-bg border border-error rounded-lg text-center">
+          <p class="text-sm font-semibold text-error">Esta loja está temporariamente indisponível.</p>
+          <p class="text-xs text-error mt-1">Entre em contato com o suporte para mais informações.</p>
+        </div>
+        }
+
         <!-- Email Field -->
         <ui-input-field class="mb-6" [required]="false" label="Email" type="email" formControlName="email"
           [class.border-error]="email?.invalid && email?.touched" placeholder="you@example.com"
@@ -44,7 +56,7 @@
 
         <!-- Submit Button -->
         <ui-button type="submit" variant="primary" [fullWidth]="true" [loading]="isLoading"
-          [disabled]="loginForm.invalid || isLoading">
+          [disabled]="loginForm.invalid || isLoading || !tenantActive">
           Sign In
         </ui-button>
       </form>

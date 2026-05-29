@@ -104,6 +104,7 @@ export class CreateSaleUseCase implements UseCase<CreateSaleInput, SaleOutput> {
           unitPrice: itemDto.unitPrice,
           discount: itemDiscount,
           total: itemTotal,
+          costPriceAtSale: Number(product.costPrice),
         }),
       );
 
@@ -131,13 +132,16 @@ export class CreateSaleUseCase implements UseCase<CreateSaleInput, SaleOutput> {
 
     if (input.payments && input.payments.length > 0) {
       for (const p of input.payments) {
+        const isDeferred = ['BOLETO', 'STORE_CREDIT'].includes(p.method);
+        const paymentStatus = isDeferred ? 'PENDING' : 'PAID';
+
         const payment = Payment.create({
           saleId: sale.id.toString(),
           method: p.method as PaymentMethod,
           amount: p.amount,
           installments: p.installments || 1,
           fee: p.fee || 0,
-          status: 'PAID',
+          status: paymentStatus,
         });
         paymentsToCreate.push(payment);
 
@@ -160,6 +164,26 @@ export class CreateSaleUseCase implements UseCase<CreateSaleInput, SaleOutput> {
 
       for (const payment of paymentsToCreate) {
         await this.paymentRepository.create(tenantId, payment);
+
+        // Gerar Conta a Receber associada
+        const dueDate = new Date();
+        if (payment.status === 'PENDING') {
+          dueDate.setDate(dueDate.getDate() + 30); // Default 30 days for deferred
+        }
+
+        await tx.financialAccount.create({
+          data: {
+            tenantId,
+            type: 'RECEIVABLE',
+            description: `Recebimento da Venda #${createdSale.id.toString()}`,
+            amount: payment.amount,
+            dueDate,
+            paidAt: payment.status === 'PAID' ? new Date() : null,
+            status: payment.status === 'PAID' ? 'PAID' : 'PENDING',
+            category: 'SALE',
+            saleId: createdSale.id.toString(),
+          },
+        });
       }
 
       return createdSale;

@@ -29,7 +29,7 @@ export class NotificationsSseController {
       "const source = new EventSource('/api/v1/notifications/stream', {\n" +
       "  headers: { Authorization: 'Bearer <token>' }\n" +
       '});\n' +
-      "source.onmessage = (event) => console.log(JSON.parse(event.data));\n" +
+      'source.onmessage = (event) => console.log(JSON.parse(event.data));\n' +
       '```\n\n' +
       '> ⚠️ O Swagger UI não suporta visualizar streams SSE. Use o código acima no frontend ou ferramentas como `curl -N`.',
     operationId: 'notifications_stream',
@@ -41,7 +41,8 @@ export class NotificationsSseController {
       'text/event-stream': {
         schema: {
           type: 'string',
-          example: 'data: {"type":"SALE_COMPLETED","payload":{"saleId":"uuid"}}\n\n',
+          example:
+            'data: {"type":"SALE_COMPLETED","payload":{"saleId":"uuid"}}\n\n',
         },
       },
     },

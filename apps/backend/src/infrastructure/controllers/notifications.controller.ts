@@ -189,7 +189,8 @@ export class NotificationsController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Marcar notificação como lida',
-    description: 'Marca uma notificação específica como lida pelo usuário autenticado.',
+    description:
+      'Marca uma notificação específica como lida pelo usuário autenticado.',
     operationId: 'notifications_markAsRead',
   })
   @ApiParam({

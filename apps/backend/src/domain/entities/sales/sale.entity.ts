@@ -20,6 +20,7 @@ export interface SaleItemProps {
   unitPrice: number;
   discount: number;
   total: number;
+  costPriceAtSale?: number;
 }
 
 export class SaleItem extends Entity<SaleItemProps> {
@@ -48,6 +49,9 @@ export class SaleItem extends Entity<SaleItemProps> {
   }
   get total(): number {
     return this.props.total;
+  }
+  get costPriceAtSale(): number | undefined {
+    return this.props.costPriceAtSale;
   }
 }
 

@@ -1,0 +1,180 @@
+<ui-page-header
+  title="DRE"
+  subtitle="Demonstração do Resultado do Exercício — {{ months[month - 1] }} {{ year }}">
+</ui-page-header>
+
+<!-- Filters + Download -->
+<ui-card [shadow]="true" padding="sm" class="mb-6">
+  <div class="flex flex-wrap gap-3 items-end">
+    <div class="flex flex-col min-w-[140px] flex-1">
+      <label class="label">Mês</label>
+      <select [(ngModel)]="month" (change)="onFilterChange()" class="input-field">
+        @for (m of months; track $index) {
+          <option [value]="$index + 1">{{ m }}</option>
+        }
+      </select>
+    </div>
+    <div class="flex flex-col min-w-[120px]">
+      <label class="label">Ano</label>
+      <select [(ngModel)]="year" (change)="onFilterChange()" class="input-field">
+        <option value="2023">2023</option>
+        <option value="2024">2024</option>
+        <option value="2025">2025</option>
+        <option value="2026">2026</option>
+      </select>
+    </div>
+
+    <div class="flex gap-2 self-end shrink-0 ml-auto">
+      <ui-button variant="secondary" [loading]="isDownloading()" (click)="downloadPDF()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+        {{ isDownloading() ? 'Gerando...' : 'Download PDF' }}
+      </ui-button>
+    </div>
+  </div>
+</ui-card>
+
+<!-- Loading State -->
+@if (isLoading()) {
+  <div class="flex items-center justify-center py-16">
+    <div class="flex flex-col items-center gap-3">
+      <div class="w-10 h-10 border-4 border-brand-500/30 border-t-brand-500 rounded-full animate-spin"></div>
+      <p class="text-content-secondary text-sm">Calculando resultados...</p>
+    </div>
+  </div>
+}
+
+<!-- KPI Summary Cards -->
+@if (data(); as d) {
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <ui-card [shadow]="true" padding="sm" class="text-center">
+      <p class="text-xs text-content-secondary mb-1">Receita Bruta</p>
+      <p class="text-xl font-bold text-emerald-400">{{ d.grossRevenue | currency:'BRL':'symbol':'1.0-0' }}</p>
+    </ui-card>
+
+    <ui-card [shadow]="true" padding="sm" class="text-center">
+      <p class="text-xs text-content-secondary mb-1">Margem Bruta</p>
+      <p class="text-xl font-bold" [ngClass]="grossMargin() >= 0 ? 'text-emerald-400' : 'text-rose-400'">
+        {{ grossMargin() | number:'1.1-1' }}%
+      </p>
+    </ui-card>
+
+    <ui-card [shadow]="true" padding="sm" class="text-center">
+      <p class="text-xs text-content-secondary mb-1">Margem Líquida</p>
+      <p class="text-xl font-bold" [ngClass]="netMargin() >= 0 ? 'text-emerald-400' : 'text-rose-400'">
+        {{ netMargin() | number:'1.1-1' }}%
+      </p>
+    </ui-card>
+
+    <ui-card [shadow]="true" padding="sm" class="text-center">
+      <p class="text-xs text-content-secondary mb-1">Lucro Líquido</p>
+      <p class="text-xl font-bold" [ngClass]="d.netProfit >= 0 ? 'text-emerald-400' : 'text-rose-400'">
+        {{ d.netProfit | currency:'BRL':'symbol':'1.0-0' }}
+      </p>
+    </ui-card>
+  </div>
+
+  <!-- DRE Statement -->
+  <ui-card [shadow]="true" padding="sm" class="max-w-3xl mx-auto">
+    <div class="p-6">
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-6 pb-4 border-b border-border">
+        <div>
+          <h2 class="text-lg font-bold text-content">Demonstração do Resultado</h2>
+          <p class="text-xs text-content-secondary mt-0.5">{{ months[month - 1] }} / {{ year }}</p>
+        </div>
+        <ui-badge [variant]="d.netProfit >= 0 ? 'success' : 'error'">
+          {{ d.netProfit >= 0 ? 'Lucro' : 'Prejuízo' }}
+        </ui-badge>
+      </div>
+
+      <!-- Receitas -->
+      <div class="mb-4">
+        <p class="text-xs font-semibold text-content-secondary uppercase tracking-wider mb-2">Receitas</p>
+        <div class="flex justify-between items-center py-2.5 px-3 rounded-md hover:bg-surface-hover transition-colors">
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+            <span class="text-content-secondary text-sm">Receita Bruta de Vendas</span>
+          </div>
+          <span class="text-emerald-400 font-semibold tabular-nums">{{ d.grossRevenue | currency:'BRL' }}</span>
+        </div>
+      </div>
+
+      <!-- CMV -->
+      <div class="mb-4">
+        <p class="text-xs font-semibold text-content-secondary uppercase tracking-wider mb-2">Custos</p>
+        <div class="flex justify-between items-center py-2.5 px-3 rounded-md hover:bg-surface-hover transition-colors">
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full bg-rose-400"></div>
+            <span class="text-content-secondary text-sm">Custo das Mercadorias Vendidas (CMV)</span>
+          </div>
+          <span class="text-rose-400 font-semibold tabular-nums">{{ d.cmv | currency:'BRL' }}</span>
+        </div>
+      </div>
+
+      <!-- Lucro Bruto -->
+      <div class="flex justify-between items-center py-3 px-4 bg-surface-hover rounded-md mb-6 border-l-2 border-emerald-400">
+        <div class="flex items-center gap-2">
+          <span class="text-content font-bold text-sm">Lucro Bruto</span>
+          <span class="text-xs text-content-secondary">(Receita − CMV)</span>
+        </div>
+        <span class="font-bold tabular-nums" [ngClass]="d.grossProfit >= 0 ? 'text-emerald-400' : 'text-rose-400'">
+          {{ d.grossProfit | currency:'BRL' }}
+        </span>
+      </div>
+
+      <!-- Despesas Operacionais -->
+      <div class="mb-4">
+        <p class="text-xs font-semibold text-content-secondary uppercase tracking-wider mb-2">Despesas Operacionais</p>
+        <div class="flex justify-between items-center py-2.5 px-3 rounded-md hover:bg-surface-hover transition-colors">
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full bg-amber-400"></div>
+            <span class="text-content-secondary text-sm">Total de Despesas</span>
+          </div>
+          <span class="text-amber-400 font-semibold tabular-nums">{{ d.expenses | currency:'BRL' }}</span>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <div class="border-t border-border my-4"></div>
+
+      <!-- Lucro Líquido -->
+      <div class="flex justify-between items-center py-4 px-4 rounded-lg border"
+        [ngClass]="d.netProfit >= 0
+          ? 'bg-emerald-400/5 border-emerald-400/20'
+          : 'bg-rose-400/5 border-rose-400/20'">
+        <div>
+          <p class="text-content font-bold">RESULTADO LÍQUIDO DO EXERCÍCIO</p>
+          <p class="text-xs text-content-secondary mt-0.5">{{ months[month - 1] }} / {{ year }}</p>
+        </div>
+        <div class="text-right">
+          <p class="text-2xl font-bold tabular-nums"
+            [ngClass]="d.netProfit >= 0 ? 'text-emerald-400' : 'text-rose-400'">
+            {{ d.netProfit | currency:'BRL' }}
+          </p>
+          <p class="text-xs mt-0.5" [ngClass]="netMargin() >= 0 ? 'text-emerald-400' : 'text-rose-400'">
+            Margem de {{ netMargin() | number:'1.1-1' }}%
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </ui-card>
+}
+
+<!-- Empty State -->
+@if (!data() && !isLoading()) {
+  <div class="flex flex-col items-center justify-center py-16 text-center">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-content-secondary mb-3" fill="none"
+      viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+      <path stroke-linecap="round" stroke-linejoin="round"
+        d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+    <p class="text-content-secondary text-sm">Nenhum dado para o período selecionado.</p>
+    <p class="text-content-secondary text-xs mt-1">Selecione outro mês ou ano para consultar a DRE.</p>
+  </div>
+}

@@ -45,7 +45,21 @@ export class CompleteSaleUseCase implements UseCase<
       throw new BadRequestException(error.message);
     }
 
-    const updated = await this.saleRepository.update(tenantId, sale);
+    const updated = await this.prisma.$transaction(async (tx) => {
+      // Mark pending payments as PAID
+      await tx.payment.updateMany({
+        where: { saleId: id, tenantId, status: 'PENDING' },
+        data: { status: 'PAID', paidAt: new Date() },
+      });
+
+      // Mark pending receivables as PAID
+      await tx.financialAccount.updateMany({
+        where: { saleId: id, tenantId, type: 'RECEIVABLE', status: 'PENDING' },
+        data: { status: 'PAID', paidAt: new Date() },
+      });
+
+      return await this.saleRepository.update(tenantId, sale);
+    });
 
     await this.eventPublisher.publishEvents(sale);
 

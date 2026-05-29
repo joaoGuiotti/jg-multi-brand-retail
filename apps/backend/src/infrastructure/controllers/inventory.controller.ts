@@ -136,7 +136,8 @@ export class InventoryController {
   @Get('movements/:id')
   @ApiOperation({
     summary: 'Buscar movimentação por ID',
-    description: 'Retorna os detalhes de uma movimentação de estoque específica.',
+    description:
+      'Retorna os detalhes de uma movimentação de estoque específica.',
     operationId: 'inventory_findOneMovement',
   })
   @ApiParam({
@@ -170,7 +171,8 @@ export class InventoryController {
   @Get('product/:productId')
   @ApiOperation({
     summary: 'Histórico de movimentações por produto',
-    description: 'Retorna todas as movimentações de estoque de um produto específico.',
+    description:
+      'Retorna todas as movimentações de estoque de um produto específico.',
     operationId: 'inventory_findByProduct',
   })
   @ApiParam({

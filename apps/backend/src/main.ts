@@ -70,7 +70,10 @@ async function bootstrap() {
     .addTag('returns', 'Solicitação e processamento de devoluções')
     .addTag('inventory', 'Movimentações e relatórios de estoque')
     .addTag('loyalty', 'Configuração e operações do programa de fidelidade')
-    .addTag('notifications', 'Notificações em tempo real e preferências do usuário')
+    .addTag(
+      'notifications',
+      'Notificações em tempo real e preferências do usuário',
+    )
     .build();
 
   const documentFactory = () =>

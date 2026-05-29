@@ -220,7 +220,8 @@ export class SalesController {
   @Get(':id')
   @ApiOperation({
     summary: 'Buscar venda por ID',
-    description: 'Retorna os dados completos de uma venda, incluindo itens e status de pagamento.',
+    description:
+      'Retorna os dados completos de uma venda, incluindo itens e status de pagamento.',
     operationId: 'sales_findOne',
   })
   @ApiParam({
@@ -255,7 +256,8 @@ export class SalesController {
   @ApiProduces('application/pdf')
   @ApiOperation({
     summary: 'Baixar comprovante da venda (PDF)',
-    description: 'Gera e retorna o comprovante da venda em formato PDF para impressão no PDV.',
+    description:
+      'Gera e retorna o comprovante da venda em formato PDF para impressão no PDV.',
     operationId: 'sales_getReceipt',
   })
   @ApiParam({
@@ -377,7 +379,8 @@ export class SalesController {
   })
   @ApiResponse({
     status: 422,
-    description: 'Venda não pode ser finalizada (pagamento pendente ou status inválido)',
+    description:
+      'Venda não pode ser finalizada (pagamento pendente ou status inválido)',
     type: ValidationErrorResponseDto,
   })
   async complete(@CurrentUser() user: any, @Param('id') id: string) {

@@ -1,12 +1,29 @@
-import { Controller, Get, Post, Patch, Body, Query, Param, UseGuards, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Body,
+  Query,
+  Param,
+  UseGuards,
+  Res,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { RolesGuard } from '../guards/roles.guard';
 import { Roles } from '../decorators/roles.decorator';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { Role } from '@prisma/client';
-import { CreateAccountUseCase, PayAccountUseCase, ListAccountsUseCase } from '../../application/use-cases/finance/account-management.use-cases';
+import {
+  CreateAccountUseCase,
+  PayAccountUseCase,
+  ListAccountsUseCase,
+} from '../../application/use-cases/finance/account-management.use-cases';
 import { CreateAccountDto, PayAccountDto } from '../dtos/finance/finance.dto';
-import { GetCashFlowUseCase, CalculateDREUseCase } from '../../application/use-cases/finance/reports.use-cases';
+import {
+  GetCashFlowUseCase,
+  CalculateDREUseCase,
+} from '../../application/use-cases/finance/reports.use-cases';
 import { GenerateDREPdfUseCase } from '../../application/use-cases/finance/pdf.use-cases';
 
 @Controller('v1/finance')
@@ -30,15 +47,21 @@ export class FinanceController {
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
   ) {
-    return this.listAccountsUseCase.execute({ tenantId: user.tenantId, type, status, startDate, endDate });
+    return this.listAccountsUseCase.execute({
+      tenantId: user.tenantId,
+      type,
+      status,
+      startDate,
+      endDate,
+    });
   }
 
   @Post('accounts')
-  async createAccount(
-    @CurrentUser() user: any,
-    @Body() dto: CreateAccountDto,
-  ) {
-    return this.createAccountUseCase.execute({ tenantId: user.tenantId, ...dto });
+  async createAccount(@CurrentUser() user: any, @Body() dto: CreateAccountDto) {
+    return this.createAccountUseCase.execute({
+      tenantId: user.tenantId,
+      ...dto,
+    });
   }
 
   @Patch('accounts/:id/pay')
@@ -47,7 +70,11 @@ export class FinanceController {
     @Param('id') id: string,
     @Body() dto: PayAccountDto,
   ) {
-    return this.payAccountUseCase.execute({ tenantId: user.tenantId, id, paidAt: dto.paidAt });
+    return this.payAccountUseCase.execute({
+      tenantId: user.tenantId,
+      id,
+      paidAt: dto.paidAt,
+    });
   }
 
   @Get('cash-flow')
@@ -56,7 +83,11 @@ export class FinanceController {
     @Query('month') month: string,
     @Query('year') year: string,
   ) {
-    return this.getCashFlowUseCase.execute({ tenantId: user.tenantId, month: Number(month), year: Number(year) });
+    return this.getCashFlowUseCase.execute({
+      tenantId: user.tenantId,
+      month: Number(month),
+      year: Number(year),
+    });
   }
 
   @Get('dre')
@@ -65,7 +96,11 @@ export class FinanceController {
     @Query('month') month: string,
     @Query('year') year: string,
   ) {
-    return this.calculateDREUseCase.execute({ tenantId: user.tenantId, month: Number(month), year: Number(year) });
+    return this.calculateDREUseCase.execute({
+      tenantId: user.tenantId,
+      month: Number(month),
+      year: Number(year),
+    });
   }
 
   @Get('dre/pdf')
@@ -75,7 +110,11 @@ export class FinanceController {
     @Query('year') year: string,
     @Res() res: any,
   ) {
-    const buffer = await this.generateDREPdfUseCase.execute({ tenantId: user.tenantId, month: Number(month), year: Number(year) });
+    const buffer = await this.generateDREPdfUseCase.execute({
+      tenantId: user.tenantId,
+      month: Number(month),
+      year: Number(year),
+    });
     res.set({
       'Content-Type': 'application/pdf',
       'Content-Disposition': `attachment; filename=dre-${month}-${year}.pdf`,

@@ -131,7 +131,8 @@ export class ProductsController {
   @Get('sku/:sku')
   @ApiOperation({
     summary: 'Buscar produto por SKU',
-    description: 'Localiza um produto pelo seu código SKU único dentro do Tenant.',
+    description:
+      'Localiza um produto pelo seu código SKU único dentro do Tenant.',
     operationId: 'products_findBySku',
   })
   @ApiParam({
@@ -201,7 +202,8 @@ export class ProductsController {
   @Get(':id')
   @ApiOperation({
     summary: 'Buscar produto por ID',
-    description: 'Retorna os dados completos de um produto específico pelo UUID.',
+    description:
+      'Retorna os dados completos de um produto específico pelo UUID.',
     operationId: 'products_findOne',
   })
   @ApiParam({

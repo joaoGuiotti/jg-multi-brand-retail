@@ -121,7 +121,8 @@ export class CustomersController {
   @Get(':id')
   @ApiOperation({
     summary: 'Buscar cliente por ID',
-    description: 'Retorna os dados completos de um cliente específico do Tenant.',
+    description:
+      'Retorna os dados completos de um cliente específico do Tenant.',
     operationId: 'customers_findOne',
   })
   @ApiParam({

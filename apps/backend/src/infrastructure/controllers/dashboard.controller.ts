@@ -11,7 +11,10 @@ import { CurrentUser } from '../decorators/current-user.decorator';
 import { Roles } from '../decorators/roles.decorator';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { RolesGuard } from '../guards/roles.guard';
-import { UnauthorizedResponseDto, ForbiddenResponseDto } from '../dtos/common/api-responses.dto';
+import {
+  UnauthorizedResponseDto,
+  ForbiddenResponseDto,
+} from '../dtos/common/api-responses.dto';
 
 @ApiTags('dashboard')
 @ApiBearerAuth('JWT')

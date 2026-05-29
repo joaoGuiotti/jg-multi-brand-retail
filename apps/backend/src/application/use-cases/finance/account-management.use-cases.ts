@@ -13,7 +13,10 @@ const mapAccount = (acc: any) => ({
 });
 
 @Injectable()
-export class CreateAccountUseCase implements UseCase<CreateAccountDto & { tenantId: string }, any> {
+export class CreateAccountUseCase implements UseCase<
+  CreateAccountDto & { tenantId: string },
+  any
+> {
   constructor(private prisma: PrismaService) {}
 
   async execute(input: CreateAccountDto & { tenantId: string }) {
@@ -33,10 +36,13 @@ export class CreateAccountUseCase implements UseCase<CreateAccountDto & { tenant
 }
 
 @Injectable()
-export class PayAccountUseCase implements UseCase<{ tenantId: string, id: string, paidAt: string }, any> {
+export class PayAccountUseCase implements UseCase<
+  { tenantId: string; id: string; paidAt: string },
+  any
+> {
   constructor(private prisma: PrismaService) {}
 
-  async execute(input: { tenantId: string, id: string, paidAt: string }) {
+  async execute(input: { tenantId: string; id: string; paidAt: string }) {
     const account = await this.prisma.financialAccount.findFirst({
       where: { id: input.id, tenantId: input.tenantId },
     });
@@ -55,12 +61,27 @@ export class PayAccountUseCase implements UseCase<{ tenantId: string, id: string
 }
 
 @Injectable()
-export class ListAccountsUseCase implements UseCase<{ tenantId: string, type?: string, status?: string, startDate?: string, endDate?: string }, any[]> {
+export class ListAccountsUseCase implements UseCase<
+  {
+    tenantId: string;
+    type?: string;
+    status?: string;
+    startDate?: string;
+    endDate?: string;
+  },
+  any[]
+> {
   constructor(private prisma: PrismaService) {}
 
-  async execute(input: { tenantId: string, type?: string, status?: string, startDate?: string, endDate?: string }) {
+  async execute(input: {
+    tenantId: string;
+    type?: string;
+    status?: string;
+    startDate?: string;
+    endDate?: string;
+  }) {
     const where: any = { tenantId: input.tenantId };
-    
+
     if (input.type) where.type = input.type;
     if (input.status) where.status = input.status;
     if (input.startDate && input.endDate) {
@@ -74,7 +95,7 @@ export class ListAccountsUseCase implements UseCase<{ tenantId: string, type?: s
       where,
       orderBy: { dueDate: 'asc' },
     });
-    
+
     return accounts.map(mapAccount);
   }
 }

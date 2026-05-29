@@ -169,7 +169,8 @@ export class ReturnsController {
   @Roles(Role.ADMIN, Role.SUPER_ADMIN, Role.USER)
   @ApiOperation({
     summary: 'Buscar devolução por ID',
-    description: 'Retorna os detalhes completos de uma solicitação de devolução.',
+    description:
+      'Retorna os detalhes completos de uma solicitação de devolução.',
     operationId: 'returns_findOne',
   })
   @ApiParam({

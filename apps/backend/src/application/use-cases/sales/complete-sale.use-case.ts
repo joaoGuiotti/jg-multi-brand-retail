@@ -61,8 +61,6 @@ export class CompleteSaleUseCase implements UseCase<
       return await this.saleRepository.update(tenantId, sale);
     });
 
-
-
     await this.eventPublisher.publishEvents(sale);
 
     return SaleOutputMapper.toOutput(updated, tenantId);

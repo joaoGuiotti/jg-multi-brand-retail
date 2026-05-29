@@ -1,4 +1,11 @@
-import { IsNumber, IsInt, Min, Max, IsPositive, IsBoolean } from 'class-validator';
+import {
+  IsNumber,
+  IsInt,
+  Min,
+  Max,
+  IsPositive,
+  IsBoolean,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ConfigureLoyaltyProgramDto {

@@ -175,7 +175,7 @@ export class CreateSaleUseCase implements UseCase<CreateSaleInput, SaleOutput> {
           data: {
             tenantId,
             type: 'RECEIVABLE',
-            description: `Recebimento da Venda #${createdSale.id}`,
+            description: `Recebimento da Venda #${createdSale.id.toString()}`,
             amount: payment.amount,
             dueDate,
             paidAt: payment.status === 'PAID' ? new Date() : null,

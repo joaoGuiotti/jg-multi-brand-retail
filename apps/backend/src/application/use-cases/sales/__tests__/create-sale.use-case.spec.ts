@@ -50,6 +50,7 @@ describe('CreateSaleUseCase', () => {
     paymentRepository = { create: jest.fn() };
     prisma = {
       $transaction: jest.fn((callback) => callback(prisma)),
+      financialAccount: { create: jest.fn() },
     };
     eventPublisher = { publishEvents: jest.fn() };
     useCase = new CreateSaleUseCase(

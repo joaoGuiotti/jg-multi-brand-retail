@@ -1,0 +1,60 @@
+<ui-page-header title="Financial Accounts" subtitle="Manage Payables and Receivables"></ui-page-header>
+
+<!-- Filters + Add Button -->
+<ui-card [shadow]="true" padding="sm" class="mb-6">
+  <div class="flex flex-wrap gap-3 items-end">
+    <div class="flex flex-col min-w-[140px] flex-1">
+      <label class="label">Type</label>
+      <select [(ngModel)]="selectedType" (change)="onFilterChange()" class="input-field">
+        <option value="">All Types</option>
+        <option value="PAYABLE">Payable</option>
+        <option value="RECEIVABLE">Receivable</option>
+      </select>
+    </div>
+
+    <div class="flex flex-col min-w-[140px] flex-1">
+      <label class="label">Status</label>
+      <select [(ngModel)]="selectedStatus" (change)="onFilterChange()" class="input-field">
+        <option value="">All Statuses</option>
+        <option value="PENDING">Pending</option>
+        <option value="PAID">Paid</option>
+        <option value="OVERDUE">Overdue</option>
+      </select>
+    </div>
+
+    <div class="flex gap-2 self-end shrink-0">
+      <ui-button variant="primary" (click)="openAddAccount()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1">
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+        Add Account
+      </ui-button>
+    </div>
+  </div>
+</ui-card>
+
+<ui-table [dataSource]="accounts()" [columns]="columns" [config]="tableConfig()">
+  <ng-template uiTableColumn="dueDate" let-account>
+    {{ formatDate(account.dueDate) }}
+  </ng-template>
+
+  <ng-template uiTableColumn="amount" let-account>
+    {{ account.amount | currency:'BRL' }}
+  </ng-template>
+
+  <ng-template uiTableColumn="type" let-account>
+    <ui-badge [variant]="getTypeVariant(account.type)">{{ account.type }}</ui-badge>
+  </ng-template>
+
+  <ng-template uiTableColumn="status" let-account>
+    <ui-badge [variant]="getStatusVariant(account.status)">{{ account.status }}</ui-badge>
+  </ng-template>
+
+  <ng-template uiTableColumn="actions" let-account>
+    <ui-button *ngIf="account.status === 'PENDING'" size="sm" variant="secondary" (click)="payAccount(account)">
+      Mark Paid
+    </ui-button>
+  </ng-template>
+</ui-table>

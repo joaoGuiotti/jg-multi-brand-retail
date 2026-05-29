@@ -9,8 +9,9 @@ import {
     UiButtonComponent,
     UiCardComponent,
     UiModalService,
+    UiPageHeaderComponent,
     UiTableColumnDirective,
-    UiTableComponent,
+    UiTableComponent
 } from '@shared/ui';
 import { InventoryFilter, InventoryMovement, MovementType, StockSummary } from '../../../../core/models/inventory.model';
 import { Product } from '../../../../core/models/product.model';
@@ -28,6 +29,7 @@ import { AddMovementModalComponent } from '../../components/add-movement-modal/a
         UiBadgeComponent,
         UiCardComponent,
         UiTableComponent,
+        UiPageHeaderComponent,
         UiTableColumnDirective,
     ],
     templateUrl: './inventory-list.component.html',

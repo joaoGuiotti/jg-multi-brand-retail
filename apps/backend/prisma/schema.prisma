@@ -39,6 +39,7 @@ model Tenant {
   loyaltyProgram          LoyaltyProgram?
   loyaltyAccounts         LoyaltyAccount[]
   loyaltyTransactions    LoyaltyTransaction[]
+  financialAccounts       FinancialAccount[]
 
   @@map("tenants")
 }
@@ -192,6 +193,7 @@ model Sale {
   payments     Payment[]
   returnOrders ReturnOrder[]
   loyaltyTransactions LoyaltyTransaction[]
+  financialAccounts FinancialAccount[]
 
   @@index([tenantId])
   @@index([createdAt])
@@ -206,6 +208,7 @@ model SaleItem {
   unitPrice Decimal @map("unit_price") @db.Decimal(10, 2)
   discount  Decimal @default(0) @db.Decimal(10, 2)
   total     Decimal @db.Decimal(10, 2)
+  costPriceAtSale Decimal? @map("cost_price_at_sale") @db.Decimal(10, 2)
 
   sale    Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [id])
@@ -604,3 +607,42 @@ model LoyaltyTransaction {
   @@index([tenantId])
   @@map("loyalty_transactions")
 }
+
+// =====================
+// FINANCE
+// =====================
+
+enum FinancialAccountType {
+  PAYABLE
+  RECEIVABLE
+}
+
+enum FinancialAccountStatus {
+  PENDING
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+model FinancialAccount {
+  id          String                 @id @default(uuid())
+  tenantId    String                 @map("tenant_id")
+  type        FinancialAccountType
+  description String
+  amount      Decimal                @db.Decimal(10, 2)
+  dueDate     DateTime               @map("due_date")
+  paidAt      DateTime?              @map("paid_at")
+  status      FinancialAccountStatus @default(PENDING)
+  category    String
+  saleId      String?                @map("sale_id")
+  createdAt   DateTime               @default(now()) @map("created_at")
+  updatedAt   DateTime               @updatedAt @map("updated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  sale   Sale?  @relation(fields: [saleId], references: [id])
+
+  @@index([tenantId])
+  @@index([saleId])
+  @@map("financial_accounts")
+}
+

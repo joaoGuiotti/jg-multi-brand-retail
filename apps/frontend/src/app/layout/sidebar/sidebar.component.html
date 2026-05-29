@@ -38,8 +38,8 @@
       <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="item.icon"></path>
       </svg>
-      <span class="font-medium whitespace-nowrap transition-opacity duration-200" [class.lg:opacity-0]="isCollapsed"
-        [class.lg:hidden]="isCollapsed">
+      <span class="font-medium truncate transition-opacity duration-200" [class.lg:opacity-0]="isCollapsed"
+        [class.lg:hidden]="isCollapsed" [title]="item.label">
         {{ item.label }}
       </span>
     </a>

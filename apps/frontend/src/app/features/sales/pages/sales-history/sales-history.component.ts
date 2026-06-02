@@ -6,11 +6,12 @@ import { TableColumn, TableConfig, TableSort, UiBadgeComponent, UiButtonComponen
 import { Sale, SaleFilter } from '../../../../core/models/sale.model';
 import { SalesService } from '../../../../core/services/sales.service';
 import { SaleDetailModalComponent } from '../../components/sale-detail-modal/sale-detail-modal.component';
+import { SellerCommissionWidgetComponent } from '../../components/seller-commission-widget/seller-commission-widget.component';
 
 @Component({
     selector: 'app-sales-history',
     standalone: true,
-    imports: [CommonModule, RouterModule, FormsModule, UiButtonComponent, UiBadgeComponent, UiCardComponent, UiTableComponent, UiTableColumnDirective, UiNumberPipe, UiPageHeaderComponent],
+    imports: [CommonModule, RouterModule, FormsModule, UiButtonComponent, UiBadgeComponent, UiCardComponent, UiTableComponent, UiTableColumnDirective, UiNumberPipe, UiPageHeaderComponent, SellerCommissionWidgetComponent],
     templateUrl: './sales-history.component.html',
     styleUrl: './sales-history.component.scss'
 })

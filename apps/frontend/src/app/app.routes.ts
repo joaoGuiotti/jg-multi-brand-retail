@@ -58,6 +58,7 @@ export const routes: Routes = [
             { path: 'finance/accounts', loadComponent: () => import('./features/finance/pages/account-list/account-list.component').then(m => m.AccountListComponent) },
             { path: 'finance/cash-flow', loadComponent: () => import('./features/finance/pages/cash-flow/cash-flow.component').then(m => m.CashFlowComponent) },
             { path: 'finance/dre', loadComponent: () => import('./features/finance/pages/dre/dre.component').then(m => m.DREComponent) },
+            { path: 'finance/commissions', loadComponent: () => import('./features/finance/pages/commissions-list/commissions-list.component').then(m => m.CommissionsListComponent) },
         ],
     },
     { path: 'access-denied', loadComponent: () => import('./features/errors/pages/access-denied/access-denied.component').then(m => m.AccessDeniedComponent) },

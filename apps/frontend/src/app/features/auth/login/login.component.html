@@ -62,12 +62,14 @@
       </form>
 
       <!-- Register Link -->
+      @if (!isCustomTenant) {
       <div class="mt-6 text-center">
         <p class="text-sm text-content-secondary">
           Don't have an account?
           <a routerLink="/register" class="text-primary hover:text-primary-hover font-medium">Sign up</a>
         </p>
       </div>
+      }
     </ui-card>
 
     <!-- Demo Credentials -->

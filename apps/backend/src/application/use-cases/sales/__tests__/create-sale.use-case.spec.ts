@@ -166,7 +166,7 @@ describe('CreateSaleUseCase', () => {
     expect(eventPublisher.publishEvents).toHaveBeenCalled();
   });
 
-  it('should remain PENDING if paid with CREDIT_CARD', async () => {
+  it('should complete sale if paid with CREDIT_CARD', async () => {
     const product = makeProduct();
     productRepository.findById.mockResolvedValue(product);
     saleRepository.create.mockImplementation((tenantId, sale) =>
@@ -176,6 +176,22 @@ describe('CreateSaleUseCase', () => {
     const result = await useCase.execute({
       ...baseInput,
       payments: [{ method: 'CREDIT_CARD', amount: 40 }],
+    });
+
+    expect(result.status).toBe('COMPLETED');
+    expect(paymentRepository.create).toHaveBeenCalled();
+  });
+
+  it('should remain PENDING if paid with BOLETO', async () => {
+    const product = makeProduct();
+    productRepository.findById.mockResolvedValue(product);
+    saleRepository.create.mockImplementation((tenantId, sale) =>
+      Promise.resolve(sale),
+    );
+
+    const result = await useCase.execute({
+      ...baseInput,
+      payments: [{ method: 'BOLETO', amount: 40 }],
     });
 
     expect(result.status).toBe('PENDING');

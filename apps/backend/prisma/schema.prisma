@@ -15,8 +15,9 @@ model Tenant {
   id        String   @id @default(uuid())
   name      String
   slug      String   @unique
-  logoUrl   String?  @map("logo_url")
-  settings  Json?
+  logoUrl        String?  @map("logo_url")
+  commissionRate Decimal? @map("commission_rate") @db.Decimal(5, 2)
+  settings       Json?
   active    Boolean  @default(true)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -40,6 +41,8 @@ model Tenant {
   loyaltyAccounts         LoyaltyAccount[]
   loyaltyTransactions    LoyaltyTransaction[]
   financialAccounts       FinancialAccount[]
+  salesTargets            SalesTarget[]
+  commissions             CommissionTransaction[]
 
   @@map("tenants")
 }
@@ -73,6 +76,8 @@ model User {
   notificationPreferences NotificationPreference[]
   createdReturns          ReturnOrder[]            @relation("CreatedReturns")
   approvedReturns         ReturnOrder[]            @relation("ApprovedReturns")
+  salesTargets            SalesTarget[]
+  commissions             CommissionTransaction[]
 
   @@index([tenantId])
   @@map("users")
@@ -194,6 +199,7 @@ model Sale {
   returnOrders ReturnOrder[]
   loyaltyTransactions LoyaltyTransaction[]
   financialAccounts FinancialAccount[]
+  commissionTransaction CommissionTransaction?
 
   @@index([tenantId])
   @@index([createdAt])
@@ -644,5 +650,55 @@ model FinancialAccount {
   @@index([tenantId])
   @@index([saleId])
   @@map("financial_accounts")
+}
+
+// =====================
+// COMMISSIONS (SPRINT 4)
+// =====================
+
+model SalesTarget {
+  id           String   @id @default(uuid())
+  tenantId     String   @map("tenant_id")
+  userId       String   @map("user_id")
+  month        Int
+  year         Int
+  targetAmount Decimal  @map("target_amount") @db.Decimal(10, 2)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([tenantId, userId, month, year])
+  @@index([tenantId])
+  @@index([userId])
+  @@map("sales_targets")
+}
+
+enum CommissionStatus {
+  PENDING
+  PAID
+  REVERSED
+}
+
+model CommissionTransaction {
+  id                String           @id @default(uuid())
+  tenantId          String           @map("tenant_id")
+  userId            String           @map("user_id")
+  saleId            String           @unique @map("sale_id")
+  baseAmount        Decimal          @map("base_amount") @db.Decimal(10, 2)
+  percentageApplied Decimal          @map("percentage_applied") @db.Decimal(5, 2)
+  commissionAmount  Decimal          @map("commission_amount") @db.Decimal(10, 2)
+  status            CommissionStatus @default(PENDING)
+  createdAt         DateTime         @default(now()) @map("created_at")
+  updatedAt         DateTime         @updatedAt @map("updated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+  sale   Sale   @relation(fields: [saleId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([userId])
+  @@map("commission_transactions")
 }
 

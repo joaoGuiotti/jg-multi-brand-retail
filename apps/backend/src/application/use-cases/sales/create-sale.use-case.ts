@@ -127,7 +127,7 @@ export class CreateSaleUseCase implements UseCase<CreateSaleInput, SaleOutput> {
     });
 
     // Handle payments and status
-    let totalCashPaid = 0;
+    let totalPaid = 0;
     const paymentsToCreate: Payment[] = [];
 
     if (input.payments && input.payments.length > 0) {
@@ -145,17 +145,13 @@ export class CreateSaleUseCase implements UseCase<CreateSaleInput, SaleOutput> {
         });
         paymentsToCreate.push(payment);
 
-        if (payment.method === 'CASH') {
-          totalCashPaid += payment.amount;
+        if (paymentStatus === 'PAID') {
+          totalPaid += payment.amount;
         }
       }
 
-      const hasOnlyCashPayments = input.payments.every(
-        (p) => p.method === 'CASH',
-      );
-
-      if (hasOnlyCashPayments && totalCashPaid >= total) {
-        sale.complete(totalCashPaid, tenantId);
+      if (totalPaid >= total) {
+        sale.complete(totalPaid, tenantId);
       }
     }
 

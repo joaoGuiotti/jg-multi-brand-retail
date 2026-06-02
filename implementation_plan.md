@@ -43,13 +43,14 @@
 |---|---|---|---|
 | Sprint 1 | **Notificações & Alertas em Tempo Real** | ~6 dias | ✅ Concluído |
 | Sprint 2 | **Gestão de Devoluções & Trocas (RMA)** | ~4 dias | ✅ Concluído |
-| Sprint 3 | **Programa de Fidelidade & Cashback** | ~5 dias | ⏳ Próxima Feature |
-| Sprint 4 | **Comissionamento Inteligente (% Fixa)** | ~4 dias | 🔲 Pendente |
+| Sprint 3 | **Programa de Fidelidade & Cashback** | ~5 dias | ✅ Concluído |
+| Sprint 4 | **Comissionamento Inteligente (% Fixa)** | ~4 dias | ✅ Concluído |
 | Sprint 5-6 | **Cupons & Promoções Dinâmicas** | ~7 dias | 🔲 Pendente |
-| Sprint 7 | **Financeiro Completo & DRE** | ~5 dias | 🔲 Pendente |
+| Sprint 7 | **Financeiro Completo & DRE** | ~5 dias | ✅ Concluído |
 | Sprint 8 | **Inteligência Artificial (Gemini Flash)** | ~6 dias | 🔲 Pendente |
 | Sprint 9 | **Integração WhatsApp API** | ~4 dias | 🔲 Pendente |
 | Sprint 10 | **Billing & Assinaturas SaaS (Stripe/MP)** | ~5 dias | 🔲 Pendente |
+| Sprint 11 | **Emissão Fiscal (NFC-e / NF-e)** | ~8 dias | 🔲 Pendente |
 
 > [!NOTE]
 > Notificações são implementadas primeiro pois todos os outros módulos emitem triggers para ela. Isso evita retrofit posterior.
@@ -63,6 +64,8 @@
 [Fidelidade] ──────────────────────────────────────┼──► [Notificações] ◄── BASE
 [Comissões]  ──────────────────────────────────────┤
 [Promoções]  ──────────────────────────────────────┘
+
+[Emissão Fiscal] ──────────────────────────────────► [Vendas] + [Notificações]
 ```
 
 ---
@@ -591,7 +594,7 @@ src/app/features/returns/
 
 # 📦 Módulo 3: Programa de Fidelidade & Cashback
 
-> **Sprint 3 — Status: ⏳ Próxima Feature** | *Depende de: Notificações (Sprint 1)*
+> **Sprint 3 — Status: ✅ Concluído** | *Depende de: Notificações (Sprint 1)*
 
 ## 🎯 Objetivo
 
@@ -799,8 +802,47 @@ src/app/features/loyalty/
 | **TOTAL** | **~36h (~5 dias)** |
 
 ---
+---
+
+# 📦 Módulo 11: Emissão Fiscal (NFC-e / NF-e)
+
+> **Sprint 11 — Status: 🔲 Pendente** | *Depende de: Vendas + Notificações (Sprints Anteriores)*
+
+## 🎯 Objetivo
+
+Integrar a emissão de cupons fiscais eletrônicos (NFC-e) diretamente pelo PDV e Notas Fiscais Eletrônicas (NF-e) para o backoffice, utilizando uma API de mensageria de terceiros (ex: Focus NFe, Webmania). Isso elimina a complexidade de assinar e transmitir XMLs diretamente para a SEFAZ, além de garantir a emissão mesmo com instabilidades da fazenda local.
+
+> [!NOTE]
+> Conforme definido com o Tech Lead, este módulo será atacado nas **últimas sprints (Sprint 11)**, permitindo que a loja consolide sua operação de vendas e MVP antes da obrigatoriedade fiscal automatizada.
+
+## 🧱 Backend (NestJS)
+
+- **Novas Entidades Fiscais:** Expandir `Tenant` (CNPJ, Inscrição Estadual, Certificado A1), `Product` (NCM, CEST, CST, Origem) e criar `Invoice` (status da nota, link DANFE, xml).
+- **Emissão Assíncrona via BullMQ:** Ao fechar a venda, um job processa os dados, monta o payload e envia para a API Parceira, evitando que o PDV trave.
+- **Webhooks:** Endpoint para receber o retorno da API Parceira ("Autorizada", "Rejeitada", "Cancelada") e atualizar o status no banco.
+- **Integração com Notificações:** Emite alerta em tempo real (`HIGH`) via WebSocket para o vendedor quando a nota é autorizada (pronta para impressão) ou rejeitada (erro no NCM, por exemplo).
+
+## 🎨 Frontend (Angular)
+
+- **Configurações Fiscais da Loja:** Upload de certificado `.pfx` e parametrização.
+- **Aba Tributária no Produto:** Cadastro de NCM e impostos de produtos.
+- **Integração no PDV:** 
+  - Possibilidade de "CPF na Nota".
+  - Botão para emissão de cupom fiscal na finalização da venda.
+- **Histórico e Impressão:** Download de XML e DANFE nas listagens de vendas.
+
+## ⏱️ Estimativa Técnica
+
+Esforço aproximado de **~8 dias** considerando integrações de API externa, filas assíncronas e lidar com exceções da SEFAZ.
+
+---
 
 ## 📦 Dependências
+
+| Pacote | Onde | Observação |
+|---|---|---|
+| `@nestjs/bullmq` | Backend | Para gestão da fila assíncrona de emissão fiscal e tratamento de falhas da SEFAZ. |
+| `bullmq` | Backend | Motor da fila e sistema de retry persistido em Redis (introduzido no Módulo 1). |
 
 - `NotificationsModule` (Sprint 1)
 
@@ -809,7 +851,7 @@ src/app/features/loyalty/
 
 # 📦 Módulo 4: Comissionamento Inteligente (% Fixa v1)
 
-> **Sprint 4 — Status: 🔲 Pendente** | *Depende de: Notificações (Sprint 1)*
+> **Sprint 4 — Status: ✅ Concluído** | *Depende de: Notificações (Sprint 1)*
 
 ## 🎯 Objetivo
 

@@ -5,6 +5,7 @@ export interface TenantProps {
   name: string;
   slug: string;
   logoUrl?: string | null;
+  commissionRate?: number | null;
   settings?: any;
   active: boolean;
   createdAt?: Date;
@@ -39,6 +40,9 @@ export class Tenant extends AggregateRoot<TenantProps> {
   get logoUrl(): string | null | undefined {
     return this.props.logoUrl;
   }
+  get commissionRate(): number | null | undefined {
+    return this.props.commissionRate;
+  }
   get settings(): any {
     return this.props.settings;
   }
@@ -64,6 +68,11 @@ export class Tenant extends AggregateRoot<TenantProps> {
 
   public updateName(name: string): void {
     this.props.name = name;
+    this.props.updatedAt = new Date();
+  }
+
+  public updateCommissionRate(rate: number | null): void {
+    this.props.commissionRate = rate;
     this.props.updatedAt = new Date();
   }
 

@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, signal, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { UiAutocompleteComponent, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiDocumentPipe, UiModalService, UiNumberPipe, UiPageHeaderComponent } from '@shared/ui';
+import { ToastService, UiAutocompleteComponent, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiDocumentPipe, UiModalService, UiNumberPipe, UiPageHeaderComponent } from '@shared/ui';
 import { Customer } from '../../../../core/models/customer.model';
 import { Product } from '../../../../core/models/product.model';
 import { CustomersService } from '../../../../core/services/customers.service';
@@ -36,6 +36,7 @@ export class PosComponent {
     private customersService = inject(CustomersService);
     private modalService = inject(UiModalService);
     private router = inject(Router);
+    private toastService = inject(ToastService);
     cartStore = inject(CartStore);
     protected loyaltyStore = inject(LoyaltyStore);
 
@@ -105,7 +106,7 @@ export class PosComponent {
 
     addToCart(product: Product): void {
         if (product.stockQuantity <= 0) {
-            alert('Product out of stock');
+            this.toastService.warning('Sem estoque', 'Este produto está sem estoque disponível.');
             return;
         }
         this.cartStore.addItem(product);
@@ -166,7 +167,7 @@ export class PosComponent {
 
     openPaymentModal(): void {
         if (this.cartStore.itemCount() === 0) {
-            alert('Cart is empty');
+            this.toastService.warning('Carrinho vazio', 'Adicione pelo menos um produto antes de finalizar.');
             return;
         }
 
@@ -189,14 +190,16 @@ export class PosComponent {
         ref.afterClosed()
             .subscribe((result) => {
                 if (result?.invoiceNumber) {
-                    alert(`Venda finalizada! Cupom: ${result.invoiceNumber}`);
+                    this.toastService.success(
+                        'Venda finalizada!',
+                        `Cupom fiscal: ${result.invoiceNumber}`
+                    );
                 }
             })
     }
 
     clearCart(): void {
-        if (confirm('Clear cart?')) {
-            this.cartStore.clearCart();
-        }
+        this.cartStore.clearCart();
+        this.toastService.info('Carrinho limpo', 'Todos os itens foram removidos.');
     }
 }

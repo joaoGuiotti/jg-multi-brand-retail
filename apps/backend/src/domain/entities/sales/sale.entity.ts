@@ -148,6 +148,13 @@ export class Sale extends AggregateRoot<SaleProps> {
     this.props.status = 'COMPLETED';
     this.props.updatedAt = new Date();
 
+    if (!this.props.invoiceNumber) {
+      const date = new Date();
+      const datePart = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
+      const randomPart = Math.random().toString(36).substring(2, 7).toUpperCase();
+      this.props.invoiceNumber = `INV-${datePart}-${randomPart}`;
+    }
+
     this.applyEvent(new SaleCompletedEvent(this, tenantId));
   }
 

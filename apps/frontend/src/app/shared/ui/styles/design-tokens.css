@@ -61,10 +61,10 @@
     /* slate-300 */
 
     /* ── Status ───────────────────────────────────────────── */
-    --color-success: #10b981;
-    /* emerald-500 */
-    --color-success-bg: #d1fae5;
-    /* emerald-100 */
+    --color-success: #065f46;
+    /* emerald-900 - high contrast on light bg */
+    --color-success-bg: #ecfdf5;
+    /* emerald-50 - clean, subtle green background */
     --color-warning: #f59e0b;
     /* amber-500   */
     --color-warning-bg: #fef3c7;

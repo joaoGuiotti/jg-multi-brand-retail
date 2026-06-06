@@ -35,10 +35,10 @@
     /* slate-600 */
 
     /* Status Colors */
-    --color-success: #34d399;
-    /* emerald-400 */
+    --color-success: #6ee7b7;
+    /* emerald-300 - bright, legible on dark bg */
     --color-success-bg: #064e3b;
-    /* emerald-900 */
+    /* emerald-900 - balanced dark green background */
     --color-warning: #fbbf24;
     /* amber-400 */
     --color-warning-bg: #78350f;

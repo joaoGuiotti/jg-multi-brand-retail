@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, inject, signal, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -17,17 +17,16 @@ import { PaymentModalComponent, PaymentModalResult } from './payment-modal.compo
     selector: 'app-pos',
     standalone: true,
     imports: [
-        CommonModule, 
-        FormsModule, 
-        UiBadgeComponent, 
-        UiButtonComponent, 
-        UiCardComponent, 
-        UiNumberPipe, 
-        UiDocumentPipe, 
-        UiAutocompleteComponent,
-        LoyaltyBadgeComponent,
-        UiPageHeaderComponent
-    ],
+    FormsModule,
+    UiBadgeComponent,
+    UiButtonComponent,
+    UiCardComponent,
+    UiNumberPipe,
+    UiDocumentPipe,
+    UiAutocompleteComponent,
+    LoyaltyBadgeComponent,
+    UiPageHeaderComponent
+],
     templateUrl: './pos.component.html',
     styleUrl: './pos.component.scss'
 })

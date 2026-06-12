@@ -10,12 +10,13 @@ import {
   signal,
   computed,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { NgClass } from '@angular/common';
+
 
 @Component({
   selector: 'ui-step',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   template: `
     @if (isActive()) {
       <div class="animate-fade-in content-wrapper">
@@ -35,7 +36,7 @@ export class UiStepComponent {
 @Component({
   selector: 'ui-stepper',
   standalone: true,
-  imports: [CommonModule],
+  imports: [NgClass],
   template: `
     <div class="block overflow-hidden">
       <!-- Stepper Header (Timeline) -->
@@ -44,11 +45,11 @@ export class UiStepComponent {
       <div class="flex items-center justify-between relative px-2 mb-10 min-h-[40px]">
         <!-- Progress Background line (Gray) -->
         <div class="absolute top-5 left-0 w-full h-0.5 bg-outline -translate-y-1/2 z-10"></div>
-        
+    
         <!-- Active Progress line (Primary) -->
         <div class="absolute top-5 left-0 h-0.5 bg-primary -translate-y-1/2 z-20 transition-all duration-500"
-          [style.width.%]="progressWidth()"></div>
-
+        [style.width.%]="progressWidth()"></div>
+    
         <!-- Render Step Indicators -->
         @for (step of stepsList(); track $index) {
           <div class="flex flex-col items-center gap-2 group relative z-30">
@@ -57,10 +58,14 @@ export class UiStepComponent {
                 'bg-primary border-primary text-white shadow-lg': currentStep >= step.index(),
                 'bg-surface border-outline text-content-tertiary': currentStep < step.index()
               }">
-              <span *ngIf="currentStep <= step.index()">{{ step.index() }}</span>
-              <svg *ngIf="currentStep > step.index()" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-              </svg>
+              @if (currentStep <= step.index()) {
+                <span>{{ step.index() }}</span>
+              }
+              @if (currentStep > step.index()) {
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                </svg>
+              }
             </div>
             <span class="text-xs font-medium"
               [ngClass]="{'text-primary': currentStep >= step.index(), 'text-content-tertiary': currentStep < step.index()}">
@@ -69,13 +74,13 @@ export class UiStepComponent {
           </div>
         }
       </div>
-
+    
       <!-- Stepper Content Body -->
       <div class="stepper-body">
         <ng-content></ng-content>
       </div>
     </div>
-  `,
+    `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UiStepperComponent implements AfterContentInit, OnChanges {

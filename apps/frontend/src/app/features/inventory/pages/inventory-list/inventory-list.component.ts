@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, computed, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
@@ -23,15 +23,14 @@ import { AddMovementModalComponent } from '../../components/add-movement-modal/a
     selector: 'app-inventory-list',
     standalone: true,
     imports: [
-        CommonModule,
-        FormsModule,
-        UiButtonComponent,
-        UiBadgeComponent,
-        UiCardComponent,
-        UiTableComponent,
-        UiPageHeaderComponent,
-        UiTableColumnDirective,
-    ],
+    FormsModule,
+    UiButtonComponent,
+    UiBadgeComponent,
+    UiCardComponent,
+    UiTableComponent,
+    UiPageHeaderComponent,
+    UiTableColumnDirective
+],
     templateUrl: './inventory-list.component.html',
     styleUrl: './inventory-list.component.scss',
 })

@@ -1,5 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterModule } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
 import { User } from '@core/models/auth.model';
@@ -19,16 +19,15 @@ import {
   selector: 'app-user-list',
   standalone: true,
   imports: [
-    CommonModule, 
-    RouterModule, 
-    UiButtonComponent, 
-    UiCardComponent, 
-    UiBadgeComponent, 
-    UiTableComponent, 
+    RouterModule,
+    UiButtonComponent,
+    UiCardComponent,
+    UiBadgeComponent,
+    UiTableComponent,
     UiTableColumnDirective,
     UiTooltipDirective,
     UiPageHeaderComponent
-  ],
+],
   templateUrl: './user-list.component.html',
   styleUrl: './user-list.component.scss'
 })

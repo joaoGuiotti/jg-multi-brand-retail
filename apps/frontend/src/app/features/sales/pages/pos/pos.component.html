@@ -1,310 +1,321 @@
 <div class="mx-auto pb-8">
 
-    <!-- Page Header -->
-    <ui-page-header title="Frente de Caixa" subtitle="Ponto de Venda (PDV)">
-    </ui-page-header>
+  <!-- Page Header -->
+  <ui-page-header title="Frente de Caixa" subtitle="Ponto de Venda (PDV)">
+  </ui-page-header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
 
-        <!-- ── Coluna Principal (2/3) ─────────────────────────────── -->
-        <div class="lg:col-span-2 flex flex-col gap-5">
+    <!-- ── Coluna Principal (2/3) ─────────────────────────────── -->
+    <div class="lg:col-span-2 flex flex-col gap-5">
 
-            <!-- Busca: Cliente + Produto -->
-            <div class="bg-surface border border-outline rounded-2xl shadow-sm overflow-hidden">
-                <div class="px-6 pt-5 pb-3 border-b border-outline bg-surface-tertiary/60">
-                    <h2 class="text-xs font-bold text-content-tertiary uppercase tracking-widest">Configurar Venda</h2>
+      <!-- Busca: Cliente + Produto -->
+      <div class="bg-surface border border-outline rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-6 pt-5 pb-3 border-b border-outline bg-surface-tertiary/60">
+          <h2 class="text-xs font-bold text-content-tertiary uppercase tracking-widest">Configurar Venda</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-outline">
+
+          <!-- Cliente -->
+          <div class="p-5 flex flex-col gap-3">
+            <div class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-content-tertiary"
+                fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                </svg>
+                <span
+                class="text-xs font-bold text-content-secondary uppercase tracking-wider">Cliente</span>
+              </div>
+
+              <!-- Campo de busca -->
+              @if (!selectedCustomer()) {
+                <div>
+                  <ui-autocomplete [suggestions]="customerSearchResults()"
+                    (completeMethod)="searchCustomers($event)" (onSelect)="selectCustomer($event)"
+                    placeholder="Buscar por nome ou CPF..." [loading]="isSearchingCustomer()"
+                    field="firstName" [dropdown]="true">
+                    <ng-template #itemTemplate let-customer>
+                      <div class="flex items-center gap-3 w-full">
+                        <div
+                          class="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0">
+                          {{ customer.firstName?.substring(0, 1) }}{{ customer.lastName?.substring(0,
+                          1) }}
+                        </div>
+                        <div class="min-w-0 flex-1">
+                          <p class="font-semibold text-content text-sm truncate">{{ customer.firstName
+                          }} {{ customer.lastName }}</p>
+                          <p class="text-content-secondary text-xs truncate">{{ customer.email }} · {{
+                          customer.document | uiDocument }}</p>
+                        </div>
+                      </div>
+                    </ng-template>
+                  </ui-autocomplete>
+                </div>
+              }
+
+              <!-- Cliente Selecionado -->
+              @if (selectedCustomer()) {
+                <div class="flex flex-col gap-3 animate-fade-in">
+                  <!-- Card do cliente -->
+                  <div
+                    class="flex items-center justify-between p-3 bg-primary/5 border border-primary/20 rounded-xl">
+                    <div class="flex items-center gap-3 overflow-hidden">
+                      <div
+                        class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold shrink-0 shadow-sm">
+                        {{ selectedCustomer()?.firstName?.substring(0, 1) }}{{
+                        selectedCustomer()?.lastName?.substring(0, 1) }}
+                      </div>
+                      <div class="overflow-hidden">
+                        <h3 class="font-bold text-sm text-content-primary truncate">
+                          {{ selectedCustomer()?.firstName }} {{ selectedCustomer()?.lastName }}
+                        </h3>
+                        <p class="text-xs text-content-tertiary truncate">{{
+                        selectedCustomer()?.document | uiDocument }}</p>
+                      </div>
+                    </div>
+                    <ui-button (click)="removeCustomer()" variant="ghost" size="sm" [outline]="true">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </ui-button>
+                    </div>
+                    <!-- Badge de Fidelidade -->
+                    <app-loyalty-badge (redeemClick)="openRedeemModal()"></app-loyalty-badge>
+                  </div>
+                }
+              </div>
+
+              <!-- Produto -->
+              <div class="p-5 flex flex-col gap-3">
+                <div class="flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-content-tertiary"
+                    fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                    </svg>
+                    <span class="text-xs font-bold text-content-secondary uppercase tracking-wider">Adicionar
+                    Produto</span>
+                  </div>
+
+                  <ui-autocomplete #productAuto [suggestions]="searchResults()"
+                    (completeMethod)="searchProducts($event)"
+                    (onSelect)="addToCart($event); productAuto.reset()" placeholder="Buscar por nome ou SKU..."
+                    [loading]="isSearching()" field="name" [dropdown]="true">
+                    <ng-template #itemTemplate let-product>
+                      <div class="flex items-center justify-between w-full gap-3">
+                        <div class="flex-1 overflow-hidden">
+                          <h3 class="font-semibold text-content text-sm truncate">{{ product.name }}</h3>
+                          <div class="flex items-center gap-2 mt-0.5">
+                            <p class="text-[10px] text-content-tertiary">{{ product.sku }}</p>
+                            <ui-badge size="sm"
+                              [variant]="product.stockQuantity <= 0 ? 'error' : product.stockQuantity < 10 ? 'warning' : 'success'">
+                              {{ product.stockQuantity <= 0 ? 'Sem estoque' : product.stockQuantity
+                            + ' em estoque' }} </ui-badge>
+                          </div>
+                        </div>
+                        <span class="text-sm font-bold text-primary shrink-0">
+                          {{ product.salePrice | uiNumber: { prefix: 'R$ ' } }}
+                        </span>
+                      </div>
+                    </ng-template>
+                  </ui-autocomplete>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-outline">
-
-                    <!-- Cliente -->
-                    <div class="p-5 flex flex-col gap-3">
-                        <div class="flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-content-tertiary"
-                                fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                            </svg>
-                            <span
-                                class="text-xs font-bold text-content-secondary uppercase tracking-wider">Cliente</span>
-                        </div>
-
-                        <!-- Campo de busca -->
-                        <div *ngIf="!selectedCustomer()">
-                            <ui-autocomplete [suggestions]="customerSearchResults()"
-                                (completeMethod)="searchCustomers($event)" (onSelect)="selectCustomer($event)"
-                                placeholder="Buscar por nome ou CPF..." [loading]="isSearchingCustomer()"
-                                field="firstName" [dropdown]="true">
-                                <ng-template #itemTemplate let-customer>
-                                    <div class="flex items-center gap-3 w-full">
-                                        <div
-                                            class="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0">
-                                            {{ customer.firstName?.substring(0, 1) }}{{ customer.lastName?.substring(0,
-                                            1) }}
-                                        </div>
-                                        <div class="min-w-0 flex-1">
-                                            <p class="font-semibold text-content text-sm truncate">{{ customer.firstName
-                                                }} {{ customer.lastName }}</p>
-                                            <p class="text-content-secondary text-xs truncate">{{ customer.email }} · {{
-                                                customer.document | uiDocument }}</p>
-                                        </div>
-                                    </div>
-                                </ng-template>
-                            </ui-autocomplete>
-                        </div>
-
-                        <!-- Cliente Selecionado -->
-                        <div *ngIf="selectedCustomer()" class="flex flex-col gap-3 animate-fade-in">
-                            <!-- Card do cliente -->
-                            <div
-                                class="flex items-center justify-between p-3 bg-primary/5 border border-primary/20 rounded-xl">
-                                <div class="flex items-center gap-3 overflow-hidden">
-                                    <div
-                                        class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold shrink-0 shadow-sm">
-                                        {{ selectedCustomer()?.firstName?.substring(0, 1) }}{{
-                                        selectedCustomer()?.lastName?.substring(0, 1) }}
-                                    </div>
-                                    <div class="overflow-hidden">
-                                        <h3 class="font-bold text-sm text-content-primary truncate">
-                                            {{ selectedCustomer()?.firstName }} {{ selectedCustomer()?.lastName }}
-                                        </h3>
-                                        <p class="text-xs text-content-tertiary truncate">{{
-                                            selectedCustomer()?.document | uiDocument }}</p>
-                                    </div>
-                                </div>
-                                <ui-button (click)="removeCustomer()" variant="ghost" size="sm" [outline]="true">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </ui-button>
-                            </div>
-
-                            <!-- Badge de Fidelidade -->
-                            <app-loyalty-badge (redeemClick)="openRedeemModal()"></app-loyalty-badge>
-                        </div>
-                    </div>
-
-                    <!-- Produto -->
-                    <div class="p-5 flex flex-col gap-3">
-                        <div class="flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-content-tertiary"
-                                fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                            </svg>
-                            <span class="text-xs font-bold text-content-secondary uppercase tracking-wider">Adicionar
-                                Produto</span>
-                        </div>
-
-                        <ui-autocomplete #productAuto [suggestions]="searchResults()"
-                            (completeMethod)="searchProducts($event)"
-                            (onSelect)="addToCart($event); productAuto.reset()" placeholder="Buscar por nome ou SKU..."
-                            [loading]="isSearching()" field="name" [dropdown]="true">
-                            <ng-template #itemTemplate let-product>
-                                <div class="flex items-center justify-between w-full gap-3">
-                                    <div class="flex-1 overflow-hidden">
-                                        <h3 class="font-semibold text-content text-sm truncate">{{ product.name }}</h3>
-                                        <div class="flex items-center gap-2 mt-0.5">
-                                            <p class="text-[10px] text-content-tertiary">{{ product.sku }}</p>
-                                            <ui-badge size="sm"
-                                                [variant]="product.stockQuantity <= 0 ? 'error' : product.stockQuantity < 10 ? 'warning' : 'success'">
-                                                {{ product.stockQuantity <= 0 ? 'Sem estoque' : product.stockQuantity
-                                                    + ' em estoque' }} </ui-badge>
-                                        </div>
-                                    </div>
-                                    <span class="text-sm font-bold text-primary shrink-0">
-                                        {{ product.salePrice | uiNumber: { prefix: 'R$ ' } }}
-                                    </span>
-                                </div>
-                            </ng-template>
-                        </ui-autocomplete>
-                    </div>
-
-                </div>
+              </div>
             </div>
 
             <!-- Carrinho -->
             <ui-card title="Itens do Carrinho" subTitle="Produtos adicionados à venda atual" class="block"
-                padding="none">
-                <div cardHeader class="p-2 bg-primary text-white rounded-lg shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="8" cy="21" r="1" />
-                        <circle cx="19" cy="21" r="1" />
-                        <path d="M2.05 2.05h1.95L6.68 14.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-                    </svg>
-                </div>
+              padding="none">
+              <div cardHeader class="p-2 bg-primary text-white rounded-lg shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="8" cy="21" r="1" />
+                  <circle cx="19" cy="21" r="1" />
+                  <path d="M2.05 2.05h1.95L6.68 14.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                </svg>
+              </div>
 
-                <!-- Title slot override via cardHeader — main title rendered as DS card title -->
-                <div class="px-6 py-5">
+              <!-- Title slot override via cardHeader — main title rendered as DS card title -->
+              <div class="px-6 py-5">
 
-                    <!-- Estado vazio -->
-                    <div *ngIf="cartStore.itemCount() === 0"
-                        class="flex flex-col items-center justify-center py-14 gap-3 rounded-2xl bg-surface-tertiary/50">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-content-tertiary/50" fill="none"
-                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
-                        </svg>
-                        <div class="text-center">
-                            <p class="text-sm font-semibold text-content-secondary">Carrinho vazio</p>
-                            <p class="text-xs text-content-tertiary mt-0.5">Busque e adicione produtos para iniciar uma
-                                venda.</p>
-                        </div>
+                <!-- Estado vazio -->
+                @if (cartStore.itemCount() === 0) {
+                  <div
+                    class="flex flex-col items-center justify-center py-14 gap-3 rounded-2xl bg-surface-tertiary/50">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-content-tertiary/50" fill="none"
+                      viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                      </svg>
+                      <div class="text-center">
+                        <p class="text-sm font-semibold text-content-secondary">Carrinho vazio</p>
+                        <p class="text-xs text-content-tertiary mt-0.5">Busque e adicione produtos para iniciar uma
+                        venda.</p>
+                      </div>
                     </div>
+                  }
 
-                    <!-- Itens do carrinho -->
-                    <div *ngIf="cartStore.itemCount() > 0" class="space-y-2">
-                        <div *ngFor="let item of cartStore.cartItems()"
-                            class="flex items-center justify-between gap-4 p-4 border border-outline rounded-xl hover:bg-surface-tertiary/40 transition-colors">
-
-                            <!-- Produto Info -->
-                            <div class="flex-1 min-w-0">
-                                <h3 class="font-semibold text-sm text-content-primary truncate">{{ item.product.name }}
-                                </h3>
-                                <p class="text-xs text-content-tertiary mt-0.5">
-                                    {{ item.unitPrice | uiNumber: { prefix: 'R$ ' } }} / un.
-                                </p>
-                            </div>
-
-                            <!-- Controles de qtd + total + remover -->
-                            <div class="flex items-center gap-4 shrink-0">
-                                <!-- Stepper -->
-                                <div
-                                    class="flex items-center gap-1 bg-surface-tertiary border border-outline rounded-lg p-0.5">
-                                    <ui-button (click)="decrementQuantity(item.product.id)" variant="ghost" size="sm">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                                d="M20 12H4" />
-                                        </svg>
-                                    </ui-button>
-                                    <span class="w-8 text-center text-sm font-bold text-content-primary tabular-nums">{{
-                                        item.quantity }}</span>
-                                    <ui-button (click)="incrementQuantity(item.product.id)" variant="ghost" size="sm">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                                d="M12 4v16m8-8H4" />
-                                        </svg>
-                                    </ui-button>
+                  <!-- Itens do carrinho -->
+                  @if (cartStore.itemCount() > 0) {
+                    <div class="space-y-2">
+                      @for (item of cartStore.cartItems(); track item) {
+                        <div
+                          class="flex items-center justify-between gap-4 p-4 border border-outline rounded-xl hover:bg-surface-tertiary/40 transition-colors">
+                          <!-- Produto Info -->
+                          <div class="flex-1 min-w-0">
+                            <h3 class="font-semibold text-sm text-content-primary truncate">{{ item.product.name }}
+                            </h3>
+                            <p class="text-xs text-content-tertiary mt-0.5">
+                              {{ item.unitPrice | uiNumber: { prefix: 'R$ ' } }} / un.
+                            </p>
+                          </div>
+                          <!-- Controles de qtd + total + remover -->
+                          <div class="flex items-center gap-4 shrink-0">
+                            <!-- Stepper -->
+                            <div
+                              class="flex items-center gap-1 bg-surface-tertiary border border-outline rounded-lg p-0.5">
+                              <ui-button (click)="decrementQuantity(item.product.id)" variant="ghost" size="sm">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                    d="M20 12H4" />
+                                  </svg>
+                                </ui-button>
+                                <span class="w-8 text-center text-sm font-bold text-content-primary tabular-nums">{{
+                                item.quantity }}</span>
+                                <ui-button (click)="incrementQuantity(item.product.id)" variant="ghost" size="sm">
+                                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                      d="M12 4v16m8-8H4" />
+                                    </svg>
+                                  </ui-button>
                                 </div>
-
                                 <!-- Total da linha -->
                                 <span class="w-24 text-right font-bold text-sm text-content-primary tabular-nums">
-                                    {{ (item.unitPrice * item.quantity) | uiNumber: { prefix: 'R$ ' } }}
+                                  {{ (item.unitPrice * item.quantity) | uiNumber: { prefix: 'R$ ' } }}
                                 </span>
-
                                 <!-- Remover -->
                                 <ui-button (click)="removeFromCart(item.product.id)" variant="danger" size="sm"
-                                    [outline]="true">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                  [outline]="true">
+                                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                     </svg>
-                                </ui-button>
-                            </div>
+                                  </ui-button>
+                                </div>
+                              </div>
+                            }
+                          </div>
+                        }
+
+                      </div>
+                    </ui-card>
+                  </div>
+
+                  <!-- ── Coluna Resumo (1/3) ─────────────────────────────────── -->
+                  <div class="lg:col-span-1">
+                    <div class="bg-surface border border-outline rounded-2xl shadow-sm sticky top-6 overflow-hidden">
+
+                      <!-- Header do resumo -->
+                      <div class="px-6 pt-5 pb-4 border-b border-outline bg-surface-tertiary/60">
+                        <h2 class="text-sm font-bold text-content-primary">Resumo da Venda</h2>
+                        <p class="text-xs text-content-tertiary mt-0.5">Valores calculados em tempo real</p>
+                      </div>
+
+                      <!-- Linhas de valores -->
+                      <div class="px-6 pt-5 pb-4 space-y-3">
+
+                        <!-- Itens -->
+                        <div class="flex justify-between items-center text-sm text-content-secondary">
+                          <span>Itens no carrinho</span>
+                          <span class="font-semibold text-content-primary">{{ cartStore.itemCount() }}</span>
                         </div>
-                    </div>
 
-                </div>
-            </ui-card>
-        </div>
-
-        <!-- ── Coluna Resumo (1/3) ─────────────────────────────────── -->
-        <div class="lg:col-span-1">
-            <div class="bg-surface border border-outline rounded-2xl shadow-sm sticky top-6 overflow-hidden">
-
-                <!-- Header do resumo -->
-                <div class="px-6 pt-5 pb-4 border-b border-outline bg-surface-tertiary/60">
-                    <h2 class="text-sm font-bold text-content-primary">Resumo da Venda</h2>
-                    <p class="text-xs text-content-tertiary mt-0.5">Valores calculados em tempo real</p>
-                </div>
-
-                <!-- Linhas de valores -->
-                <div class="px-6 pt-5 pb-4 space-y-3">
-
-                    <!-- Itens -->
-                    <div class="flex justify-between items-center text-sm text-content-secondary">
-                        <span>Itens no carrinho</span>
-                        <span class="font-semibold text-content-primary">{{ cartStore.itemCount() }}</span>
-                    </div>
-
-                    <!-- Subtotal -->
-                    <div class="flex justify-between items-center text-sm text-content-secondary">
-                        <span>Subtotal</span>
-                        <span class="font-semibold text-content-primary tabular-nums">
+                        <!-- Subtotal -->
+                        <div class="flex justify-between items-center text-sm text-content-secondary">
+                          <span>Subtotal</span>
+                          <span class="font-semibold text-content-primary tabular-nums">
                             {{ cartStore.subtotal() | uiNumber: { prefix: 'R$ ' } }}
-                        </span>
-                    </div>
+                          </span>
+                        </div>
 
-                    <!-- Desconto de produto (se houver) -->
-                    <div *ngIf="cartStore.totalDiscount() > 0" class="flex justify-between items-center text-sm">
-                        <span class="text-danger">Desconto</span>
-                        <span class="font-semibold text-danger tabular-nums">
-                            − {{ cartStore.totalDiscount() | uiNumber: { prefix: 'R$ ' } }}
-                        </span>
-                    </div>
+                        <!-- Desconto de produto (se houver) -->
+                        @if (cartStore.totalDiscount() > 0) {
+                          <div class="flex justify-between items-center text-sm">
+                            <span class="text-danger">Desconto</span>
+                            <span class="font-semibold text-danger tabular-nums">
+                              − {{ cartStore.totalDiscount() | uiNumber: { prefix: 'R$ ' } }}
+                            </span>
+                          </div>
+                        }
 
-                    <!-- Cashback resgatado (se houver) -->
-                    <div *ngIf="loyaltyStore.discountApplied() > 0"
-                        class="flex justify-between items-center text-sm p-2.5 bg-amber-500/8 border border-amber-500/20 rounded-lg">
-                        <div class="flex items-center gap-1.5">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                        <!-- Cashback resgatado (se houver) -->
+                        @if (loyaltyStore.discountApplied() > 0) {
+                          <div
+                            class="flex justify-between items-center text-sm p-2.5 bg-amber-500/8 border border-amber-500/20 rounded-lg">
+                            <div class="flex items-center gap-1.5">
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                                 class="w-3.5 h-3.5 text-amber-500">
                                 <path fill-rule="evenodd"
-                                    d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                            <span class="text-amber-600 dark:text-amber-400 font-semibold">Cashback</span>
-                        </div>
-                        <span class="font-bold text-amber-600 dark:text-amber-400 tabular-nums">
-                            − {{ loyaltyStore.discountApplied() | uiNumber: { prefix: 'R$ ' } }}
-                        </span>
-                    </div>
+                                  d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z"
+                                  clip-rule="evenodd" />
+                                </svg>
+                                <span class="text-amber-600 dark:text-amber-400 font-semibold">Cashback</span>
+                              </div>
+                              <span class="font-bold text-amber-600 dark:text-amber-400 tabular-nums">
+                                − {{ loyaltyStore.discountApplied() | uiNumber: { prefix: 'R$ ' } }}
+                              </span>
+                            </div>
+                          }
 
-                    <!-- Separador -->
-                    <div class="border-t border-outline pt-3">
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm font-bold text-content-primary">Total Líquido</span>
-                            <span class="text-xl font-extrabold text-content-primary tabular-nums">
+                          <!-- Separador -->
+                          <div class="border-t border-outline pt-3">
+                            <div class="flex justify-between items-center">
+                              <span class="text-sm font-bold text-content-primary">Total Líquido</span>
+                              <span class="text-xl font-extrabold text-content-primary tabular-nums">
                                 {{ totalToPay | uiNumber: { prefix: 'R$ ' } }}
-                            </span>
-                        </div>
-                    </div>
+                              </span>
+                            </div>
+                          </div>
 
-                    <!-- Cliente vinculado -->
-                    <div *ngIf="selectedCustomer()"
-                        class="flex items-center gap-2 p-2.5 bg-primary/5 border border-primary/15 rounded-lg mt-1">
-                        <div
-                            class="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white text-[10px] font-bold shrink-0">
-                            {{ selectedCustomer()?.firstName?.substring(0, 1) }}{{
-                            selectedCustomer()?.lastName?.substring(0, 1) }}
+                          <!-- Cliente vinculado -->
+                          @if (selectedCustomer()) {
+                            <div
+                              class="flex items-center gap-2 p-2.5 bg-primary/5 border border-primary/15 rounded-lg mt-1">
+                              <div
+                                class="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white text-[10px] font-bold shrink-0">
+                                {{ selectedCustomer()?.firstName?.substring(0, 1) }}{{
+                                selectedCustomer()?.lastName?.substring(0, 1) }}
+                              </div>
+                              <span class="text-xs text-content-secondary font-medium truncate">
+                                {{ selectedCustomer()?.firstName }} {{ selectedCustomer()?.lastName }}
+                              </span>
+                            </div>
+                          }
                         </div>
-                        <span class="text-xs text-content-secondary font-medium truncate">
-                            {{ selectedCustomer()?.firstName }} {{ selectedCustomer()?.lastName }}
-                        </span>
-                    </div>
-                </div>
 
-                <!-- Ações -->
-                <div class="px-6 pb-6 pt-2 flex flex-col gap-3">
-                    <ui-button [fullWidth]="true" variant="primary" size="lg" (click)="openPaymentModal()"
-                        [disabled]="cartStore.itemCount() === 0">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        <!-- Ações -->
+                        <div class="px-6 pb-6 pt-2 flex flex-col gap-3">
+                          <ui-button [fullWidth]="true" variant="primary" size="lg" (click)="openPaymentModal()"
+                            [disabled]="cartStore.itemCount() === 0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                        </svg>
-                        Processar Pagamento
-                    </ui-button>
+                              </svg>
+                              Processar Pagamento
+                            </ui-button>
 
-                    <ui-button [fullWidth]="true" variant="danger" [outline]="true" (click)="clearCart()"
-                        [disabled]="cartStore.itemCount() === 0">
-                        Limpar Carrinho
-                    </ui-button>
-                </div>
+                            <ui-button [fullWidth]="true" variant="danger" [outline]="true" (click)="clearCart()"
+                              [disabled]="cartStore.itemCount() === 0">
+                              Limpar Carrinho
+                            </ui-button>
+                          </div>
 
-            </div>
-        </div>
+                        </div>
+                      </div>
 
-    </div>
-</div>
+                    </div>
+                  </div>

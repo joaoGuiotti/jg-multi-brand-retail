@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, computed, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -11,7 +11,7 @@ import { ProductFormComponent } from '../product-form/product-form.component';
 @Component({
     selector: 'app-product-list',
     standalone: true,
-    imports: [CommonModule, RouterModule, FormsModule, UiButtonComponent, UiCardComponent, UiBadgeComponent, UiNumberPipe, UiTableComponent, UiTableColumnDirective, UiHasRoleDirective, UiPageHeaderComponent],
+    imports: [RouterModule, FormsModule, UiButtonComponent, UiCardComponent, UiBadgeComponent, UiNumberPipe, UiTableComponent, UiTableColumnDirective, UiHasRoleDirective, UiPageHeaderComponent],
     templateUrl: './product-list.component.html',
     styleUrl: './product-list.component.scss'
 })

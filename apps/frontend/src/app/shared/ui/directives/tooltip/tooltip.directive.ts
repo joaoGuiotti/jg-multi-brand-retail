@@ -7,7 +7,7 @@ import {
   OverlayRef
 } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { CommonModule } from '@angular/common';
+
 import { Component, ComponentRef, Directive, ElementRef, HostListener, inject, Input, OnDestroy, ViewContainerRef } from '@angular/core';
 
 @Component({
@@ -18,7 +18,7 @@ import { Component, ComponentRef, Directive, ElementRef, HostListener, inject, I
       {{ content }}
     </div>
   `,
-  imports: [CommonModule],
+  imports: [],
   styles: [`
     :host { display: block; z-index: 1000; pointer-events: none; }
   `]

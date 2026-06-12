@@ -1,102 +1,106 @@
 <div class="mx-auto">
-    <ui-page-header title="Histórico de Vendas" subtitle="Consulte e exporte todas as vendas realizadas.">
-        <ng-template #actions>
-            <ui-button (clicked)="downloadReport()" variant="secondary" [loading]="isDownloadingReport()">
-                Download PDF
-            </ui-button>
-        </ng-template>
-    </ui-page-header>
+  <ui-page-header title="Histórico de Vendas" subtitle="Consulte e exporte todas as vendas realizadas.">
+    <ng-template #actions>
+      <ui-button (clicked)="downloadReport()" variant="secondary" [loading]="isDownloadingReport()">
+        Download PDF
+      </ui-button>
+    </ng-template>
+  </ui-page-header>
 
-    <!-- Seller Commission Metrics -->
-    <app-seller-commission-widget></app-seller-commission-widget>
+  <!-- Seller Commission Metrics -->
+  <app-seller-commission-widget></app-seller-commission-widget>
 
-    <!-- Filters -->
-    <ui-card [shadow]="true" padding="sm" class="mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-                <label class="label">Status</label>
-                <select [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event); onFilterChange()"
-                    class="input-field">
-                    <option value="">All</option>
-                    <option value="COMPLETED">Completed</option>
-                    <option value="PENDING">Pending</option>
-                    <option value="RETURN_REQUESTED">Em Devolução</option>
-                    <option value="RETURNED">Devolvido</option>
-                    <option value="CANCELLED">Cancelled</option>
-                </select>
-            </div>
-            <div>
-                <label class="label">Start Date</label>
-                <input type="date" [ngModel]="startDate()" (ngModelChange)="startDate.set($event); onFilterChange()"
-                    class="input-field" />
-            </div>
-            <div>
-                <label class="label">End Date</label>
-                <input type="date" [ngModel]="endDate()" (ngModelChange)="endDate.set($event); onFilterChange()"
-                    class="input-field" />
-            </div>
-            <div class="flex items-end text-sm text-content-secondary px-2">
-                Total: {{ totalItems() }} sales
-            </div>
+  <!-- Filters -->
+  <ui-card [shadow]="true" padding="sm" class="mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div>
+        <label class="label">Status</label>
+        <select [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event); onFilterChange()"
+          class="input-field">
+          <option value="">All</option>
+          <option value="COMPLETED">Completed</option>
+          <option value="PENDING">Pending</option>
+          <option value="RETURN_REQUESTED">Em Devolução</option>
+          <option value="RETURNED">Devolvido</option>
+          <option value="CANCELLED">Cancelled</option>
+        </select>
+      </div>
+      <div>
+        <label class="label">Start Date</label>
+        <input type="date" [ngModel]="startDate()" (ngModelChange)="startDate.set($event); onFilterChange()"
+          class="input-field" />
         </div>
-    </ui-card>
+        <div>
+          <label class="label">End Date</label>
+          <input type="date" [ngModel]="endDate()" (ngModelChange)="endDate.set($event); onFilterChange()"
+            class="input-field" />
+          </div>
+          <div class="flex items-end text-sm text-content-secondary px-2">
+            Total: {{ totalItems() }} sales
+          </div>
+        </div>
+      </ui-card>
 
-    <!-- Error Message -->
-    <div *ngIf="errorMessage()" class="mb-4 p-3 bg-error-bg border border-error rounded-lg">
-        <p class="text-sm text-error">{{ errorMessage() }}</p>
-    </div>
+      <!-- Error Message -->
+      @if (errorMessage()) {
+        <div class="mb-4 p-3 bg-error-bg border border-error rounded-lg">
+          <p class="text-sm text-error">{{ errorMessage() }}</p>
+        </div>
+      }
 
-    <!-- Sales Table -->
-    <div class="min-h-[400px]">
+      <!-- Sales Table -->
+      <div class="min-h-[400px]">
         <ui-table [columns]="columns" [dataSource]="sales()" [config]="tableConfig()"
-            (pageChange)="onPageChange($event)" (sortChange)="onSortChange($event)">
+          (pageChange)="onPageChange($event)" (sortChange)="onSortChange($event)">
 
-            <!-- Invoice Number -->
-            <div *uiTableColumn="'invoiceNumber'; let row">
-                <div class="text-sm font-medium text-content">#{{ row.invoiceNumber }}</div>
-            </div>
+          <!-- Invoice Number -->
+          <div *uiTableColumn="'invoiceNumber'; let row">
+            <div class="text-sm font-medium text-content">#{{ row.invoiceNumber }}</div>
+          </div>
 
-            <!-- Date -->
-            <div *uiTableColumn="'createdAt'; let row">
-                <div class="text-xs text-content-secondary">
-                    {{ row.createdAt | date: 'dd/MM/yyyy HH:mm' }}
-                </div>
+          <!-- Date -->
+          <div *uiTableColumn="'createdAt'; let row">
+            <div class="text-xs text-content-secondary">
+              {{ row.createdAt | date: 'dd/MM/yyyy HH:mm' }}
             </div>
+          </div>
 
-            <!-- Items -->
-            <div *uiTableColumn="'items'; let row">
-                <div class="text-sm text-content">
-                    {{ row.items.length }} item(s)
-                </div>
+          <!-- Items -->
+          <div *uiTableColumn="'items'; let row">
+            <div class="text-sm text-content">
+              {{ row.items.length }} item(s)
             </div>
+          </div>
 
-            <!-- Total -->
-            <div *uiTableColumn="'total'; let row">
-                <div class="text-sm font-medium text-content">
-                    {{ row.total | uiNumber: { decimalPlaces: 2, prefix: 'R$ ' } }}
-                </div>
+          <!-- Total -->
+          <div *uiTableColumn="'total'; let row">
+            <div class="text-sm font-medium text-content">
+              {{ row.total | uiNumber: { decimalPlaces: 2, prefix: 'R$ ' } }}
             </div>
+          </div>
 
-            <!-- Status -->
-            <div *uiTableColumn="'status'; let row">
-                <ui-badge [variant]="getStatusVariant(row.status)" [dot]="true">
-                    {{ row.status }}
-                </ui-badge>
-            </div>
+          <!-- Status -->
+          <div *uiTableColumn="'status'; let row">
+            <ui-badge [variant]="getStatusVariant(row.status)" [dot]="true">
+              {{ row.status }}
+            </ui-badge>
+          </div>
 
-            <!-- Actions -->
-            <div *uiTableColumn="'actions'; let row">
-                <div class="flex justify-end gap-2 items-center">
-                    <ui-button *ngIf="row.status === 'COMPLETED'" variant="secondary" size="sm"
-                        [routerLink]="['/returns/new']" [queryParams]="{ saleId: row.id }">
-                        Return
-                    </ui-button>
-                    <ui-button variant="ghost" size="sm" (clicked)="viewSale(row.id)">
-                        View Details
-                    </ui-button>
-                </div>
+          <!-- Actions -->
+          <div *uiTableColumn="'actions'; let row">
+            <div class="flex justify-end gap-2 items-center">
+              @if (row.status === 'COMPLETED') {
+                <ui-button variant="secondary" size="sm"
+                  [routerLink]="['/returns/new']" [queryParams]="{ saleId: row.id }">
+                  Return
+                </ui-button>
+              }
+              <ui-button variant="ghost" size="sm" (clicked)="viewSale(row.id)">
+                View Details
+              </ui-button>
             </div>
+          </div>
 
         </ui-table>
+      </div>
     </div>
-</div>

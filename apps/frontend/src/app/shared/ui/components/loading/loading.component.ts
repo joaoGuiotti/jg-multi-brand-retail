@@ -1,10 +1,10 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, input } from '@angular/core';
 
 @Component({
     selector: 'ui-loading',
     standalone: true,
-    imports: [CommonModule],
+    imports: [],
     template: `
     <div [class.loading-overlay]="overlay()" class="flex flex-col items-center justify-center gap-3">
       <div class="spinner-container">

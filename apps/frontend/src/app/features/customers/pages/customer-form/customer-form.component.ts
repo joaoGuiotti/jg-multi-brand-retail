@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -11,14 +11,13 @@ import { LoyaltyHistoryComponent } from '../../../loyalty/components/loyalty-his
     selector: 'app-customer-form',
     standalone: true,
     imports: [
-        CommonModule, 
-        ReactiveFormsModule, 
-        UiButtonComponent, 
-        UiCardComponent, 
-        UiInputFieldComponent,
-        LoyaltyHistoryComponent,
-        UiPageHeaderComponent
-    ],
+    ReactiveFormsModule,
+    UiButtonComponent,
+    UiCardComponent,
+    UiInputFieldComponent,
+    LoyaltyHistoryComponent,
+    UiPageHeaderComponent
+],
     templateUrl: './customer-form.component.html',
     styleUrl: './customer-form.component.scss'
 })

@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, Input } from '@angular/core';
 import { UiCardComponent } from '@shared/ui';
 import { NgApexchartsModule } from 'ng-apexcharts';
@@ -6,7 +6,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
 @Component({
     selector: 'app-revenue-chart',
     standalone: true,
-    imports: [CommonModule, UiCardComponent, NgApexchartsModule],
+    imports: [UiCardComponent, NgApexchartsModule],
     template: `
     <ui-card [shadow]="true" padding="md" class="mb-6">
       <div class="flex items-center justify-between mb-4">

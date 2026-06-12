@@ -31,28 +31,32 @@ import { CommonModule } from '@angular/common';
       <!-- Left: icon + title block -->
       <div class="flex items-center gap-3 min-w-0">
         <!-- Optional icon slot -->
-        <ng-container *ngIf="iconTpl">
+        @if (iconTpl) {
           <div class="flex-shrink-0 p-2.5 bg-primary rounded-xl text-white shadow-md">
             <ng-container *ngTemplateOutlet="iconTpl"></ng-container>
           </div>
-        </ng-container>
-
+        }
+    
         <!-- Title + subtitle -->
         <div class="min-w-0">
           <h1 class="text-2xl font-bold text-content-primary leading-tight tracking-tight truncate">
             {{ title }}
             <ng-content select="[titleSuffix]"></ng-content>
           </h1>
-          <p *ngIf="subtitle" class="text-xs text-content-tertiary mt-0.5 truncate">{{ subtitle }}</p>
+          @if (subtitle) {
+            <p class="text-xs text-content-tertiary mt-0.5 truncate">{{ subtitle }}</p>
+          }
         </div>
       </div>
-
+    
       <!-- Right: actions slot -->
-      <div *ngIf="actionsTpl" class="flex items-center gap-3 flex-shrink-0">
-        <ng-container *ngTemplateOutlet="actionsTpl"></ng-container>
-      </div>
+      @if (actionsTpl) {
+        <div class="flex items-center gap-3 flex-shrink-0">
+          <ng-container *ngTemplateOutlet="actionsTpl"></ng-container>
+        </div>
+      }
     </div>
-  `,
+    `,
 })
 export class UiPageHeaderComponent {
   /** Título principal da página (obrigatório) */

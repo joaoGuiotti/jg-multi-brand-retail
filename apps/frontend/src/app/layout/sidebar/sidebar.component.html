@@ -6,14 +6,20 @@
   <div class="h-16 flex items-center border-b border-outline overflow-hidden flex-shrink-0"
     [class.px-4]="!isCollapsed || isMobile()" [class.lg:justify-center]="isCollapsed" [class.lg:px-0]="isCollapsed" [class.gap-3]="!isCollapsed || isMobile()">
     <button (click)="toggleCollapse.emit()" class="hidden lg:flex items-center justify-center p-1.5 rounded-lg hover:bg-surface-hover transition-colors flex-shrink-0" aria-label="Toggle sidebar collapse">
-      <svg *ngIf="isCollapsed" class="w-5 h-5 text-content-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-      </svg>
-      <svg *ngIf="!isCollapsed" class="w-5 h-5 text-content-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16"></path>
-      </svg>
+      @if (isCollapsed) {
+        <svg class="w-5 h-5 text-content-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      }
+      @if (!isCollapsed) {
+        <svg class="w-5 h-5 text-content-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16"></path>
+        </svg>
+      }
     </button>
-    <span class="text-xs font-bold text-content-tertiary uppercase tracking-widest" *ngIf="!isCollapsed || isMobile()">Menu</span>
+    @if (!isCollapsed || isMobile()) {
+      <span class="text-xs font-bold text-content-tertiary uppercase tracking-widest">Menu</span>
+    }
     <button (click)="onToggle()" class="lg:hidden p-2 rounded-lg hover:bg-surface-hover ml-auto" aria-label="Close sidebar">
       <svg class="w-5 h-5 text-content-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -23,61 +29,67 @@
 
   <!-- Navigation Menu -->
   <nav class="flex-1 overflow-y-auto p-3 space-y-0.5">
-    <ng-container *ngFor="let item of filteredMenuItems">
-
+    @for (item of filteredMenuItems; track item) {
       <!-- ── Leaf Item (no children) ── -->
-      <a *ngIf="!isGroup(item)" [routerLink]="item.route"
-        routerLinkActive="bg-primary/10 text-primary border-primary font-semibold"
-        [routerLinkActiveOptions]="{ exact: true }"
-        [uiTooltip]="item.label" [uiTooltipDisabled]="!isCollapsed || isMobile()"
-        class="flex items-center gap-3 rounded-lg text-content-secondary hover:bg-surface-hover hover:text-content transition-all border-l-2 border-transparent px-3 py-2.5 cursor-pointer"
-        [class.lg:justify-center]="isCollapsed" [class.lg:gap-0]="isCollapsed" [class.lg:px-2]="isCollapsed">
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="item.icon"></path>
-        </svg>
-        <span class="text-sm truncate transition-opacity duration-200" [class.lg:hidden]="isCollapsed">{{ item.label }}</span>
-      </a>
-
-      <!-- ── Group Item (with children) ── -->
-      <div *ngIf="isGroup(item)" class="space-y-0.5">
-        <!-- Group Header -->
-        <button (click)="toggleGroup(item.label)"
+      @if (!isGroup(item)) {
+        <a [routerLink]="item.route"
+          routerLinkActive="bg-primary/10 text-primary border-primary font-semibold"
+          [routerLinkActiveOptions]="{ exact: true }"
           [uiTooltip]="item.label" [uiTooltipDisabled]="!isCollapsed || isMobile()"
-          class="w-full flex items-center gap-3 rounded-lg text-content-secondary hover:bg-surface-hover hover:text-content transition-all px-3 py-2.5 cursor-pointer"
+          class="flex items-center gap-3 rounded-lg text-content-secondary hover:bg-surface-hover hover:text-content transition-all border-l-2 border-transparent px-3 py-2.5 cursor-pointer"
           [class.lg:justify-center]="isCollapsed" [class.lg:gap-0]="isCollapsed" [class.lg:px-2]="isCollapsed">
           <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="item.icon"></path>
           </svg>
-          <span class="text-sm truncate flex-1 text-left transition-opacity duration-200" [class.lg:hidden]="isCollapsed">{{ item.label }}</span>
-          <!-- Chevron -->
-          <svg *ngIf="!isCollapsed || isMobile()"
-            class="w-4 h-4 flex-shrink-0 transition-transform duration-200"
-            [class.rotate-180]="isExpanded(item.label)"
-            fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-          </svg>
-        </button>
-
-        <!-- Children -->
-        <div *ngIf="isExpanded(item.label) && (!isCollapsed || isMobile())" class="ml-3 pl-3 border-l border-outline/60 space-y-0.5">
-          <ng-container *ngFor="let child of filteredChildren(item.children || [])">
-            <a [routerLink]="child.route"
-              routerLinkActive="bg-primary/10 text-primary font-semibold"
-              [routerLinkActiveOptions]="{ exact: true }"
-              class="flex items-center gap-2.5 rounded-lg text-content-secondary hover:bg-surface-hover hover:text-content transition-all px-3 py-2 cursor-pointer text-sm">
-              <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="child.icon"></path>
+          <span class="text-sm truncate transition-opacity duration-200" [class.lg:hidden]="isCollapsed">{{ item.label }}</span>
+        </a>
+      }
+      <!-- ── Group Item (with children) ── -->
+      @if (isGroup(item)) {
+        <div class="space-y-0.5">
+          <!-- Group Header -->
+          <button (click)="toggleGroup(item.label)"
+            [uiTooltip]="item.label" [uiTooltipDisabled]="!isCollapsed || isMobile()"
+            class="w-full flex items-center gap-3 rounded-lg text-content-secondary hover:bg-surface-hover hover:text-content transition-all px-3 py-2.5 cursor-pointer"
+            [class.lg:justify-center]="isCollapsed" [class.lg:gap-0]="isCollapsed" [class.lg:px-2]="isCollapsed">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="item.icon"></path>
+            </svg>
+            <span class="text-sm truncate flex-1 text-left transition-opacity duration-200" [class.lg:hidden]="isCollapsed">{{ item.label }}</span>
+            <!-- Chevron -->
+            @if (!isCollapsed || isMobile()) {
+              <svg
+                class="w-4 h-4 flex-shrink-0 transition-transform duration-200"
+                [class.rotate-180]="isExpanded(item.label)"
+                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
               </svg>
-              <span class="truncate">{{ child.label }}</span>
-            </a>
-          </ng-container>
+            }
+          </button>
+          <!-- Children -->
+          @if (isExpanded(item.label) && (!isCollapsed || isMobile())) {
+            <div class="ml-3 pl-3 border-l border-outline/60 space-y-0.5">
+              @for (child of filteredChildren(item.children || []); track child) {
+                <a [routerLink]="child.route"
+                  routerLinkActive="bg-primary/10 text-primary font-semibold"
+                  [routerLinkActiveOptions]="{ exact: true }"
+                  class="flex items-center gap-2.5 rounded-lg text-content-secondary hover:bg-surface-hover hover:text-content transition-all px-3 py-2 cursor-pointer text-sm">
+                  <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="child.icon"></path>
+                  </svg>
+                  <span class="truncate">{{ child.label }}</span>
+                </a>
+              }
+            </div>
+          }
         </div>
-      </div>
-
-    </ng-container>
+      }
+    }
   </nav>
 
 </aside>
 
 <!-- Overlay for mobile -->
-<div *ngIf="isOpen" (click)="onToggle()" class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"></div>
+@if (isOpen) {
+  <div (click)="onToggle()" class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"></div>
+}

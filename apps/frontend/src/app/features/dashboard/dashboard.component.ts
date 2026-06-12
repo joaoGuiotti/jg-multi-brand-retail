@@ -1,5 +1,5 @@
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
-import { CommonModule } from '@angular/common';
+
 import { Component, OnInit, effect, inject, signal, untracked } from '@angular/core';
 import { Router } from '@angular/router';
 import { ThemeService, ToastService, UiButtonComponent, UiPageHeaderComponent } from '@shared/ui';
@@ -18,7 +18,6 @@ import { RevenueChartComponent } from './components/revenue-chart/revenue-chart.
   selector: 'app-dashboard',
   standalone: true,
   imports: [
-    CommonModule,
     NgApexchartsModule,
     QuickActionsComponent,
     KpiCardsComponent,
@@ -31,7 +30,7 @@ import { RevenueChartComponent } from './components/revenue-chart/revenue-chart.
     CdkDrag,
     CdkDragHandle,
     DashboardEditToolbarComponent
-  ],
+],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
   providers: [DashboardService],

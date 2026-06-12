@@ -1,82 +1,84 @@
 <div class="mx-auto">
-    <ui-page-header title="Produtos" subtitle="Gerencie o catálogo de produtos da loja.">
-        <ng-template #actions>
-            <ui-button [uiHasRole]="'ADMIN'" variant="primary" (clicked)="openProductModal()">
-                <svg class="w-5 h-5 mr-1 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Novo Produto
-            </ui-button>
-        </ng-template>
+  <ui-page-header title="Produtos" subtitle="Gerencie o catálogo de produtos da loja.">
+    <ng-template #actions>
+      <ui-button [uiHasRole]="'ADMIN'" variant="primary" (clicked)="openProductModal()">
+        <svg class="w-5 h-5 mr-1 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          Novo Produto
+        </ui-button>
+      </ng-template>
     </ui-page-header>
 
     <!-- Filters -->
     <ui-card padding="sm" [shadow]="true" class="mb-6 block">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-            <div class="md:col-span-2">
-                <label class="label">Search</label>
-                <input type="text" [(ngModel)]="searchTerm" (keyup.enter)="onSearch()" class="input-field"
-                    placeholder="Search by name, SKU, or barcode" />
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+        <div class="md:col-span-2">
+          <label class="label">Search</label>
+          <input type="text" [(ngModel)]="searchTerm" (keyup.enter)="onSearch()" class="input-field"
+            placeholder="Search by name, SKU, or barcode" />
+          </div>
+          <div>
+            <label class="label">Status</label>
+            <select [(ngModel)]="showActiveOnly" (change)="onFilterChange()" class="input-field">
+              <option [value]="true">Active Only</option>
+              <option [value]="false">All Products</option>
+            </select>
+          </div>
+          <div class="flex items-end mb-3">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" [(ngModel)]="showLowStockOnly" (change)="onFilterChange()"
+                class="w-4 h-4 rounded" />
+                <span class="text-sm text-content-secondary">Low Stock Only</span>
+              </label>
             </div>
-            <div>
-                <label class="label">Status</label>
-                <select [(ngModel)]="showActiveOnly" (change)="onFilterChange()" class="input-field">
-                    <option [value]="true">Active Only</option>
-                    <option [value]="false">All Products</option>
-                </select>
-            </div>
-            <div class="flex items-end mb-3">
-                <label class="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" [(ngModel)]="showLowStockOnly" (change)="onFilterChange()"
-                        class="w-4 h-4 rounded" />
-                    <span class="text-sm text-content-secondary">Low Stock Only</span>
-                </label>
-            </div>
-        </div>
-    </ui-card>
+          </div>
+        </ui-card>
 
-    <!-- Error Message -->
-    <div *ngIf="errorMessage()" class="mb-4 p-3 bg-error-bg border border-error rounded-lg">
-        <p class="text-sm text-error">{{ errorMessage() }}</p>
-    </div>
+        <!-- Error Message -->
+        @if (errorMessage()) {
+          <div class="mb-4 p-3 bg-error-bg border border-error rounded-lg">
+            <p class="text-sm text-error">{{ errorMessage() }}</p>
+          </div>
+        }
 
-    <!-- Products Table -->
-    <div class="min-h-[400px]">
-        <ui-table [columns]="columns()" [dataSource]="products()" [config]="tableConfig()"
+        <!-- Products Table -->
+        <div class="min-h-[400px]">
+          <ui-table [columns]="columns()" [dataSource]="products()" [config]="tableConfig()"
             (pageChange)="onPageChange($event)" (sortChange)="onSortChange($event)">
 
             <!-- Custom template for Product Name/Barcode -->
             <div *uiTableColumn="'name'; let row">
-                <div class="text-sm font-medium text-content">{{ row.name }}</div>
-                @if (row.barcode) {
+              <div class="text-sm font-medium text-content">{{ row.name }}</div>
+              @if (row.barcode) {
                 <div class="text-xs text-content-secondary mt-0.5">{{ row.barcode }}</div>
-                }
+              }
             </div>
 
             <!-- Custom template for Stock Badge -->
             <div *uiTableColumn="'stockQuantity'; let row">
-                <ui-badge [variant]="getStockVariant(row)" size="sm">
-                    {{ row.stockQuantity | uiNumber : { decimalPlaces: 0 } }}
-                </ui-badge>
+              <ui-badge [variant]="getStockVariant(row)" size="sm">
+                {{ row.stockQuantity | uiNumber : { decimalPlaces: 0 } }}
+              </ui-badge>
             </div>
 
             <!-- Custom template for Status Badge -->
             <div *uiTableColumn="'active'; let row">
-                <ui-badge [variant]="getStockVariant(row)" [dot]="true">
-                    {{ getStockLevelText(row) }}
-                </ui-badge>
+              <ui-badge [variant]="getStockVariant(row)" [dot]="true">
+                {{ getStockLevelText(row) }}
+              </ui-badge>
             </div>
 
             <!-- Custom template for Actions -->
             <div *uiTableColumn="'actions'; let row">
-                <div class="flex justify-end gap-2">
-                    <ui-button variant="ghost" size="sm" (clicked)="editProduct(row.id)">Edit</ui-button>
-                    <ui-button [uiHasRole]="'ADMIN'" variant="danger" size="sm"
-                        (clicked)="deleteProduct(row.id)">Delete</ui-button>
-                </div>
+              <div class="flex justify-end gap-2">
+                <ui-button variant="ghost" size="sm" (clicked)="editProduct(row.id)">Edit</ui-button>
+                <ui-button [uiHasRole]="'ADMIN'" variant="danger" size="sm"
+                (clicked)="deleteProduct(row.id)">Delete</ui-button>
+              </div>
             </div>
 
-        </ui-table>
-    </div>
-</div>
+          </ui-table>
+        </div>
+      </div>

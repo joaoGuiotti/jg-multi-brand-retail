@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MODAL_DATA, MODAL_REF, ModalRef, UiButtonComponent, UiInputFieldComponent } from '@shared/ui';
@@ -9,7 +9,7 @@ import { InventoryService } from '../../../../core/services/inventory.service';
 @Component({
     selector: 'app-add-movement-modal',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, UiButtonComponent, UiInputFieldComponent],
+    imports: [ReactiveFormsModule, UiButtonComponent, UiInputFieldComponent],
     templateUrl: './add-movement-modal.component.html',
     styleUrl: './add-movement-modal.component.scss',
 })

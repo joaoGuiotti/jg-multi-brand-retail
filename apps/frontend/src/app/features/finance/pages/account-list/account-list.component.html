@@ -53,8 +53,10 @@
   </ng-template>
 
   <ng-template uiTableColumn="actions" let-account>
-    <ui-button *ngIf="account.status === 'PENDING'" size="sm" variant="secondary" (click)="payAccount(account)">
-      Mark Paid
-    </ui-button>
+    @if (account.status === 'PENDING') {
+      <ui-button size="sm" variant="secondary" (click)="payAccount(account)">
+        Mark Paid
+      </ui-button>
+    }
   </ng-template>
 </ui-table>

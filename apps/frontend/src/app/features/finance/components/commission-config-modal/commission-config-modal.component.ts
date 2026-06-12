@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MODAL_REF, ModalRef, UiAutocompleteComponent, UiButtonComponent, ToastService } from '@shared/ui';
@@ -9,15 +9,15 @@ import { User } from '../../../../core/models/auth.model';
 @Component({
   selector: 'app-commission-config-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, UiButtonComponent, UiAutocompleteComponent],
+  imports: [FormsModule, UiButtonComponent, UiAutocompleteComponent],
   template: `
     <div class="space-y-6 p-1">
-
+    
       <!-- ── Seção 1: Taxa Padrão ─────────────────────────────── -->
       <div class="pb-5 border-b border-outline">
         <h4 class="text-sm font-bold text-content mb-1">Taxa de Comissão Padrão</h4>
         <p class="text-xs text-content-secondary mb-4">Percentual aplicado a todas as vendas concluídas da loja.</p>
-
+    
         <div class="flex gap-3 items-end">
           <div class="flex-1">
             <label class="label">Taxa (%)</label>
@@ -28,57 +28,61 @@ import { User } from '../../../../core/models/auth.model';
           </ui-button>
         </div>
       </div>
-
+    
       <!-- ── Seção 2: Meta do Vendedor ────────────────────────── -->
       <div>
         <h4 class="text-sm font-bold text-content mb-1">Meta Mensal do Vendedor</h4>
         <p class="text-xs text-content-secondary mb-4">Defina a meta de vendas (R$) para um vendedor no período.</p>
-
+    
         <div class="space-y-4">
           <!-- Autocomplete Vendedor -->
           <div>
             <label class="label">Vendedor</label>
-            <div *ngIf="!selectedUser()">
-              <ui-autocomplete
-                [suggestions]="userSearchResults()"
-                (completeMethod)="searchUsers($event)"
-                (onSelect)="selectUser($event)"
-                placeholder="Buscar por nome ou email..."
-                field="name"
-                [dropdown]="true">
-                <ng-template #itemTemplate let-user>
-                  <div class="flex items-center gap-3 w-full">
-                    <div class="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0 uppercase">
-                      {{ user.name?.substring(0, 2) }}
+            @if (!selectedUser()) {
+              <div>
+                <ui-autocomplete
+                  [suggestions]="userSearchResults()"
+                  (completeMethod)="searchUsers($event)"
+                  (onSelect)="selectUser($event)"
+                  placeholder="Buscar por nome ou email..."
+                  field="name"
+                  [dropdown]="true">
+                  <ng-template #itemTemplate let-user>
+                    <div class="flex items-center gap-3 w-full">
+                      <div class="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0 uppercase">
+                        {{ user.name?.substring(0, 2) }}
+                      </div>
+                      <div class="min-w-0 flex-1">
+                        <p class="font-semibold text-content text-sm truncate">{{ user.name }}</p>
+                        <p class="text-content-secondary text-xs truncate">{{ user.email }}</p>
+                      </div>
                     </div>
-                    <div class="min-w-0 flex-1">
-                      <p class="font-semibold text-content text-sm truncate">{{ user.name }}</p>
-                      <p class="text-content-secondary text-xs truncate">{{ user.email }}</p>
-                    </div>
-                  </div>
-                </ng-template>
-              </ui-autocomplete>
-            </div>
-
-            <!-- Selecionado -->
-            <div *ngIf="selectedUser()" class="flex items-center justify-between p-2.5 bg-primary/5 border border-primary/20 rounded-xl">
-              <div class="flex items-center gap-2 overflow-hidden">
-                <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold shrink-0 uppercase">
-                  {{ selectedUser()?.name?.substring(0, 2) }}
-                </div>
-                <div>
-                  <p class="text-sm font-bold text-content truncate">{{ selectedUser()?.name }}</p>
-                  <p class="text-xs text-content-tertiary truncate">{{ selectedUser()?.email }}</p>
-                </div>
+                  </ng-template>
+                </ui-autocomplete>
               </div>
-              <ui-button (click)="clearUser()" variant="ghost" size="sm" [outline]="true">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </ui-button>
-            </div>
+            }
+    
+            <!-- Selecionado -->
+            @if (selectedUser()) {
+              <div class="flex items-center justify-between p-2.5 bg-primary/5 border border-primary/20 rounded-xl">
+                <div class="flex items-center gap-2 overflow-hidden">
+                  <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold shrink-0 uppercase">
+                    {{ selectedUser()?.name?.substring(0, 2) }}
+                  </div>
+                  <div>
+                    <p class="text-sm font-bold text-content truncate">{{ selectedUser()?.name }}</p>
+                    <p class="text-xs text-content-tertiary truncate">{{ selectedUser()?.email }}</p>
+                  </div>
+                </div>
+                <ui-button (click)="clearUser()" variant="ghost" size="sm" [outline]="true">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </ui-button>
+              </div>
+            }
           </div>
-
+    
           <!-- Mês / Ano / Meta -->
           <div class="grid grid-cols-2 gap-3">
             <div>
@@ -96,7 +100,7 @@ import { User } from '../../../../core/models/auth.model';
           </div>
         </div>
       </div>
-
+    
       <!-- Actions -->
       <div class="flex justify-end gap-3 pt-2 border-t border-outline">
         <ui-button variant="ghost" [outline]="true" (clicked)="cancel()">Cancelar</ui-button>
@@ -105,7 +109,7 @@ import { User } from '../../../../core/models/auth.model';
         </ui-button>
       </div>
     </div>
-  `
+    `
 })
 export class CommissionConfigModalComponent implements OnInit {
   private commissionsService = inject(CommissionsService);

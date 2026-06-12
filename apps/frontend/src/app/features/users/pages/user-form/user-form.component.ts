@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
@@ -14,14 +14,13 @@ import {
   selector: 'app-user-form',
   standalone: true,
   imports: [
-    CommonModule, 
-    ReactiveFormsModule, 
-    RouterModule, 
-    UiInputFieldComponent, 
-    UiButtonComponent, 
+    ReactiveFormsModule,
+    RouterModule,
+    UiInputFieldComponent,
+    UiButtonComponent,
     UiCardComponent,
     UiPageHeaderComponent
-  ],
+],
   templateUrl: './user-form.component.html',
   styleUrl: './user-form.component.scss'
 })

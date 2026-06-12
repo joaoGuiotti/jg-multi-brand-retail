@@ -1,71 +1,73 @@
 <div class="min-h-screen bg-surface flex items-center justify-center p-4">
-    <div class="max-w-md w-full">
-        <!-- Logo/Brand -->
-        <div class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-content mb-2">Retail POS</h1>
-            <p class="text-content-secondary">Create your account</p>
-        </div>
+  <div class="max-w-md w-full">
+    <!-- Logo/Brand -->
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-bold text-content mb-2">Retail POS</h1>
+      <p class="text-content-secondary">Create your account</p>
+    </div>
 
-        <!-- Register Card -->
-        <ui-card padding="lg" [shadow]="true">
-            <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-                <!-- Name Field -->
-                <div class="mb-4">
-                    <ui-input-field id="name" label="Full Name" formControlName="name"
-                        [class.border-error]="name?.invalid && name?.touched" placeholder="John Doe" />
-                </div>
+    <!-- Register Card -->
+    <ui-card padding="lg" [shadow]="true">
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <!-- Name Field -->
+        <div class="mb-4">
+          <ui-input-field id="name" label="Full Name" formControlName="name"
+            [class.border-error]="name?.invalid && name?.touched" placeholder="John Doe" />
+          </div>
 
-                <!-- Email Field -->
-                <div class="mb-4">
-                    <ui-input-field id="email" label="Email" formControlName="email"
-                        [class.border-error]="email?.invalid && email?.touched" placeholder="you@example.com" />
-                </div>
+          <!-- Email Field -->
+          <div class="mb-4">
+            <ui-input-field id="email" label="Email" formControlName="email"
+              [class.border-error]="email?.invalid && email?.touched" placeholder="you@example.com" />
+            </div>
 
-                <!-- Tenant Name Field -->
-                <div class="mb-4">
-                    <ui-input-field id="tenantName" label="Store Name" formControlName="tenantName"
-                        [class.border-error]="tenantName?.invalid && tenantName?.touched" placeholder="My Store" />
-                </div>
+            <!-- Tenant Name Field -->
+            <div class="mb-4">
+              <ui-input-field id="tenantName" label="Store Name" formControlName="tenantName"
+                [class.border-error]="tenantName?.invalid && tenantName?.touched" placeholder="My Store" />
+              </div>
 
-                <!-- Logo URL Field -->
-                <div class="mb-4">
-                    <ui-input-field id="logoUrl" label="Logo URL" formControlName="logoUrl"
-                        placeholder="https://example.com/logo.png"
-                        [hint]="'Provide a URL for your business logo to be used in reports and receipts.'" />
+              <!-- Logo URL Field -->
+              <div class="mb-4">
+                <ui-input-field id="logoUrl" label="Logo URL" formControlName="logoUrl"
+                  placeholder="https://example.com/logo.png"
+                  [hint]="'Provide a URL for your business logo to be used in reports and receipts.'" />
                 </div>
 
                 <!-- Password Field -->
                 <div class="mb-4">
-                    <ui-input-field id="password" label="Password" formControlName="password" type="password"
-                        [class.border-error]="password?.invalid && password?.touched" placeholder="••••••••" />
-                </div>
+                  <ui-input-field id="password" label="Password" formControlName="password" type="password"
+                    [class.border-error]="password?.invalid && password?.touched" placeholder="••••••••" />
+                  </div>
 
-                <!-- Confirm Password Field -->
-                <div class="mb-6">
+                  <!-- Confirm Password Field -->
+                  <div class="mb-6">
                     <ui-input-field id="confirmPassword" label="Confirm Password" formControlName="confirmPassword"
-                        type="password" [class.border-error]="confirmPassword?.invalid && confirmPassword?.touched"
-                        placeholder="••••••••" />
-                </div>
+                      type="password" [class.border-error]="confirmPassword?.invalid && confirmPassword?.touched"
+                      placeholder="••••••••" />
+                    </div>
 
-                <!-- Error Message -->
-                <div *ngIf="errorMessage" class="mb-4 p-3 bg-error-bg border border-error rounded-lg">
-                    <p class="text-sm text-error">{{ errorMessage }}</p>
-                </div>
+                    <!-- Error Message -->
+                    @if (errorMessage) {
+                      <div class="mb-4 p-3 bg-error-bg border border-error rounded-lg">
+                        <p class="text-sm text-error">{{ errorMessage }}</p>
+                      </div>
+                    }
 
-                <!-- Submit Button -->
-                <ui-button type="submit" variant="primary" [fullWidth]="true" [loading]="isLoading"
-                    [disabled]="registerForm.invalid || isLoading">
-                    Create Account
-                </ui-button>
-            </form>
+                    <!-- Submit Button -->
+                    <ui-button type="submit" variant="primary" [fullWidth]="true" [loading]="isLoading"
+                      [disabled]="registerForm.invalid || isLoading">
+                      Create Account
+                    </ui-button>
+                  </form>
 
-            <!-- Login Link -->
-            <div class="mt-6 text-center">
-                <p class="text-sm text-content-secondary">
-                    Already have an account?
-                    <a routerLink="/login" class="text-primary hover:text-primary-hover font-medium">Sign in</a>
-                </p>
+                  <!-- Login Link -->
+                  <div class="mt-6 text-center">
+                    <p class="text-sm text-content-secondary">
+                      Already have an account?
+                      <a routerLink="/login" class="text-primary hover:text-primary-hover font-medium">Sign in</a>
+                    </p>
+                  </div>
+                </ui-card>
+              </div>
             </div>
-        </ui-card>
-    </div>
-</div>

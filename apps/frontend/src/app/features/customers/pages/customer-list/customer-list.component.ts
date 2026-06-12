@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, computed, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -9,7 +9,7 @@ import { CustomersService } from '../../../../core/services/customers.service';
 @Component({
     selector: 'app-customer-list',
     standalone: true,
-    imports: [CommonModule, RouterModule, FormsModule, UiButtonComponent, UiCardComponent, UiBadgeComponent, UiTableComponent, UiTableColumnDirective, UiDocumentPipe, UiPhonePipe, UiInputFieldComponent, UiHasRoleDirective, UiPageHeaderComponent],
+    imports: [RouterModule, FormsModule, UiButtonComponent, UiCardComponent, UiBadgeComponent, UiTableComponent, UiTableColumnDirective, UiDocumentPipe, UiPhonePipe, UiInputFieldComponent, UiHasRoleDirective, UiPageHeaderComponent],
     templateUrl: './customer-list.component.html',
     styleUrl: './customer-list.component.scss'
 })

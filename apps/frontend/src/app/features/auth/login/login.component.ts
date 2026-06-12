@@ -1,4 +1,4 @@
-import { Component, OnInit, isDevMode } from '@angular/core';
+import { Component, OnInit, isDevMode, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { UiButtonComponent, UiCardComponent, UiInputFieldComponent } from '@shared/ui';
@@ -13,17 +13,17 @@ import { AUTH_QUERY_PARAMS } from '../auth.constants';
 })
 export class LoginComponent implements OnInit {
     loginForm: FormGroup;
-    errorMessage = '';
-    successMessage = '';
-    isLoading = false;
+    errorMessage = signal('');
+    successMessage = signal('');
+    isLoading = signal(false);
     isDevMode = isDevMode();
-    copiedField: string | null = null;
+    copiedField = signal<string | null>(null);
 
     // Tenant Branding States
-    tenantName = 'Retail POS';
-    tenantLogoUrl: string | null = null;
-    tenantActive = true;
-    isCustomTenant = false;
+    tenantName = signal('Retail POS');
+    tenantLogoUrl = signal<string | null>(null);
+    tenantActive = signal(true);
+    isCustomTenant = signal(false);
 
     constructor(
         private fb: FormBuilder,
@@ -40,7 +40,7 @@ export class LoginComponent implements OnInit {
     ngOnInit(): void {
         const passwordReset = this.route.snapshot.queryParamMap.get(AUTH_QUERY_PARAMS.PASSWORD_RESET_SUCCESS);
         if (passwordReset === 'true') {
-            this.successMessage = 'Senha atualizada com sucesso. Faça login com a nova senha.';
+            this.successMessage.set('Senha atualizada com sucesso. Faça login com a nova senha.');
         }
 
         this.resolveTenantBranding();
@@ -69,10 +69,10 @@ export class LoginComponent implements OnInit {
                 next: (res) => {
                     if (res && res.data) {
                         const tenant = res.data;
-                        this.tenantName = tenant.name;
-                        this.tenantLogoUrl = tenant.logoUrl;
-                        this.tenantActive = tenant.active;
-                        this.isCustomTenant = true;
+                        this.tenantName.set(tenant.name);
+                        this.tenantLogoUrl.set(tenant.logoUrl);
+                        this.tenantActive.set(tenant.active);
+                        this.isCustomTenant.set(true);
 
                         // Apply Dynamic Brand Colors
                         if (tenant.theme) {
@@ -81,7 +81,7 @@ export class LoginComponent implements OnInit {
 
                         // Block Login if tenant is inactive
                         if (!tenant.active) {
-                            this.errorMessage = 'Esta loja está temporariamente indisponível. Entre em contato com o suporte.';
+                            this.errorMessage.set('Esta loja está temporariamente indisponível. Entre em contato com o suporte.');
                             this.loginForm.disable();
                         }
                     }
@@ -102,29 +102,29 @@ export class LoginComponent implements OnInit {
     }
 
     private resetTenantTheme(): void {
-        this.tenantName = 'Retail POS';
-        this.tenantLogoUrl = null;
-        this.tenantActive = true;
-        this.isCustomTenant = false;
+        this.tenantName.set('Retail POS');
+        this.tenantLogoUrl.set(null);
+        this.tenantActive.set(true);
+        this.isCustomTenant.set(false);
         document.documentElement.style.setProperty('--tenant-primary-color', '#3b82f6');
         document.documentElement.style.setProperty('--tenant-accent-color', '#1d4ed8');
     }
 
     onSubmit(): void {
-        if (this.loginForm.valid && this.tenantActive) {
-            this.isLoading = true;
-            this.errorMessage = '';
-            this.successMessage = '';
+        if (this.loginForm.valid && this.tenantActive()) {
+            this.isLoading.set(true);
+            this.errorMessage.set('');
+            this.successMessage.set('');
 
             this.authService.login(this.loginForm.value).subscribe({
                 next: () => {
                     this.router.navigate(['/']);
                 },
                 error: (error) => {
-                    this.errorMessage = error.error?.message || 'Login failed. Please check your credentials.';
+                    this.errorMessage.set(error.error?.message || 'Login failed. Please check your credentials.');
                 }
             }).add(() => {
-                this.isLoading = false;
+                this.isLoading.set(false);
             });
         }
     }
@@ -141,8 +141,8 @@ export class LoginComponent implements OnInit {
 
     copyToClipboard(field: string, value: string): void {
         navigator.clipboard.writeText(value).then(() => {
-            this.copiedField = field;
-            setTimeout(() => (this.copiedField = null), 1500);
+            this.copiedField.set(field);
+            setTimeout(() => this.copiedField.set(null), 1500);
         });
     }
 

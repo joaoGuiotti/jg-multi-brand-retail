@@ -1,10 +1,10 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, computed, EventEmitter, input, Output } from '@angular/core';
 
 @Component({
     selector: 'ui-pagination',
     standalone: true,
-    imports: [CommonModule],
+    imports: [],
     template: `
     <div class="bg-surface-secondary px-6 py-3 flex items-center justify-between border-t border-outline">
       <div class="text-sm text-content-secondary">

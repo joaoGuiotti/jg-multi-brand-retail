@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
+import { Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { 
   UiButtonComponent, 
@@ -10,11 +10,10 @@ import {
   selector: 'app-access-denied',
   standalone: true,
   imports: [
-    CommonModule, 
-    RouterModule, 
-    UiButtonComponent, 
+    RouterModule,
+    UiButtonComponent,
     UiCardComponent
-  ],
+],
   templateUrl: './access-denied.component.html',
   styleUrl: './access-denied.component.scss'
 })

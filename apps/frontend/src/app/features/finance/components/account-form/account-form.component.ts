@@ -1,5 +1,5 @@
 import { Component, EventEmitter, inject, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { UiButtonComponent, ModalRef, MODAL_REF } from '@shared/ui';
 import { FinanceService, CreateAccountDto, FinancialAccountType } from '../../services/finance.service';
@@ -7,7 +7,7 @@ import { FinanceService, CreateAccountDto, FinancialAccountType } from '../../se
 @Component({
   selector: 'app-account-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, UiButtonComponent],
+  imports: [FormsModule, UiButtonComponent],
   templateUrl: './account-form.component.html'
 })
 export class AccountFormComponent {

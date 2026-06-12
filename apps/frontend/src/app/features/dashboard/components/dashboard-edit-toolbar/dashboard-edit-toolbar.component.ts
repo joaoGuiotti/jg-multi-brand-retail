@@ -1,11 +1,11 @@
 import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { UiButtonComponent } from '@shared/ui';
 
 @Component({
   selector: 'app-dashboard-edit-toolbar',
   standalone: true,
-  imports: [CommonModule, UiButtonComponent],
+  imports: [UiButtonComponent],
   templateUrl: './dashboard-edit-toolbar.component.html',
   styleUrl: './dashboard-edit-toolbar.component.scss'
 })

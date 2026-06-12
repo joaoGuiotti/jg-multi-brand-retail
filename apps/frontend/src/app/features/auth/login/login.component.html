@@ -2,10 +2,10 @@
   <div class="max-w-md w-full">
     <!-- Logo/Brand -->
     <div class="text-center mb-8">
-      @if (tenantLogoUrl) {
-        <img [src]="tenantLogoUrl" [alt]="tenantName" class="mx-auto h-20 w-auto mb-4 object-contain rounded-lg" />
+      @if (tenantLogoUrl()) {
+        <img [src]="tenantLogoUrl()" [alt]="tenantName()" class="mx-auto h-20 w-auto mb-4 object-contain rounded-lg" />
       } @else {
-        <h1 class="text-4xl font-bold text-content mb-2">{{ tenantName }}</h1>
+        <h1 class="text-4xl font-bold text-content mb-2">{{ tenantName() }}</h1>
       }
       <p class="text-content-secondary">Sign in to your account</p>
     </div>
@@ -14,7 +14,7 @@
     <ui-card padding="lg" [shadow]="true">
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
         <!-- Inactive Tenant Warning -->
-        @if (!tenantActive) {
+        @if (!tenantActive()) {
         <div class="mb-6 p-4 bg-error-bg border border-error rounded-lg text-center">
           <p class="text-sm font-semibold text-error">Esta loja está temporariamente indisponível.</p>
           <p class="text-xs text-error mt-1">Entre em contato com o suporte para mais informações.</p>
@@ -36,16 +36,16 @@
         </ui-input-field>
 
         <!-- Error Message -->
-        @if (errorMessage) {
+        @if (errorMessage()) {
         <div class="mb-4 p-3 bg-error-bg border border-error rounded-lg">
-          <p class="text-sm text-error">{{ errorMessage }}</p>
+          <p class="text-sm text-error">{{ errorMessage() }}</p>
         </div>
         }
 
         <!-- Success Message -->
-        @if (successMessage) {
+        @if (successMessage()) {
         <div class="mb-4 p-3 bg-success/10 border border-success rounded-lg">
-          <p class="text-sm text-success">{{ successMessage }}</p>
+          <p class="text-sm text-success">{{ successMessage() }}</p>
         </div>
         }
 
@@ -55,14 +55,14 @@
         </div>
 
         <!-- Submit Button -->
-        <ui-button type="submit" variant="primary" [fullWidth]="true" [loading]="isLoading"
-          [disabled]="loginForm.invalid || isLoading || !tenantActive">
+        <ui-button type="submit" variant="primary" [fullWidth]="true" [loading]="isLoading()"
+          [disabled]="loginForm.invalid || isLoading() || !tenantActive()">
           Sign In
         </ui-button>
       </form>
 
       <!-- Register Link -->
-      @if (!isCustomTenant) {
+      @if (!isCustomTenant()) {
       <div class="mt-6 text-center">
         <p class="text-sm text-content-secondary">
           Don't have an account?
@@ -81,7 +81,7 @@
         <p class="text-xs text-info">Email: admin&#64;lojademo.com</p>
         <button type="button" title="Copy email" (click)="copyToClipboard('email', 'admin@lojademo.com')"
           class="copy-btn">
-          @if (copiedField === 'email') {
+          @if (copiedField() === 'email') {
           <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="20 6 9 17 4 12" />
@@ -99,7 +99,7 @@
       <div class="flex items-center gap-2">
         <p class="text-xs text-info">Password: *********</p>
         <button type="button" title="Copy password" (click)="copyToClipboard('password', 'loja123')" class="copy-btn">
-          @if (copiedField === 'password') {
+          @if (copiedField() === 'password') {
           <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="20 6 9 17 4 12" />

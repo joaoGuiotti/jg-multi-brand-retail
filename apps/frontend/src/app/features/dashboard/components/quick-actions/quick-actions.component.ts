@@ -1,11 +1,11 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, EventEmitter, Output } from '@angular/core';
 import { UiButtonComponent, UiCardComponent } from '@shared/ui';
 
 @Component({
     selector: 'app-quick-actions',
     standalone: true,
-    imports: [CommonModule, UiCardComponent, UiButtonComponent],
+    imports: [UiCardComponent, UiButtonComponent],
     template: `
     <ui-card [shadow]="true" padding="md" class="mb-6">
       <div class="flex flex-wrap items-center gap-4">

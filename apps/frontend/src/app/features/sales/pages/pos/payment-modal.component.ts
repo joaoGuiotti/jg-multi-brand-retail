@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MODAL_DATA, MODAL_REF, ModalRef, UiButtonComponent, UiInputFieldComponent, UiNumberPipe } from '@shared/ui';
@@ -18,7 +18,7 @@ export interface PaymentModalResult {
 @Component({
     selector: 'app-payment-modal',
     standalone: true,
-    imports: [CommonModule, FormsModule, UiButtonComponent, UiInputFieldComponent, UiNumberPipe],
+    imports: [FormsModule, UiButtonComponent, UiInputFieldComponent, UiNumberPipe],
     templateUrl: './payment-modal.component.html',
 })
 export class PaymentModalComponent {

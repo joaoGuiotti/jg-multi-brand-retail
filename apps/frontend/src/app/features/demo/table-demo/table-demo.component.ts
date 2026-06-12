@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { AfterViewInit, Component, computed, effect, signal, TemplateRef, ViewChild } from '@angular/core';
 import {
   BadgeVariant,
@@ -34,7 +34,7 @@ export class StatusBadgeComponent extends TableCellBase<any, string> {
 @Component({
   selector: 'app-table-demo',
   standalone: true,
-  imports: [CommonModule, UiTableComponent, UiCardComponent, ThemeToggleComponent],
+  imports: [UiTableComponent, UiCardComponent, ThemeToggleComponent],
   template: `
     <div class="flex justify-end p-4">
       <ui-theme-toggle />

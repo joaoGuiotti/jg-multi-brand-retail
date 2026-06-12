@@ -32,10 +32,7 @@
                 "output": "/styles"
               }
             ],
-            "styles": [
-              "src/app/shared/ui/styles/design-tokens.css",
-              "src/styles.css"
-            ],
+            "styles": ["src/app/shared/ui/styles/design-tokens.css", "src/styles.css"],
             "scripts": []
           },
           "configurations": {
@@ -78,20 +75,9 @@
           "builder": "@angular/build:extract-i18n"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "polyfills": [],
-            "tsConfig": "tsconfig.spec.json",
-            "inlineStyleLanguage": "scss",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets"
-            ],
-            "styles": [
-              "src/app/shared/ui/styles/design-tokens.css",
-              "src/styles.css"
-            ],
-            "scripts": []
+            "runnerConfig": "vitest-base.config.ts"
           }
         }
       }

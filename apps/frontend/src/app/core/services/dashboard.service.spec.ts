@@ -10,13 +10,13 @@ class MockEventSource {
   onopen: any;
   onmessage: any;
   onerror: any;
-  
+
   constructor(public url: string) {
     MockEventSource.instances.push(this);
   }
 
   close() {
-    MockEventSource.instances = MockEventSource.instances.filter(i => i !== this);
+    MockEventSource.instances = MockEventSource.instances.filter((i) => i !== this);
   }
 
   triggerMessage(data: any) {
@@ -50,9 +50,9 @@ describe('DashboardService', () => {
         provideHttpClientTesting(),
         {
           provide: DestroyRef,
-          useValue: { onDestroy: jasmine.createSpy('onDestroy') }
-        }
-      ]
+          useValue: { onDestroy: vi.fn().mockName('onDestroy') },
+        },
+      ],
     });
 
     service = TestBed.inject(DashboardService);
@@ -73,10 +73,19 @@ describe('DashboardService', () => {
     const mockResponse = {
       data: {
         kpis: { revenueToday: 1000, salesToday: 10, lowStock: 2, outOfStock: 1, totalProducts: 50 },
-        recentSales: [{ id: 's1', total: 100, status: 'COMPLETED', createdAt: '2026-04-20', customerId: null, itemCount: 2 }],
+        recentSales: [
+          {
+            id: 's1',
+            total: 100,
+            status: 'COMPLETED',
+            createdAt: '2026-04-20',
+            customerId: null,
+            itemCount: 2,
+          },
+        ],
         recentMovements: [],
-        dailyRevenue: []
-      }
+        dailyRevenue: [],
+      },
     };
 
     req.flush(mockResponse);
@@ -90,7 +99,7 @@ describe('DashboardService', () => {
   it('should connect to SSE and handle dashboard.sale_completed event', () => {
     service.connectSSE();
     const mockES = MockEventSource.instances[0];
-    
+
     expect(mockES).toBeDefined();
     mockES.triggerOpen();
     expect(service.connectionState()).toBe('connected');
@@ -106,13 +115,12 @@ describe('DashboardService', () => {
         status: 'COMPLETED',
         createdAt: new Date().toISOString(),
         customerId: null,
-        itemCount: 1
-      }
+        itemCount: 1,
+      },
     });
 
     expect(service.salesToday()).toBe(lastSalesToday + 1);
     expect(service.revenueToday()).toBe(lastRevenueToday + 50);
     expect(service.recentSales()[0].id).toBe('s2');
   });
-
 });

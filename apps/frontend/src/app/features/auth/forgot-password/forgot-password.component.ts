@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { UiButtonComponent, UiCardComponent, UiInputFieldComponent } from '@shared/ui';
@@ -8,6 +8,7 @@ import { AuthService } from '../../../core/services/auth.service';
     selector: 'app-forgot-password',
     imports: [ReactiveFormsModule, RouterModule, UiButtonComponent, UiCardComponent, UiInputFieldComponent],
     templateUrl: './forgot-password.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './forgot-password.component.scss',
 })
 export class ForgotPasswordComponent implements OnInit {

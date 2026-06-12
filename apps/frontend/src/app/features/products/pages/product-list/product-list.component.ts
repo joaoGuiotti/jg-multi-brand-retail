@@ -1,5 +1,5 @@
 
-import { Component, computed, OnInit, signal } from '@angular/core';
+import { Component, computed, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { BadgeVariant, TableColumn, TableConfig, TableSort, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiHasRoleDirective, UiModalService, UiNumberPipe, UiPageHeaderComponent, UiTableColumnDirective, UiTableComponent } from '@shared/ui';
@@ -13,6 +13,7 @@ import { ProductFormComponent } from '../product-form/product-form.component';
     standalone: true,
     imports: [RouterModule, FormsModule, UiButtonComponent, UiCardComponent, UiBadgeComponent, UiNumberPipe, UiTableComponent, UiTableColumnDirective, UiHasRoleDirective, UiPageHeaderComponent],
     templateUrl: './product-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './product-list.component.scss'
 })
 export class ProductListComponent implements OnInit {

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { UiCardComponent } from '@shared/ui';
 
 @Component({
@@ -73,6 +73,7 @@ import { UiCardComponent } from '@shared/ui';
       </ui-card>
     </div>
   `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styles: [`
     :host {
       display: block;

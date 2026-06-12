@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Notification } from '../../services/notifications.service';
 
@@ -6,16 +6,17 @@ import { Notification } from '../../services/notifications.service';
   selector: 'app-notification-item',
   standalone: true,
   imports: [CommonModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div
       class="p-4 border-b border-outline hover:bg-surface-hover flex items-start cursor-pointer transition-colors duration-200"
-      [ngClass]="{'bg-primary/5': !notification?.readAt, 'bg-surface': notification?.readAt}"
+      [ngClass]="{'bg-primary/5': !notification?.readAt, 'bg-surface': $safeNavigationMigration(notification?.readAt)}"
       (click)="onClick()"
       >
       <div class="flex-1 min-w-0">
         <div class="flex justify-between items-start mb-1 gap-2">
           <span class="text-sm font-semibold text-content truncate">{{ notification?.title }}</span>
-          <span class="text-[10px] text-content-tertiary whitespace-nowrap pt-0.5">{{ notification?.createdAt | date:'shortTime' }}</span>
+          <span class="text-[10px] text-content-tertiary whitespace-nowrap pt-0.5">{{ $safeNavigationMigration(notification?.createdAt) | date:'shortTime' }}</span>
         </div>
         <p class="text-sm text-content-secondary line-clamp-2 leading-snug">{{ notification?.message }}</p>
       </div>

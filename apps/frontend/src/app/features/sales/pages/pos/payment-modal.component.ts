@@ -1,5 +1,5 @@
 
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MODAL_DATA, MODAL_REF, ModalRef, UiButtonComponent, UiInputFieldComponent, UiNumberPipe } from '@shared/ui';
 import { CreatePaymentDto } from '../../../../core/models/sale.model';
@@ -19,6 +19,7 @@ export interface PaymentModalResult {
     selector: 'app-payment-modal',
     standalone: true,
     imports: [FormsModule, UiButtonComponent, UiInputFieldComponent, UiNumberPipe],
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: './payment-modal.component.html',
 })
 export class PaymentModalComponent {

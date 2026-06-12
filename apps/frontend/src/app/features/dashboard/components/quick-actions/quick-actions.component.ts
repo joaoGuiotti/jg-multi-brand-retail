@@ -1,5 +1,5 @@
 
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ChangeDetectionStrategy } from '@angular/core';
 import { UiButtonComponent, UiCardComponent } from '@shared/ui';
 
 @Component({
@@ -49,6 +49,7 @@ import { UiButtonComponent, UiCardComponent } from '@shared/ui';
       </div>
     </ui-card>
   `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styles: [`
     :host {
       display: block;

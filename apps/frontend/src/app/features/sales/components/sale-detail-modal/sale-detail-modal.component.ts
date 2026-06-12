@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { MODAL_DATA, MODAL_REF, ModalRef, TableColumn, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiNumberPipe, UiTableColumnDirective, UiTableComponent } from '@shared/ui';
 import { finalize } from 'rxjs';
@@ -18,6 +18,7 @@ import { SalesService } from '../../../../core/services/sales.service';
         UiTableColumnDirective,
         UiNumberPipe
     ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: './sale-detail-modal.component.html',
 })
 export class SaleDetailModalComponent implements OnInit {

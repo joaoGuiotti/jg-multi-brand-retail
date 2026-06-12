@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, Optional } from '@angular/core';
+import { Component, Inject, OnInit, Optional, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MODAL_DATA, MODAL_REF, ModalRef, UiButtonComponent, UiCardComponent, UiHasRoleDirective, UiInputFieldComponent, UiPageHeaderComponent } from '@shared/ui';
@@ -9,6 +9,7 @@ import { ProductsService } from '../../../../core/services/products.service';
     standalone: true,
     imports: [ReactiveFormsModule, UiButtonComponent, UiCardComponent, UiInputFieldComponent, UiHasRoleDirective, UiPageHeaderComponent],
     templateUrl: './product-form.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './product-form.component.scss'
 })
 export class ProductFormComponent implements OnInit {

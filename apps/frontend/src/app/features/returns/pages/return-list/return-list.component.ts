@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   UiBadgeComponent,
@@ -35,6 +35,7 @@ import { ReturnDetailsComponent } from '../../components/return-details/return-d
     UiNumberPipe,
     UiPageHeaderComponent
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="mx-auto">
       <ui-page-header 

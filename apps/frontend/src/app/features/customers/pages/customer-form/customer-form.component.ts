@@ -1,5 +1,5 @@
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MaskitoOptions } from '@maskito/core';
@@ -19,6 +19,7 @@ import { LoyaltyHistoryComponent } from '../../../loyalty/components/loyalty-his
     UiPageHeaderComponent
 ],
     templateUrl: './customer-form.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './customer-form.component.scss'
 })
 export class CustomerFormComponent implements OnInit {

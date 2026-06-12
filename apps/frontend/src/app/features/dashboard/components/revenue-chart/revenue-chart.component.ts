@@ -1,5 +1,5 @@
 
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { UiCardComponent } from '@shared/ui';
 import { NgApexchartsModule } from 'ng-apexcharts';
 
@@ -37,6 +37,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
       }
     </ui-card>
   `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styles: [`
     :host {
       display: block;

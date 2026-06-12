@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -22,6 +22,7 @@ import {
     UiPageHeaderComponent
 ],
   templateUrl: './user-form.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './user-form.component.scss'
 })
 export class UserFormComponent {

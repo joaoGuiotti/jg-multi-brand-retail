@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Output, ChangeDetectionStrategy } from '@angular/core';
 
 import { ThemeToggleComponent, UiOverlayComponent } from '@shared/ui';
 import { AuthService } from '../../core/services/auth.service';
@@ -9,6 +9,7 @@ import { NotificationBellComponent } from '../../features/notifications/componen
   standalone: true,
   imports: [ThemeToggleComponent, UiOverlayComponent, NotificationBellComponent],
   templateUrl: './header.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent {

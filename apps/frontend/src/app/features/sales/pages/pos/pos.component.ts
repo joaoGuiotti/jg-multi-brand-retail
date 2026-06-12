@@ -1,5 +1,5 @@
 
-import { Component, inject, signal, effect } from '@angular/core';
+import { Component, inject, signal, effect, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastService, UiAutocompleteComponent, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiDocumentPipe, UiModalService, UiNumberPipe, UiPageHeaderComponent } from '@shared/ui';
@@ -28,6 +28,7 @@ import { PaymentModalComponent, PaymentModalResult } from './payment-modal.compo
     UiPageHeaderComponent
 ],
     templateUrl: './pos.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './pos.component.scss'
 })
 export class PosComponent {

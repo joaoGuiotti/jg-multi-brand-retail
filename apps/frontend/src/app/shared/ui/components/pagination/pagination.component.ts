@@ -1,5 +1,5 @@
 
-import { Component, computed, EventEmitter, input, Output } from '@angular/core';
+import { Component, computed, EventEmitter, input, Output, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
     selector: 'ui-pagination',
@@ -72,6 +72,7 @@ import { Component, computed, EventEmitter, input, Output } from '@angular/core'
       </div>
     </div>
   `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styles: [`
     :host {
       display: block;

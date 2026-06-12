@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { Toast } from '../../services/toast/toast.service';
@@ -80,6 +80,7 @@ import { Toast } from '../../services/toast/toast.service';
       </div>
     </div>
     `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [`
     .transition-all { transition-property: all; }
     .duration-linear { transition-timing-function: linear; }

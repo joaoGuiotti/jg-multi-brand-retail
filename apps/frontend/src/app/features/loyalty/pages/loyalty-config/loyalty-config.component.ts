@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LoyaltyService } from '../../services/loyalty.service';
@@ -18,6 +18,7 @@ import { UiButtonComponent, UiCardComponent, UiInputFieldComponent, UiPageHeader
     UiPageHeaderComponent
   ],
   templateUrl: './loyalty-config.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './loyalty-config.component.scss'
 })
 export class LoyaltyConfigComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { ComponentFixture, DeferBlockState, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { TableColumn, TableCellBase } from '../models/table.types';
@@ -6,6 +6,7 @@ import { UiTableComponent } from '../table.component';
 
 @Component({
     standalone: true,
+    changeDetection: ChangeDetectionStrategy.Eager,
     template: `<div class="ui-custom-cell">Custom Component: {{ row().name }}</div>`
 })
 class TestCellComponent extends TableCellBase<any, any> {}

@@ -1,5 +1,5 @@
 
-import { Component, input } from '@angular/core';
+import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
     selector: 'ui-loading',
@@ -18,6 +18,7 @@ import { Component, input } from '@angular/core';
       }
     </div>
   `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styles: [`
     .loading-overlay {
       position: absolute;

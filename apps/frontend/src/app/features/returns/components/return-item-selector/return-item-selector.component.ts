@@ -1,4 +1,4 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, Input, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ReturnsStore } from '../../store/returns.store';
@@ -11,6 +11,7 @@ import { UiButtonComponent, UiCardComponent } from '@shared/ui';
   selector: 'app-return-item-selector',
   standalone: true,
   imports: [CommonModule, FormsModule, UiButtonComponent, UiCardComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './return-item-selector.component.html',
 })
 export class ReturnItemSelectorComponent {

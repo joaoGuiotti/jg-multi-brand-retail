@@ -1,5 +1,5 @@
 
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MODAL_REF, ModalRef, UiAutocompleteComponent, UiButtonComponent, ToastService } from '@shared/ui';
 import { CommissionsService } from '../../../../core/services/commissions.service';
@@ -10,6 +10,7 @@ import { User } from '../../../../core/models/auth.model';
   selector: 'app-commission-config-modal',
   standalone: true,
   imports: [FormsModule, UiButtonComponent, UiAutocompleteComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="space-y-6 p-1">
     

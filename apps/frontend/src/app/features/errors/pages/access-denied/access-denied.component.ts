@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { 
@@ -15,6 +15,7 @@ import {
     UiCardComponent
 ],
   templateUrl: './access-denied.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './access-denied.component.scss'
 })
 export class AccessDeniedComponent implements OnInit {

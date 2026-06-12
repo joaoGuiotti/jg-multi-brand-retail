@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { UiBadgeComponent, UiButtonComponent, UiCardComponent } from '@shared/ui';
 import { DashboardRecentMovement } from '../../../../core/models/dashboard.model';
 
@@ -44,6 +44,7 @@ import { DashboardRecentMovement } from '../../../../core/models/dashboard.model
       </div>
     </ui-card>
   `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styles: [`
     :host {
       display: block;

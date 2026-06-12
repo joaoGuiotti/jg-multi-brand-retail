@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, OnInit, signal } from '@angular/core';
+import { Component, computed, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { TableColumn, TableConfig, TableSort, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiModalService, UiNumberPipe, UiTableColumnDirective, UiTableComponent, UiPageHeaderComponent } from '@shared/ui';
@@ -13,6 +13,7 @@ import { SellerCommissionWidgetComponent } from '../../components/seller-commiss
     standalone: true,
     imports: [CommonModule, RouterModule, FormsModule, UiButtonComponent, UiBadgeComponent, UiCardComponent, UiTableComponent, UiTableColumnDirective, UiNumberPipe, UiPageHeaderComponent, SellerCommissionWidgetComponent],
     templateUrl: './sales-history.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './sales-history.component.scss'
 })
 export class SalesHistoryComponent implements OnInit {

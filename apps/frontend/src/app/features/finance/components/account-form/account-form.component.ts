@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Output, ChangeDetectionStrategy } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { UiButtonComponent, ModalRef, MODAL_REF } from '@shared/ui';
@@ -8,6 +8,7 @@ import { FinanceService, CreateAccountDto, FinancialAccountType } from '../../se
   selector: 'app-account-form',
   standalone: true,
   imports: [FormsModule, UiButtonComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './account-form.component.html'
 })
 export class AccountFormComponent {

@@ -1,5 +1,5 @@
 
-import { Component, computed, OnInit, signal } from '@angular/core';
+import { Component, computed, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
     TableColumn,
@@ -32,6 +32,7 @@ import { AddMovementModalComponent } from '../../components/add-movement-modal/a
     UiTableColumnDirective
 ],
     templateUrl: './inventory-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './inventory-list.component.scss',
 })
 export class InventoryListComponent implements OnInit {

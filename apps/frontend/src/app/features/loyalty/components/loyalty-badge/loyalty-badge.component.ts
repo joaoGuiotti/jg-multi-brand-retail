@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Output, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LoyaltyStore } from '../../store/loyalty.store';
 import { UiButtonComponent } from '@shared/ui';
@@ -8,6 +8,7 @@ import { UiButtonComponent } from '@shared/ui';
   standalone: true,
   imports: [CommonModule, UiButtonComponent],
   templateUrl: './loyalty-badge.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './loyalty-badge.component.scss'
 })
 export class LoyaltyBadgeComponent {

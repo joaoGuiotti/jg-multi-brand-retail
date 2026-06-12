@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { UiButtonComponent, UiCardComponent, UiPageHeaderComponent, UiStepComponent, UiStepperComponent } from '@shared/ui';
@@ -27,6 +27,7 @@ import { ReturnsStore } from '../../store/returns.store';
     UiStepperComponent,
     UiStepComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './return-form.component.html',
 })
 export class ReturnFormComponent implements OnInit {

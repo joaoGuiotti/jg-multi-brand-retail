@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MODAL_DATA, MODAL_REF, ModalRef, UiButtonComponent, UiInputFieldComponent } from '@shared/ui';
@@ -19,6 +19,7 @@ export interface RedeemDialogData {
     UiInputFieldComponent
   ],
   templateUrl: './redeem-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './redeem-dialog.component.scss'
 })
 export class RedeemDialogComponent implements OnInit {

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal } from '@angular/core';
+import { Component, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UiAutocompleteComponent } from '@shared/ui/components/autocomplete/autocomplete.component';
 
@@ -7,6 +7,7 @@ import { UiAutocompleteComponent } from '@shared/ui/components/autocomplete/auto
     selector: 'ui-autocomplete-demo',
     standalone: true,
     imports: [CommonModule, FormsModule, ReactiveFormsModule, UiAutocompleteComponent],
+    changeDetection: ChangeDetectionStrategy.Eager,
     template: `
         <div class="p-8 space-y-8 max-w-2xl mx-auto">
             <h1 class="text-2xl font-bold mb-6">Autocomplete Demo</h1>

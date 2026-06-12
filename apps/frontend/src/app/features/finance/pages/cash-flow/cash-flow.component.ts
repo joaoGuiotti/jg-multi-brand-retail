@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, OnInit, signal } from '@angular/core';
+import { Component, computed, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   TableColumn,
@@ -22,6 +22,7 @@ import { CashFlowStatement, FinanceService } from '../../services/finance.servic
     UiPageHeaderComponent,
     UiTableColumnDirective,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './cash-flow.component.html',
 })
 export class CashFlowComponent implements OnInit {

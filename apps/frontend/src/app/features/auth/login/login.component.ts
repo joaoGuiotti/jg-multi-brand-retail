@@ -1,4 +1,4 @@
-import { Component, OnInit, isDevMode, signal } from '@angular/core';
+import { Component, OnInit, isDevMode, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { UiButtonComponent, UiCardComponent, UiInputFieldComponent } from '@shared/ui';
@@ -9,6 +9,7 @@ import { AUTH_QUERY_PARAMS } from '../auth.constants';
     selector: 'app-login',
     imports: [ReactiveFormsModule, RouterModule, UiButtonComponent, UiCardComponent, UiInputFieldComponent],
     templateUrl: './login.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './login.component.scss'
 })
 export class LoginComponent implements OnInit {

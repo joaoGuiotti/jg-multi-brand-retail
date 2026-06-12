@@ -1,4 +1,4 @@
-import { Component, computed, OnInit, signal } from '@angular/core';
+import { Component, computed, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UiButtonComponent, UiBadgeComponent, UiCardComponent, UiPageHeaderComponent } from '@shared/ui';
@@ -8,6 +8,7 @@ import { FinanceService, DREStatement } from '../../services/finance.service';
   selector: 'app-dre',
   standalone: true,
   imports: [CommonModule, FormsModule, UiButtonComponent, UiBadgeComponent, UiCardComponent, UiPageHeaderComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './dre.component.html',
 })
 export class DREComponent implements OnInit {

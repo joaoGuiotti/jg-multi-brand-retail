@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Output, ChangeDetectionStrategy } from '@angular/core';
 import { NotificationsStore } from '../../store/notifications.store';
 
 @Component({
   selector: 'app-notification-settings',
   standalone: true,
   imports: [CommonModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="flex flex-col w-full h-full min-h-[400px] bg-surface">
       <div class="px-4 py-3 bg-surface-secondary border-b border-outline flex items-center gap-3">

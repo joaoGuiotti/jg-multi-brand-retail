@@ -1,4 +1,4 @@
-import { Component, computed, OnInit, signal } from '@angular/core';
+import { Component, computed, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -28,6 +28,7 @@ import { AccountFormComponent } from '../../components/account-form/account-form
     UiPageHeaderComponent,
     UiTableColumnDirective,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './account-list.component.html',
 })
 export class AccountListComponent implements OnInit {

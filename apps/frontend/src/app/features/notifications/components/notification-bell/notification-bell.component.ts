@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, effect, inject, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 
 import { NotificationsStore } from '../../store/notifications.store';
 import { NotificationsWsService } from '../../services/notifications-ws.service';
@@ -10,6 +10,7 @@ import { UiOverlayComponent } from '../../../../shared/ui/components/overlay/ove
   selector: 'app-notification-bell',
   standalone: true,
   imports: [NotificationPanelComponent, UiOverlayComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="relative inline-block text-left">
       <button

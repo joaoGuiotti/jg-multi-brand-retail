@@ -1,6 +1,6 @@
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
 
-import { Component, OnInit, effect, inject, signal, untracked } from '@angular/core';
+import { Component, OnInit, effect, inject, signal, untracked, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { ThemeService, ToastService, UiButtonComponent, UiPageHeaderComponent } from '@shared/ui';
 import { NgApexchartsModule } from 'ng-apexcharts';
@@ -33,6 +33,7 @@ import { RevenueChartComponent } from './components/revenue-chart/revenue-chart.
 ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   providers: [DashboardService],
 })
 export class DashboardComponent implements OnInit {

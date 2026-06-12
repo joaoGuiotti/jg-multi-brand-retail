@@ -1,5 +1,5 @@
 
-import { Component, OnInit, effect, inject, signal, untracked } from '@angular/core';
+import { Component, OnInit, effect, inject, signal, untracked, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ThemeService, UiCardComponent, UiButtonComponent, UiPageHeaderComponent } from '@shared/ui';
 import { ApexOptions, NgApexchartsModule } from 'ng-apexcharts';
@@ -10,6 +10,7 @@ import { SalesService } from '../../../../core/services/sales.service';
     standalone: true,
     imports: [UiCardComponent, NgApexchartsModule, FormsModule, UiButtonComponent, UiPageHeaderComponent],
     templateUrl: './reports-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './reports-list.component.scss'
 })
 export class ReportsListComponent implements OnInit {

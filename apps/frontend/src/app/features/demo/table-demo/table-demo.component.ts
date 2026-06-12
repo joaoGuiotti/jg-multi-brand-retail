@@ -1,5 +1,5 @@
 
-import { AfterViewInit, Component, computed, effect, signal, TemplateRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, computed, effect, signal, TemplateRef, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import {
   BadgeVariant,
   RowExpandConfig,
@@ -16,6 +16,7 @@ import {
 @Component({
   standalone: true,
   imports: [UiBadgeComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <ui-badge [variant]="variant()">{{ value() }}</ui-badge>
   `
@@ -35,6 +36,7 @@ export class StatusBadgeComponent extends TableCellBase<any, string> {
   selector: 'app-table-demo',
   standalone: true,
   imports: [UiTableComponent, UiCardComponent, ThemeToggleComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="flex justify-end p-4">
       <ui-theme-toggle />

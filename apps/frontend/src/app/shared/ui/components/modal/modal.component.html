@@ -1,7 +1,7 @@
 <div class="ui-modal-backdrop" role="dialog" aria-modal="true"
     [attr.aria-labelledby]="options?.title ? 'ui-modal-title-' + modalId : null"
     [style.z-index]="options?.zIndex ?? 1000" (click)="onBackdropClick($event)">
-    <div class="ui-modal-panel" [ngClass]="options?.styleClass" [ngStyle]="panelStyle"
+    <div class="ui-modal-panel" [ngClass]="$safeNavigationMigration(options?.styleClass)" [ngStyle]="panelStyle"
         (click)="$event.stopPropagation()">
         <!-- Header (shown if title or closable) -->
         @if (options?.title || isClosable) {

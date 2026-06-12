@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output, signal, ChangeDetectionStrategy } from '@angular/core';
 
 import { UiButtonComponent } from '@shared/ui';
 
@@ -7,6 +7,7 @@ import { UiButtonComponent } from '@shared/ui';
   standalone: true,
   imports: [UiButtonComponent],
   templateUrl: './dashboard-edit-toolbar.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './dashboard-edit-toolbar.component.scss'
 })
 export class DashboardEditToolbarComponent {

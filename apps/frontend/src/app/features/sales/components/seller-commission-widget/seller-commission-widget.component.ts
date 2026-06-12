@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 
 import { UiCardComponent, UiNumberPipe } from '@shared/ui';
 import { CommissionsService, CommissionMetrics } from '../../../../core/services/commissions.service';
@@ -8,6 +8,7 @@ import { AuthService } from '../../../../core/services/auth.service';
   selector: 'app-seller-commission-widget',
   standalone: true,
   imports: [UiCardComponent, UiNumberPipe],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     @if (metrics() && !isAdmin()) {
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">

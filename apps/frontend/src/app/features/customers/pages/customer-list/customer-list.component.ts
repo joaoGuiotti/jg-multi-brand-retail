@@ -1,5 +1,5 @@
 
-import { Component, computed, OnInit, signal } from '@angular/core';
+import { Component, computed, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { TableColumn, TableConfig, TableSort, UiBadgeComponent, UiButtonComponent, UiCardComponent, UiDocumentPipe, UiInputFieldComponent, UiPhonePipe, UiTableColumnDirective, UiTableComponent, UiHasRoleDirective, UiPageHeaderComponent } from '@shared/ui';
@@ -11,6 +11,7 @@ import { CustomersService } from '../../../../core/services/customers.service';
     standalone: true,
     imports: [RouterModule, FormsModule, UiButtonComponent, UiCardComponent, UiBadgeComponent, UiTableComponent, UiTableColumnDirective, UiDocumentPipe, UiPhonePipe, UiInputFieldComponent, UiHasRoleDirective, UiPageHeaderComponent],
     templateUrl: './customer-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './customer-list.component.scss'
 })
 export class CustomerListComponent implements OnInit {

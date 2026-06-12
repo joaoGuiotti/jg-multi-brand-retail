@@ -1,4 +1,4 @@
-import { Component, inject, input, OnInit, signal, computed, effect } from '@angular/core';
+import { Component, inject, input, OnInit, signal, computed, effect, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LoyaltyService, LoyaltyAccountResponse } from '../../services/loyalty.service';
@@ -16,6 +16,7 @@ import { UiButtonComponent, UiInputFieldComponent } from '@shared/ui';
     UiInputFieldComponent
   ],
   templateUrl: './loyalty-history.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './loyalty-history.component.scss'
 })
 export class LoyaltyHistoryComponent implements OnInit {

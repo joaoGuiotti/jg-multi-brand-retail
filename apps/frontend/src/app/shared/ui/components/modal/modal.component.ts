@@ -25,7 +25,7 @@ let _modalIdCounter = 0;
     imports: [NgComponentOutlet, NgClass, NgStyle],
     templateUrl: './modal.component.html',
     styleUrl: './modal.component.scss',
-    changeDetection: ChangeDetectionStrategy.Default,
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class UiModalComponent implements OnInit {
     /** The component class to render inside the modal panel. */

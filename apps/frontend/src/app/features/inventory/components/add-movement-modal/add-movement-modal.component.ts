@@ -1,5 +1,5 @@
 
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MODAL_DATA, MODAL_REF, ModalRef, UiButtonComponent, UiInputFieldComponent } from '@shared/ui';
 import { CreateMovementDto, MovementType } from '../../../../core/models/inventory.model';
@@ -11,6 +11,7 @@ import { InventoryService } from '../../../../core/services/inventory.service';
     standalone: true,
     imports: [ReactiveFormsModule, UiButtonComponent, UiInputFieldComponent],
     templateUrl: './add-movement-modal.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './add-movement-modal.component.scss',
 })
 export class AddMovementModalComponent implements OnInit {

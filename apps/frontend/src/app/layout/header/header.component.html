@@ -9,7 +9,7 @@
 
     @if (user()?.logoUrl) {
       <div class="flex items-center gap-2">
-        <img [src]="user()?.logoUrl" alt="Tenant Logo" class="h-8 w-auto object-contain rounded-sm">
+        <img [src]="$safeNavigationMigration(user()?.logoUrl)" alt="Tenant Logo" class="h-8 w-auto object-contain rounded-sm">
       </div>
     }
     <h1 class="text-xl font-semibold text-content">Retail OS</h1>

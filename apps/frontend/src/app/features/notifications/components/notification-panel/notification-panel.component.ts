@@ -1,4 +1,4 @@
-import { Component, inject, Output, EventEmitter, signal } from '@angular/core';
+import { Component, inject, Output, EventEmitter, signal, ChangeDetectionStrategy } from '@angular/core';
 
 import { NotificationsStore } from '../../store/notifications.store';
 import { NotificationItemComponent } from '../notification-item/notification-item.component';
@@ -10,6 +10,7 @@ type PanelView = 'LIST' | 'SETTINGS';
   selector: 'app-notification-panel',
   standalone: true,
   imports: [NotificationItemComponent, NotificationSettingsComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="flex flex-col w-full h-full min-h-[400px]">
       <!-- List View -->

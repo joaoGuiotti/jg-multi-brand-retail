@@ -1,4 +1,4 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { DestroyRef } from '@angular/core';
 import { TestBed, fakeAsync, tick, discardPeriodicTasks } from '@angular/core/testing';
@@ -46,7 +46,7 @@ describe('DashboardService', () => {
     TestBed.configureTestingModule({
       providers: [
         DashboardService,
-        provideHttpClient(),
+        provideHttpClient(withXhr()),
         provideHttpClientTesting(),
         {
           provide: DestroyRef,

@@ -72,7 +72,7 @@
                           {{ selectedCustomer()?.firstName }} {{ selectedCustomer()?.lastName }}
                         </h3>
                         <p class="text-xs text-content-tertiary truncate">{{
-                        selectedCustomer()?.document | uiDocument }}</p>
+                        $safeNavigationMigration(selectedCustomer()?.document) | uiDocument }}</p>
                       </div>
                     </div>
                     <ui-button (click)="removeCustomer()" variant="ghost" size="sm" [outline]="true">

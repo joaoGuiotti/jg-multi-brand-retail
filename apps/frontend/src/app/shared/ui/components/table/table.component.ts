@@ -1,6 +1,6 @@
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDragPlaceholder, CdkDragPreview, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CommonModule, NgComponentOutlet, NgTemplateOutlet } from '@angular/common';
-import { Component, computed, ContentChildren, EventEmitter, input, Output, QueryList, signal } from '@angular/core';
+import { Component, computed, ContentChildren, EventEmitter, input, Output, QueryList, signal, ChangeDetectionStrategy } from '@angular/core';
 import { UiNumberPipe } from '../../pipes/number.pipe';
 import { UiLoadingComponent } from '../loading/loading.component';
 import { UiPaginationComponent } from '../pagination/pagination.component';
@@ -12,6 +12,7 @@ import { RowExpandConfig, SortDirection, TableColumn, TableConfig, TableSort } f
     standalone: true,
     imports: [CommonModule, NgComponentOutlet, NgTemplateOutlet, UiNumberPipe, UiLoadingComponent, UiPaginationComponent, CdkDropList, CdkDrag, CdkDragPreview, CdkDragPlaceholder, CdkDragHandle],
     templateUrl: './table.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './table.component.scss'
 })
 export class UiTableComponent<T = any> {

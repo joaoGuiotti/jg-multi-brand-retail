@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReturnsStore } from '../../store/returns.store';
 
@@ -6,6 +6,7 @@ import { ReturnsStore } from '../../store/returns.store';
   selector: 'app-return-summary',
   standalone: true,
   imports: [CommonModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './return-summary.component.html',
 })
 export class ReturnSummaryComponent {

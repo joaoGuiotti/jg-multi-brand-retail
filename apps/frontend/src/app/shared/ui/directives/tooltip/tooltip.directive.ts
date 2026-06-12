@@ -8,7 +8,7 @@ import {
 } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 
-import { Component, ComponentRef, Directive, ElementRef, HostListener, inject, Input, OnDestroy, ViewContainerRef } from '@angular/core';
+import { Component, ComponentRef, Directive, ElementRef, HostListener, inject, Input, OnDestroy, ViewContainerRef, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'ui-tooltip-content',
@@ -19,6 +19,7 @@ import { Component, ComponentRef, Directive, ElementRef, HostListener, inject, I
     </div>
   `,
   imports: [],
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [`
     :host { display: block; z-index: 1000; pointer-events: none; }
   `]

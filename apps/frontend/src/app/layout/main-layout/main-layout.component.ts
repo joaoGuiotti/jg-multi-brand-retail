@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 import { RouterModule } from '@angular/router';
 import { HeaderComponent } from '../header/header.component';
@@ -10,6 +10,7 @@ import { ToastContainerComponent } from '../../shared/ui/components/toast/toast-
   standalone: true,
   imports: [RouterModule, HeaderComponent, SidebarComponent, ToastContainerComponent],
   templateUrl: './main-layout.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './main-layout.component.scss'
 })
 export class MainLayoutComponent {

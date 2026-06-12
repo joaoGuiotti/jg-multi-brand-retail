@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import {
     AbstractControl,
     FormBuilder,
@@ -24,6 +24,7 @@ const passwordMatchValidator: ValidatorFn = (control: AbstractControl): Validati
     selector: 'app-reset-password',
     imports: [ReactiveFormsModule, RouterModule, UiButtonComponent, UiCardComponent, UiInputFieldComponent],
     templateUrl: './reset-password.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './reset-password.component.scss',
 })
 export class ResetPasswordComponent implements OnInit {

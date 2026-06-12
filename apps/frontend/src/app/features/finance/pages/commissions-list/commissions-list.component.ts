@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   TableColumn,
@@ -34,6 +34,7 @@ import { CommissionConfigModalComponent } from '../../components/commission-conf
     UiTableComponent,
     UiTableColumnDirective,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="mx-auto">
       <ui-page-header

@@ -43,7 +43,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 12H6"></path>
                   </svg>
                 </ui-button>
-                <input type="number" [ngModel]="getItemSelected(item.productId)?.quantity"
+                <input type="number" [ngModel]="$safeNavigationMigration(getItemSelected(item.productId)?.quantity)"
                   (ngModelChange)="updateQuantity(item.productId, $event, item.quantity)"
                   class="w-full text-center bg-transparent border-none focus:ring-0 text-sm font-bold p-0">
                   <ui-button variant="ghost" size="sm" class="!w-7 !h-7 !p-0 min-w-0"
@@ -58,7 +58,7 @@
               <!-- Condition Select -->
               <div class="flex flex-col gap-1 w-36">
                 <label class="text-[10px] uppercase font-bold text-content-tertiary">Condição</label>
-                <select [ngModel]="getItemSelected(item.productId)?.condition"
+                <select [ngModel]="$safeNavigationMigration(getItemSelected(item.productId)?.condition)"
                   (ngModelChange)="updateCondition(item.productId, $event)"
                   class="bg-surface border border-outline rounded-lg text-xs font-medium h-9 px-2 focus:ring-primary focus:border-primary">
                   <option value="GOOD">Em Bom Estado</option>

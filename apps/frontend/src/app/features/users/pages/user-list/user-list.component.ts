@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 
 import { RouterModule } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
@@ -29,6 +29,7 @@ import {
     UiPageHeaderComponent
 ],
   templateUrl: './user-list.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './user-list.component.scss'
 })
 export class UserListComponent implements OnInit {

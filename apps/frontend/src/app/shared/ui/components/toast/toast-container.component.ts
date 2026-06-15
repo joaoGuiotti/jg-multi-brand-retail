@@ -12,15 +12,12 @@ import { ToastComponent } from './toast.component';
     <div
       class="fixed top-20 right-0 z-[9999] p-8 pointer-events-none flex flex-col gap-2 items-end overflow-visible"
       style="min-width: 400px;"
-      >
-      @for (toast of toastService.toasts(); track toast) {
-        <ui-toast
-          [toast]="toast"
-          (close)="toastService.remove(toast.id)"
-        ></ui-toast>
+    >
+      @for (toast of toastService.toasts(); track toast.id) {
+        <ui-toast [toast]="toast" (close)="toastService.remove(toast.id)"></ui-toast>
       }
     </div>
-    `
+  `,
 })
 export class ToastContainerComponent {
   toastService = inject(ToastService);

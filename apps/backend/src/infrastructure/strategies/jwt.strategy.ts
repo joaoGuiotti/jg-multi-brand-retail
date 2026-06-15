@@ -4,6 +4,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { ClsService } from 'nestjs-cls';
 
 export interface JwtPayload {
   sub: string;
@@ -19,6 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private configService: ConfigService,
     private userRepository: UserRepository,
     private tenantRepository: TenantRepository,
+    private cls: ClsService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
@@ -29,6 +31,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       secretOrKey: configService.get<string>('JWT_SECRET') || 'default-secret',
     });
   }
+
+  // Cache simples de tenants (ID -> status e tempo de expiração) para evitar bater no DB todo request
+  private tenantCache = new Map<string, { active: boolean; expiresAt: number }>();
+  private readonly CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutos
 
   async validate(payload: JwtPayload) {
     const user = await this.userRepository.findById(
@@ -51,11 +57,26 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       );
     }
 
-    const tenant = await this.tenantRepository.findById(payload.tenantId);
+    let isTenantActive = false;
+    const cachedTenant = this.tenantCache.get(payload.tenantId);
 
-    if (!tenant || !tenant.active) {
+    if (cachedTenant && cachedTenant.expiresAt > Date.now()) {
+      isTenantActive = cachedTenant.active;
+    } else {
+      const tenantRecord = await this.tenantRepository.findById(payload.tenantId);
+      isTenantActive = tenantRecord ? tenantRecord.active : false;
+      this.tenantCache.set(payload.tenantId, {
+        active: isTenantActive,
+        expiresAt: Date.now() + this.CACHE_TTL_MS,
+      });
+    }
+
+    if (!isTenantActive) {
       throw new UnauthorizedException('Tenant is inactive');
     }
+
+    // Configura o Tenant ID no contexto global da requisição via CLS
+    this.cls.set('tenantId', payload.tenantId);
 
     return {
       id: user.id.toString(),
@@ -63,10 +84,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       name: user.name,
       role: user.role,
       tenantId: payload.tenantId,
+      // Nota: o objeto tenant aqui retorna null para o nome/slug pois priorizamos o cache para evitar db hit. 
+      // Se necessário nos controllers, deve-se buscar explicitamente.
       tenant: {
-        id: tenant.id.toString(),
-        name: tenant.name,
-        slug: tenant.slug,
+        id: payload.tenantId,
+        name: 'Cached', 
+        slug: 'cached',
       },
     };
   }

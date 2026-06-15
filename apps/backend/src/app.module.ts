@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ClsModule } from 'nestjs-cls';
 import { provideTransformInterceptor } from './infrastructure/interceptors/transform/transform-interceptor.provider';
 import { AuthModule } from './infrastructure/modules/auth.module';
 import { ConfigModule } from './infrastructure/modules/config.module';
@@ -21,6 +22,10 @@ const isDev = process.env.NODE_ENV !== 'production';
 
 @Module({
   imports: [
+    ClsModule.forRoot({
+      global: true,
+      middleware: { mount: true },
+    }),
     ConfigModule.forRoot(),
     EventEmitterModule.forRoot(),
     PrismaModule,

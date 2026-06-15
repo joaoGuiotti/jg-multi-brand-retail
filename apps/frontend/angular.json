@@ -32,7 +32,7 @@
                 "output": "/styles"
               }
             ],
-            "styles": ["src/app/shared/ui/styles/design-tokens.css", "src/styles.css"],
+            "styles": ["src/styles.css"],
             "scripts": []
           },
           "configurations": {

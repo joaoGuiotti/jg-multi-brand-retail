@@ -1,9 +1,10 @@
 @import '@angular/cdk/overlay-prebuilt.css';
+@import './app/shared/ui/styles/design-tokens.css';
 
 :root {
   --tenant-primary-color: #3b82f6; /* Default Blue-500 */
-  --tenant-accent-color: #1d4ed8;  /* Default Blue-700 */
-  
+  --tenant-accent-color: #1d4ed8; /* Default Blue-700 */
+
   --color-primary: var(--tenant-primary-color);
   --color-primary-hover: var(--tenant-accent-color);
 }
@@ -21,7 +22,6 @@
 }
 
 @layer components {
-
   /* Input Fields */
   .input-field {
     @apply w-full px-3 py-2 bg-surface border border-outline rounded-lg;

@@ -5,7 +5,7 @@ import { Notification } from './notifications.service';
 import { environment } from '../../../../environments/environment';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NotificationsWsService {
   private socket!: Socket;
@@ -16,13 +16,21 @@ export class NotificationsWsService {
       return;
     }
 
-    this.socket = io(`${environment.apiUrl}/notifications`, {
+    const wsBaseUrl =
+      (environment as { wsUrl?: string }).wsUrl ||
+      (environment.apiUrl.startsWith('http')
+        ? environment.apiUrl
+        : typeof window !== 'undefined'
+          ? window.location.origin
+          : '');
+
+    this.socket = io(`${wsBaseUrl}/notifications`, {
       auth: { token },
       query: { tenantId, userId },
       transports: ['websocket'],
     });
 
-    console.log(`[WS] Attempting to connect to ${environment.apiUrl}/notifications for user ${userId}`);
+    console.log(`[WS] Attempting to connect to ${wsBaseUrl}/notifications for user ${userId}`);
 
     this.socket.on('connect', () => {
       console.log('[WS] Connected successfully to notifications WS');
@@ -58,4 +66,3 @@ export class NotificationsWsService {
     }
   }
 }
-

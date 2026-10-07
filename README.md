@@ -159,4 +159,4 @@ Proprietary - Todos os direitos reservados
 
 ## 👥 Time
 
-Desenvolvido por [Seu Time/Empresa]
+Desenvolvido por João Guiotti

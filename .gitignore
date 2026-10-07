@@ -4,6 +4,10 @@ build/
 .env
 .env.local
 .env.*.local
+.env.prod
+.env.prod.*
+!.env.example
+!.env.prod.example
 _docs/
 
 # IDEs
@@ -27,9 +31,6 @@ yarn-error.log*
 # Testing
 coverage/
 .nyc_output/
-
-# Prisma
-apps/backend/prisma/migrations/**/migration.sql
 
 # Misc
 .cache/

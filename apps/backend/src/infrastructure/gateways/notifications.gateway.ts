@@ -14,7 +14,8 @@ import { MarkAsReadUseCase } from '../../application/use-cases/notifications/mar
 @Injectable()
 @WebSocketGateway({
   cors: {
-    origin: '*',
+    origin: process.env.FRONTEND_URL || 'http://localhost:4200',
+    credentials: true,
   },
   namespace: '/notifications',
 })

@@ -70,7 +70,11 @@ export class ConfigModule extends NestConfigModule {
         MAIL_FROM: Joi.string().default(
           'Retail SaaS <no-reply@retailsaas.com>',
         ),
-        FRONTEND_URL: Joi.string().default('http://localhost:4200'),
+        FRONTEND_URL: Joi.string().when('NODE_ENV', {
+          is: 'production',
+          then: Joi.string().required(),
+          otherwise: Joi.string().default('http://localhost:4200'),
+        }),
       }).concat(DB_SCHEMA),
       ...otherOptions,
     });

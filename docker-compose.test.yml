@@ -1,0 +1,16 @@
+include:
+  - path: docker-compose.prod.yml
+
+services:
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    networks:
+      - internal
+    ports:
+      - "8025:8025"
+
+  backend:
+    environment:
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025

@@ -70,10 +70,95 @@ jobs:
       - name: Build Application
         run: npm run build
 
-  build-validation:
-    name: Build Validation
+  validation:
+    name: Build & Compose Smoke Tests
     runs-on: ubuntu-latest
     needs: [backend-tests, frontend-tests]
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - name: Pipeline Success
-        run: echo "All backend and frontend tests passed successfully!"
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check changes for Prisma migrate
+        uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters:
+            migrate:
+              - 'apps/backend/prisma/**'
+              - 'apps/backend/package-lock.json'
+
+      - name: Create Test Environment File
+        run: |
+          cat << 'EOF' > .env.test
+          DB_USER=postgres
+          DB_PASSWORD=ci_test_password_123
+          DB_NAME=retail_ci
+          JWT_SECRET=ci_super_secret_jwt_key_32_characters_minimum!
+          JWT_REFRESH_SECRET=ci_super_secret_jwt_refresh_key_32_chars!
+          FRONTEND_URL=http://localhost
+          MAIL_HOST=localhost
+          MAIL_PORT=1025
+          EOF
+
+      - name: Build Compose Production Images
+        run: docker compose -f docker-compose.prod.yml --env-file .env.test build
+
+      - name: Start Compose Services
+        run: docker compose -f docker-compose.prod.yml --env-file .env.test up -d --wait
+
+      - name: Smoke Test - Frontend Root (expect 200)
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost/)
+          echo "GET / returned: $STATUS"
+          if [ "$STATUS" -ne 200 ]; then
+            echo "Smoke test failed: expected 200 on /"
+            docker compose -f docker-compose.prod.yml --env-file .env.test logs
+            exit 1
+          fi
+
+      - name: Smoke Test - Protected API Route (expect 401)
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost/api/products)
+          echo "GET /api/products returned: $STATUS"
+          if [ "$STATUS" -ne 401 ]; then
+            echo "Smoke test failed: expected 401 on /api/products"
+            docker compose -f docker-compose.prod.yml --env-file .env.test logs
+            exit 1
+          fi
+
+      - name: Smoke Test - Public DB Route (expect 200 or 404, never 500)
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost/api/auth/tenants/by-slug/smoke-ci-check)
+          echo "GET /api/auth/tenants/by-slug/smoke-ci-check returned: $STATUS"
+          if [ "$STATUS" -ne 200 ] && [ "$STATUS" -ne 404 ]; then
+            echo "Smoke test failed: expected 200 or 404 on public DB route, got $STATUS"
+            docker compose -f docker-compose.prod.yml --env-file .env.test logs
+            exit 1
+          fi
+
+      - name: Tear Down Compose Services
+        if: always()
+        run: docker compose -f docker-compose.prod.yml --env-file .env.test down -v
+
+      - name: Log in to GitHub Container Registry
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.changes.outputs.migrate == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish Migrate Image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.changes.outputs.migrate == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: ./apps/backend
+          target: migrate
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/retail-migrate:latest
+

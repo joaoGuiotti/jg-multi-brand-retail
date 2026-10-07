@@ -43,9 +43,9 @@
 
 ### Implementation for User Story 1
 
-- [ ] T007 [US1] Criar arquivo de configuração de projeto `apps/backend/project.json` com targets (`build`, `serve`, `test`, `test:cov`, `lint`, `prisma:generate`, `prisma:migrate`, `prisma:seed`)
-- [ ] T008 [US1] Validar execução do target de build do backend via `npx nx run backend:build`
-- [ ] T009 [US1] Validar execução dos testes unitários do backend via `npx nx run backend:test`
+- [x] T007 [US1] Criar arquivo de configuração de projeto `apps/backend/project.json` com targets (`build`, `serve`, `test`, `test:cov`, `lint`, `prisma:generate`, `prisma:migrate`, `prisma:seed`)
+- [x] T008 [US1] Validar execução do target de build do backend via `npx nx run backend:build`
+- [x] T009 [US1] Validar execução dos testes unitários do backend via `npx nx run backend:test`
 - [ ] T010 [US1] Criar arquivo de configuração de projeto `apps/frontend/project.json` com targets (`build`, `serve`, `test`, `lint`)
 - [ ] T011 [US1] Validar execução de compilação inicial do frontend via `npx nx run frontend:build`
 

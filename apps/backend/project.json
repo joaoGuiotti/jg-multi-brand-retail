@@ -1,0 +1,81 @@
+{
+  "name": "backend",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/backend/src",
+  "targets": {
+    "build": {
+      "command": "npm run build",
+      "options": {
+        "cwd": "apps/backend"
+      },
+      "dependsOn": ["prisma:generate"],
+      "outputs": ["{workspaceRoot}/apps/backend/dist"],
+      "cache": true
+    },
+    "serve": {
+      "command": "npm run start:dev",
+      "options": {
+        "cwd": "apps/backend"
+      },
+      "dependsOn": ["prisma:generate"]
+    },
+    "start": {
+      "command": "npm run start",
+      "options": {
+        "cwd": "apps/backend"
+      },
+      "dependsOn": ["prisma:generate"]
+    },
+    "test": {
+      "command": "npm run test",
+      "options": {
+        "cwd": "apps/backend"
+      },
+      "cache": true
+    },
+    "test:cov": {
+      "command": "npm run test:cov",
+      "options": {
+        "cwd": "apps/backend"
+      },
+      "outputs": ["{workspaceRoot}/apps/backend/coverage"],
+      "cache": true
+    },
+    "test:e2e": {
+      "command": "npm run test:e2e",
+      "options": {
+        "cwd": "apps/backend"
+      },
+      "dependsOn": ["prisma:generate"],
+      "cache": true
+    },
+    "lint": {
+      "command": "npm run lint",
+      "options": {
+        "cwd": "apps/backend"
+      },
+      "cache": true
+    },
+    "prisma:generate": {
+      "command": "npm run prisma:generate",
+      "options": {
+        "cwd": "apps/backend"
+      },
+      "cache": true
+    },
+    "prisma:migrate": {
+      "command": "npm run prisma:migrate",
+      "options": {
+        "cwd": "apps/backend"
+      }
+    },
+    "prisma:seed": {
+      "command": "npm run prisma:seed",
+      "options": {
+        "cwd": "apps/backend"
+      },
+      "dependsOn": ["prisma:generate"]
+    }
+  }
+}

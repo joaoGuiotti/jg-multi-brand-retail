@@ -82,8 +82,8 @@ services:
 
   frontend:
     build:
-      context: ./apps/frontend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./apps/frontend/Dockerfile
       target: runtime
     restart: unless-stopped
     ports:

@@ -46,8 +46,8 @@
 - [x] T007 [US1] Criar arquivo de configuração de projeto `apps/backend/project.json` com targets (`build`, `serve`, `test`, `test:cov`, `lint`, `prisma:generate`, `prisma:migrate`, `prisma:seed`)
 - [x] T008 [US1] Validar execução do target de build do backend via `npx nx run backend:build`
 - [x] T009 [US1] Validar execução dos testes unitários do backend via `npx nx run backend:test`
-- [ ] T010 [US1] Criar arquivo de configuração de projeto `apps/frontend/project.json` com targets (`build`, `serve`, `test`, `lint`)
-- [ ] T011 [US1] Validar execução de compilação inicial do frontend via `npx nx run frontend:build`
+- [x] T010 [US1] Criar arquivo de configuração de projeto `apps/frontend/project.json` com targets (`build`, `serve`, `test`, `lint`)
+- [x] T011 [US1] Validar execução de compilação inicial do frontend via `npx nx run frontend:build`
 
 **Checkpoint**: Backend e Frontend integrados e operáveis via targets declarativos do Nx.
 
@@ -61,13 +61,13 @@
 
 ### Implementation for User Story 2
 
-- [ ] T012 [US2] Criar diretório da biblioteca `libs/ui/src/` e migrar componentes, diretivas, pipes, services, styles e `tailwind.preset.js` de `apps/frontend/src/app/shared/ui`
-- [ ] T013 [US2] Configurar ponto de entrada público em `libs/ui/src/index.ts` exportando todos os símbolos públicos da biblioteca
-- [ ] T014 [US2] Criar arquivo de configuração do projeto da biblioteca em `libs/ui/project.json`
-- [ ] T015 [US2] Configurar paths de resolução `@shared/ui` e `@shared/ui/*` no arquivo `tsconfig.base.json` e sincronizar em `apps/frontend/tsconfig.json`
-- [ ] T016 [US2] Atualizar arquivo `apps/frontend/tailwind.config.js` para referenciar o preset e o caminho de conteúdo de `libs/ui`
-- [ ] T017 [US2] Remover pasta obsoleta `apps/frontend/src/app/shared/ui` garantindo que não restem arquivos duplicados
-- [ ] T018 [US2] Validar compilação do frontend consumindo `libs/ui` via `npx nx run frontend:build` e rodar testes do frontend via `npx nx run frontend:test`
+- [x] T012 [US2] Criar diretório da biblioteca `libs/ui/src/` e migrar componentes, diretivas, pipes, services, styles e `tailwind.preset.js` de `apps/frontend/src/app/shared/ui`
+- [x] T013 [US2] Configurar ponto de entrada público em `libs/ui/src/index.ts` exportando todos os símbolos públicos da biblioteca
+- [x] T014 [US2] Criar arquivo de configuração do projeto da biblioteca em `libs/ui/project.json`
+- [x] T015 [US2] Configurar paths de resolução `@shared/ui` e `@shared/ui/*` no arquivo `tsconfig.base.json` e sincronizar em `apps/frontend/tsconfig.json`
+- [x] T016 [US2] Atualizar arquivo `apps/frontend/tailwind.config.js` para referenciar o preset e o caminho de conteúdo de `libs/ui`
+- [x] T017 [US2] Remover pasta obsoleta `apps/frontend/src/app/shared/ui` garantindo que não restem arquivos duplicados
+- [x] T018 [US2] Validar compilação do frontend consumindo `libs/ui` via `npx nx run frontend:build` e rodar testes do frontend via `npx nx run frontend:test`
 
 **Checkpoint**: Biblioteca `libs/ui` isolada com sucesso e consumida transparentemente pelo frontend sem regressões.
 
@@ -83,7 +83,7 @@
 
 - [ ] T019 [US3] Atualizar job `backend-tests` em `.github/workflows/ci.yml` para utilizar comandos Nx (`npx nx run backend:test:cov` e `npx nx run backend:build`)
 - [ ] T020 [US3] Atualizar job `frontend-tests` em `.github/workflows/ci.yml` para utilizar comandos Nx (`npx nx run frontend:test` e `npx nx run frontend:build`)
-- [ ] T021 [US3] Adaptar contexto de build e Dockerfile em `apps/frontend/Dockerfile` e `docker-compose.prod.yml` para suportar `libs/ui`
+- [x] T021 [US3] Adaptar contexto de build e Dockerfile em `apps/frontend/Dockerfile` e `docker-compose.prod.yml` para suportar `libs/ui`
 - [ ] T022 [US3] Validar integridade e sintaxe completa de `.github/workflows/ci.yml`
 
 **Checkpoint**: Pipeline de CI otimizado com suporte a Nx e compatibilidade mantida com Docker.

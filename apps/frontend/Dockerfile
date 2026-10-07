@@ -4,19 +4,24 @@
 FROM node:24-alpine AS build
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-RUN npm ci
+# Copy root configs and project dependencies
+COPY package.json package-lock.json nx.json tsconfig.base.json ./
+COPY apps/frontend/package.json apps/frontend/package-lock.json ./apps/frontend/
+RUN cd apps/frontend && npm ci
 
-COPY . .
-RUN npm run build -- --configuration production
+# Copy shared UI library and frontend source code
+COPY libs/ui ./libs/ui
+COPY apps/frontend ./apps/frontend
+
+RUN cd apps/frontend && npm run build -- --configuration production
 
 # ==========================================
 # Stage: Runtime
 # ==========================================
 FROM nginx:1.27-alpine AS runtime
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /app/dist/frontend/browser /usr/share/nginx/html
+COPY apps/frontend/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/apps/frontend/dist/frontend/browser /usr/share/nginx/html
 
 EXPOSE 80
 

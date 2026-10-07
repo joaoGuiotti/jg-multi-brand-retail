@@ -21,15 +21,9 @@
     "target": "ES2022",
     "module": "ES2022",
     "paths": {
-      "@shared/ui": [
-        "src/app/shared/ui/index.ts"
-      ],
-      "@shared/ui/*": [
-        "src/app/shared/ui/*"
-      ],
-      "@core/*": [
-        "src/app/core/*"
-      ]
+      "@shared/ui": ["../../libs/ui/src/index.ts"],
+      "@shared/ui/*": ["../../libs/ui/src/*"],
+      "@core/*": ["src/app/core/*"]
     }
   },
   "angularCompilerOptions": {

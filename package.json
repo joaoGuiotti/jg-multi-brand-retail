@@ -12,7 +12,8 @@
     "build:frontend": "cd apps/frontend && npm run build",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
-    "migrate": "cd apps/backend && npx prisma migrate dev",
+    "generate": "cd apps/backend && npm run prisma:generate",
+    "migrate": "cd apps/backend && npm run prisma:migrate",
     "seed": "cd apps/backend && npm run prisma:seed",
     "test": "echo \"Run tests in apps\"",
     "lint": "echo \"Run linters in apps\""

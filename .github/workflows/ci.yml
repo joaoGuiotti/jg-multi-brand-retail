@@ -70,8 +70,8 @@ jobs:
       - name: Build Application
         run: npm run build
 
-  validation:
-    name: Build & Compose Smoke Tests
+  build-validation:
+    name: Build Validation
     runs-on: ubuntu-latest
     needs: [backend-tests, frontend-tests]
     permissions:

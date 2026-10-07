@@ -32,9 +32,6 @@ yarn-error.log*
 coverage/
 .nyc_output/
 
-# Prisma
-apps/backend/prisma/migrations/**/migration.sql
-
 # Misc
 .cache/
 tmp/

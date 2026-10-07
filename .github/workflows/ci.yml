@@ -87,7 +87,7 @@ jobs:
         uses: dorny/paths-filter@v3
         id: changes
         with:
-          filters:
+          filters: |
             migrate:
               - 'apps/backend/prisma/**'
               - 'apps/backend/package-lock.json'

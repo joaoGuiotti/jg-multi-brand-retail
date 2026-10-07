@@ -27,14 +27,7 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: 'npm'
-
-      - name: Cache Node Modules
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-backend-${{ hashFiles('**/apps/backend/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-backend-
+          cache-dependency-path: apps/backend/package-lock.json
 
       - name: Install Dependencies
         run: npm ci
@@ -66,14 +59,7 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: 'npm'
-
-      - name: Cache Node Modules
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-frontend-${{ hashFiles('**/apps/frontend/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-frontend-
+          cache-dependency-path: apps/frontend/package-lock.json
 
       - name: Install Dependencies
         run: npm ci

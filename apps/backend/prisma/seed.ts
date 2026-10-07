@@ -19,6 +19,12 @@ async function main() {
   console.log('🌱 Seeding database...');
 
   // Limpar dados existentes (cuidado em produção!)
+  await prisma.loyaltyTransaction.deleteMany();
+  await prisma.loyaltyAccount.deleteMany();
+  await prisma.loyaltyProgram.deleteMany();
+  await prisma.financialAccount.deleteMany();
+  await prisma.commissionTransaction.deleteMany();
+  await prisma.salesTarget.deleteMany();
   await prisma.returnItem.deleteMany();
   await prisma.returnOrder.deleteMany();
   await prisma.notificationPreference.deleteMany();

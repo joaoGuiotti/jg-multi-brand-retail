@@ -1,100 +1,160 @@
 <div class="mx-auto">
-
-    @if(!isModal) {
-    <ui-page-header [title]="isEditMode ? 'Editar Produto' : 'Novo Produto'"
-        [subtitle]="isEditMode ? 'Atualize as informações do produto.' : 'Preencha os dados para cadastrar um novo produto.'">
+  @if (!isModal) {
+    <ui-page-header
+      [title]="isEditMode ? 'Editar Produto' : 'Novo Produto'"
+      [subtitle]="
+        isEditMode
+          ? 'Atualize as informações do produto.'
+          : 'Preencha os dados para cadastrar um novo produto.'
+      "
+    >
     </ui-page-header>
-    }
+  }
 
-    <!-- Loading State -->
-    @if (isLoading) {
+  <!-- Loading State -->
+  @if (isLoading()) {
     <div class="flex justify-center items-center py-12">
-        <svg class="animate-spin h-8 w-8 text-primary" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none">
-            </circle>
-            <path class="opacity-75" fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-            </path>
-        </svg>
+      <svg class="animate-spin h-8 w-8 text-primary" viewBox="0 0 24 24">
+        <circle
+          class="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          stroke-width="4"
+          fill="none"
+        ></circle>
+        <path
+          class="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+        ></path>
+      </svg>
     </div>
-    } @else {
+  } @else {
     <!-- Form -->
     <ui-card [padding]="isModal ? 'sm' : 'md'" [shadow]="!isModal" [bordered]="!isModal">
-        <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
-            <!-- Error Message -->
-            @if (errorMessage) {
-            <div class="mb-4 p-3 bg-error-bg border border-error rounded-lg">
-                <p class="text-sm text-error">{{ errorMessage }}</p>
-            </div>
-            }
+      <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+        <!-- Error Message -->
+        @if (errorMessage()) {
+          <div class="mb-4 p-3 bg-error-bg border border-error rounded-lg">
+            <p class="text-sm text-error">{{ errorMessage() }}</p>
+          </div>
+        }
 
-            <!-- Basic Information -->
-            <div class="mb-6">
-                <h2 class="text-lg font-semibold text-content mb-4">Basic Information</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <ui-input-field class="md:col-span-2" id="name" label="Product Name" type="text"
-                        formControlName="name" placeholder="e.g., Blue T-Shirt">
-                    </ui-input-field>
+        <!-- Basic Information -->
+        <div class="mb-6">
+          <h2 class="text-lg font-semibold text-content mb-4">Basic Information</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <ui-input-field
+              class="md:col-span-2"
+              id="name"
+              label="Product Name"
+              type="text"
+              formControlName="name"
+              placeholder="e.g., Blue T-Shirt"
+            >
+            </ui-input-field>
 
-                    <div class="md:col-span-2">
-                        <label for="description" class="label">Description</label>
-                        <textarea id="description" formControlName="description" rows="3" class="input-field"
-                            placeholder="Product description (optional)"></textarea>
-                    </div>
-
-                    <ui-input-field id="sku" label="SKU" type="text" formControlName="sku"
-                        placeholder="e.g., SHIRT-001" />
-
-                    <ui-input-field id="barcode" label="Barcode" type="text" formControlName="barcode"
-                        placeholder="e.g., 7891234567890" />
-                </div>
-            </div>
-
-            <!-- Pricing -->
-            <div class="mb-6">
-                <h2 class="text-lg font-semibold text-content mb-4">Pricing</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-                    <ui-input-field id="costPrice" label="Cost Price" type="number" formControlName="costPrice"
-                        placeholder="0.00" prefix="R$ " />
-
-                    <ui-input-field id="salePrice" label="Sale Price" type="number" formControlName="salePrice"
-                        placeholder="0.00" prefix="R$ " />
-
-                    <div>
-                        <label class="label">Margin</label>
-                        <div class="input-field" [class.text-success]="calculatedMargin > 0"
-                            [class.text-error]="calculatedMargin < 0">
-                            {{ calculatedMargin.toFixed(2) }}%
-                        </div>
-                    </div>
-                </div>
+            <div class="md:col-span-2">
+              <label for="description" class="label">Description</label>
+              <textarea
+                id="description"
+                formControlName="description"
+                rows="3"
+                class="input-field"
+                placeholder="Product description (optional)"
+              ></textarea>
             </div>
 
-            <!-- Stock -->
-            <div class="mb-6">
-                <h2 class="text-lg font-semibold text-content mb-4">Stock</h2>
-                <ui-input-field id="stockQuantity" label="Current Stock" type="number" formControlName="stockQuantity"
-                    [decimalPlaces]="0" placeholder="0" />
-            </div>
+            <ui-input-field
+              id="sku"
+              label="SKU"
+              type="text"
+              formControlName="sku"
+              placeholder="e.g., SHIRT-001"
+            />
 
-            <!-- Status -->
-            <div class="mb-6">
-                <label class="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" formControlName="active" class="w-4 h-4 rounded" />
-                    <span class="text-sm font-medium text-content-secondary">Product is active</span>
-                </label>
-            </div>
+            <ui-input-field
+              id="barcode"
+              label="Barcode"
+              type="text"
+              formControlName="barcode"
+              placeholder="e.g., 7891234567890"
+            />
+          </div>
+        </div>
 
-            <!-- Actions -->
-            <div class="flex gap-3">
-                <ui-button [uiHasRole]="'ADMIN'" type="submit" variant="primary" [loading]="isSubmitting"
-                    [disabled]="productForm.invalid || isSubmitting">
-                    {{ isEditMode ? 'Update Product' : 'Create Product' }}
-                </ui-button>
-                <ui-button type="button" variant="secondary" (clicked)="cancel()">Cancel</ui-button>
+        <!-- Pricing -->
+        <div class="mb-6">
+          <h2 class="text-lg font-semibold text-content mb-4">Pricing</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <ui-input-field
+              id="costPrice"
+              label="Cost Price"
+              type="number"
+              formControlName="costPrice"
+              placeholder="0.00"
+              prefix="R$ "
+            />
+
+            <ui-input-field
+              id="salePrice"
+              label="Sale Price"
+              type="number"
+              formControlName="salePrice"
+              placeholder="0.00"
+              prefix="R$ "
+            />
+
+            <div>
+              <label class="label">Margin</label>
+              <div
+                class="input-field"
+                [class.text-success]="calculatedMargin > 0"
+                [class.text-error]="calculatedMargin < 0"
+              >
+                {{ calculatedMargin.toFixed(2) }}%
+              </div>
             </div>
-        </form>
+          </div>
+        </div>
+
+        <!-- Stock -->
+        <div class="mb-6">
+          <h2 class="text-lg font-semibold text-content mb-4">Stock</h2>
+          <ui-input-field
+            id="stockQuantity"
+            label="Current Stock"
+            type="number"
+            formControlName="stockQuantity"
+            [decimalPlaces]="0"
+            placeholder="0"
+          />
+        </div>
+
+        <!-- Status -->
+        <div class="mb-6">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" formControlName="active" class="w-4 h-4 rounded" />
+            <span class="text-sm font-medium text-content-secondary">Product is active</span>
+          </label>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex gap-3">
+          <ui-button
+            [uiHasRole]="'ADMIN'"
+            type="submit"
+            variant="primary"
+            [loading]="isSubmitting()"
+            [disabled]="productForm.invalid || isSubmitting()"
+          >
+            {{ isEditMode ? 'Update Product' : 'Create Product' }}
+          </ui-button>
+          <ui-button type="button" variant="secondary" (clicked)="cancel()">Cancel</ui-button>
+        </div>
+      </form>
     </ui-card>
-    }
+  }
 </div>

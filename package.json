@@ -4,22 +4,25 @@
   "description": "Multi-Brand Retail SaaS Platform",
   "private": true,
   "scripts": {
+    "nx": "nx",
     "start": "concurrently -k -p \"[{name}]\" -n \"Backend,Frontend\" -c \"blue.bold,magenta.bold\" \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "dev:backend": "cd apps/backend && npm run prisma:generate && npm run start:dev",
-    "dev:frontend": "cd apps/frontend && npm start",
-    "build": "npm run build:backend && npm run build:frontend",
-    "build:backend": "cd apps/backend && npm run build",
-    "build:frontend": "cd apps/frontend && npm run build",
+    "dev:backend": "nx serve backend",
+    "dev:frontend": "nx serve frontend",
+    "build": "nx run-many -t build",
+    "build:backend": "nx build backend",
+    "build:frontend": "nx build frontend",
+    "test": "nx run-many -t test",
+    "lint": "nx run-many -t lint",
+    "graph": "nx graph",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
-    "generate": "cd apps/backend && npm run prisma:generate",
-    "migrate": "cd apps/backend && npm run prisma:migrate",
-    "seed": "cd apps/backend && npm run prisma:seed",
-    "test": "echo \"Run tests in apps\"",
-    "lint": "echo \"Run linters in apps\""
+    "generate": "nx run backend:prisma:generate",
+    "migrate": "nx run backend:prisma:migrate",
+    "seed": "nx run backend:prisma:seed"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "nx": "^23.3.0"
   },
   "engines": {
     "node": ">=20.0.0",

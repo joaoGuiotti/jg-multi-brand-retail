@@ -65,7 +65,7 @@
       "options": {
         "cwd": "apps/backend"
       },
-      "cache": true
+      "cache": false
     },
     "prisma:migrate": {
       "command": "npm run prisma:migrate",

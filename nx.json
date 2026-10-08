@@ -30,14 +30,105 @@
         "default",
         "^production"
       ],
-      "cache": true
+      "cache": true,
+      "dependsOn": [
+        "^test"
+      ]
     },
     "lint": {
       "inputs": [
         "default"
       ],
+      "cache": true,
+      "dependsOn": [
+        "^lint"
+      ]
+    },
+    "format": {
+      "dependsOn": [
+        "^format"
+      ],
+      "cache": true
+    },
+    "start": {
+      "dependsOn": [
+        "^start"
+      ],
+      "cache": true
+    },
+    "start:dev": {
+      "dependsOn": [
+        "^start:dev"
+      ],
+      "cache": true
+    },
+    "start:debug": {
+      "dependsOn": [
+        "^start:debug"
+      ],
+      "cache": true
+    },
+    "start:prod": {
+      "dependsOn": [
+        "^start:prod"
+      ],
+      "cache": true
+    },
+    "test:watch": {
+      "dependsOn": [
+        "^test:watch"
+      ],
+      "cache": true
+    },
+    "test:cov": {
+      "dependsOn": [
+        "^test:cov"
+      ],
+      "cache": true
+    },
+    "test:debug": {
+      "dependsOn": [
+        "^test:debug"
+      ],
+      "cache": true
+    },
+    "test:e2e": {
+      "dependsOn": [
+        "^test:e2e"
+      ],
+      "cache": true
+    },
+    "prisma:migrate": {
+      "dependsOn": [
+        "^prisma:migrate"
+      ],
+      "cache": true
+    },
+    "prisma:generate": {
+      "dependsOn": [
+        "^prisma:generate"
+      ],
+      "cache": true
+    },
+    "prisma:seed": {
+      "dependsOn": [
+        "^prisma:seed"
+      ],
+      "cache": true
+    },
+    "ng": {
+      "dependsOn": [
+        "^ng"
+      ],
+      "cache": true
+    },
+    "watch": {
+      "dependsOn": [
+        "^watch"
+      ],
       "cache": true
     }
   },
-  "analytics": true
+  "analytics": true,
+  "nxCloudId": "6ac77a931fdd934184e67a9a"
 }

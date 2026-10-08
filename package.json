@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "description": "Multi-Brand Retail SaaS Platform",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "libs/*"
+  ],
   "scripts": {
-    "nx": "nx",
-    "start": "concurrently -k -p \"[{name}]\" -n \"Backend,Frontend\" -c \"blue.bold,magenta.bold\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "start": "nx run-many --target=serve --all",
     "dev:backend": "nx serve backend",
     "dev:frontend": "nx serve frontend",
     "build": "nx run-many -t build",
@@ -21,7 +24,6 @@
     "seed": "nx run backend:prisma:seed"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2",
     "nx": "^23.3.0"
   },
   "engines": {

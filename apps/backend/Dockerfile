@@ -9,25 +9,29 @@ WORKDIR /app
 # Stage: Dependencies (all deps for building)
 # ==========================================
 FROM base AS deps
-COPY package.json package-lock.json ./
+COPY package.json package-lock.json nx.json tsconfig.base.json ./
+COPY apps/backend/package.json ./apps/backend/
+COPY apps/frontend/package.json ./apps/frontend/
+COPY libs/ui/package.json ./libs/ui/
 RUN npm ci
 
 # ==========================================
 # Stage: Build
 # ==========================================
 FROM deps AS build
-COPY . .
-RUN npx prisma generate && npm run build
+COPY apps/backend ./apps/backend
+RUN npx nx run backend:prisma:generate && npx nx run backend:build
 
 # ==========================================
 # Stage: Migrate (runs prisma migrate deploy)
 # ==========================================
 FROM build AS migrate
+WORKDIR /app/apps/backend
 CMD ["npx", "prisma", "migrate", "deploy"]
 
 # ==========================================
 # Stage: Production Dependencies
-# Prunes devDependencies and strips non-runtime artifacts (CLI engines, dev tools, unused template engines)
+# Prunes devDependencies and strips non-runtime artifacts
 # ==========================================
 FROM deps AS prod-deps
 RUN npm prune --omit=dev && \
@@ -63,8 +67,8 @@ ENV PORT=3000
 COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=build /app/node_modules/@prisma/client ./node_modules/@prisma/client
-COPY --from=build /app/dist ./dist
-COPY --from=build /app/package.json ./package.json
+COPY --from=build /app/apps/backend/dist ./dist
+COPY --from=build /app/apps/backend/package.json ./package.json
 
 USER node
 

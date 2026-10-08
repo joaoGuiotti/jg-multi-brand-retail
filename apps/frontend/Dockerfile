@@ -4,16 +4,18 @@
 FROM node:24-alpine AS build
 WORKDIR /app
 
-# Copy root configs and project dependencies
+# Copy root configs and lockfile
 COPY package.json package-lock.json nx.json tsconfig.base.json ./
-COPY apps/frontend/package.json apps/frontend/package-lock.json ./apps/frontend/
-RUN cd apps/frontend && npm ci
+COPY apps/frontend/package.json ./apps/frontend/
+COPY apps/backend/package.json ./apps/backend/
+COPY libs/ui/package.json ./libs/ui/
+RUN npm ci
 
 # Copy shared UI library and frontend source code
 COPY libs/ui ./libs/ui
 COPY apps/frontend ./apps/frontend
 
-RUN cd apps/frontend && npm run build -- --configuration production
+RUN npx nx run frontend:build --configuration=production
 
 # ==========================================
 # Stage: Runtime

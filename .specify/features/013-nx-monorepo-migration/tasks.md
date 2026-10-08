@@ -81,10 +81,10 @@
 
 ### Implementation for User Story 3
 
-- [ ] T019 [US3] Atualizar job `backend-tests` em `.github/workflows/ci.yml` para utilizar comandos Nx (`npx nx run backend:test:cov` e `npx nx run backend:build`)
-- [ ] T020 [US3] Atualizar job `frontend-tests` em `.github/workflows/ci.yml` para utilizar comandos Nx (`npx nx run frontend:test` e `npx nx run frontend:build`)
+- [x] T019 [US3] Atualizar job `backend-tests` em `.github/workflows/ci.yml` para utilizar comandos Nx (`npx nx run backend:test:cov` e `npx nx run backend:build`)
+- [x] T020 [US3] Atualizar job `frontend-tests` em `.github/workflows/ci.yml` para utilizar comandos Nx (`npx nx run frontend:test` e `npx nx run frontend:build`)
 - [x] T021 [US3] Adaptar contexto de build e Dockerfile em `apps/frontend/Dockerfile` e `docker-compose.prod.yml` para suportar `libs/ui`
-- [ ] T022 [US3] Validar integridade e sintaxe completa de `.github/workflows/ci.yml`
+- [x] T022 [US3] Validar integridade e sintaxe completa de `.github/workflows/ci.yml`
 
 **Checkpoint**: Pipeline de CI otimizado com suporte a Nx e compatibilidade mantida com Docker.
 
@@ -98,11 +98,11 @@
 
 ### Implementation for User Story 4
 
-- [ ] T023 [US4] Implementar parada com solicitação de aprovação ao término da Etapa 1 (Fundação do Monorepo Nx)
-- [ ] T024 [US4] Implementar parada com solicitação de aprovação ao término da Etapa 2 (Integração do Backend)
-- [ ] T025 [US4] Implementar parada com solicitação de aprovação ao término da Etapa 3 (Extração de libs/ui)
-- [ ] T026 [US4] Implementar parada com solicitação de aprovação ao término da Etapa 4 (Integração e Validação do Frontend)
-- [ ] T027 [US4] Implementar parada e validação final ao término da Etapa 5 (CI e Docker)
+- [x] T023 [US4] Implementar parada com solicitação de aprovação ao término da Etapa 1 (Fundação do Monorepo Nx)
+- [x] T024 [US4] Implementar parada com solicitação de aprovação ao término da Etapa 2 (Integração do Backend)
+- [x] T025 [US4] Implementar parada com solicitação de aprovação ao término da Etapa 3 (Extração de libs/ui)
+- [x] T026 [US4] Implementar parada com solicitação de aprovação ao término da Etapa 4 (Integração e Validação do Frontend)
+- [x] T027 [US4] Implementar parada e validação final ao término da Etapa 5 (CI e Docker)
 
 **Checkpoint**: Total conformidade com a exigência de governança e aprovações passo a passo.
 
@@ -112,9 +112,9 @@
 
 **Purpose**: Verificação final do grafo, formatação e documentação
 
-- [ ] T028 Gerar e verificar o grafo de dependências do workspace executando `npx nx graph --file=dist/graph.json` ou exibindo resumo das relações
-- [ ] T029 Executar build integrado de todos os projetos com `npx nx run-many -t build`
-- [ ] T030 Atualizar documentação do projeto em `README.md` refletindo os comandos do novo monorepo Nx
+- [x] T028 Gerar e verificar o grafo de dependências do workspace executando `npx nx graph --file=dist/graph.json` ou exibindo resumo das relações
+- [x] T029 Executar build integrado de todos os projetos com `npx nx run-many -t build`
+- [x] T030 Atualizar documentação do projeto em `README.md` refletindo os comandos do novo monorepo Nx
 
 ---
 

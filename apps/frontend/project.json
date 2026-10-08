@@ -3,6 +3,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "sourceRoot": "apps/frontend/src",
+  "implicitDependencies": ["ui"],
   "targets": {
     "build": {
       "command": "npm run build",
@@ -15,7 +16,8 @@
     "serve": {
       "command": "npm run start",
       "options": {
-        "cwd": "apps/frontend"
+        "cwd": "apps/frontend",
+        "proxyConfig": "apps/frontend/proxy.conf.json"
       }
     },
     "start": {

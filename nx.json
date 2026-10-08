@@ -53,32 +53,27 @@
     "start": {
       "dependsOn": [
         "^start"
-      ],
-      "cache": true
+      ]
     },
     "start:dev": {
       "dependsOn": [
         "^start:dev"
-      ],
-      "cache": true
+      ]
     },
     "start:debug": {
       "dependsOn": [
         "^start:debug"
-      ],
-      "cache": true
+      ]
     },
     "start:prod": {
       "dependsOn": [
         "^start:prod"
-      ],
-      "cache": true
+      ]
     },
     "test:watch": {
       "dependsOn": [
         "^test:watch"
-      ],
-      "cache": true
+      ]
     },
     "test:cov": {
       "dependsOn": [
@@ -89,8 +84,7 @@
     "test:debug": {
       "dependsOn": [
         "^test:debug"
-      ],
-      "cache": true
+      ]
     },
     "test:e2e": {
       "dependsOn": [
@@ -101,32 +95,25 @@
     "prisma:migrate": {
       "dependsOn": [
         "^prisma:migrate"
-      ],
-      "cache": true
+      ]
     },
     "prisma:generate": {
-      "dependsOn": [
-        "^prisma:generate"
-      ],
-      "cache": true
+      "cache": false
     },
     "prisma:seed": {
       "dependsOn": [
         "^prisma:seed"
-      ],
-      "cache": true
+      ]
     },
     "ng": {
       "dependsOn": [
         "^ng"
-      ],
-      "cache": true
+      ]
     },
     "watch": {
       "dependsOn": [
         "^watch"
-      ],
-      "cache": true
+      ]
     }
   },
   "analytics": true,

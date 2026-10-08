@@ -32,6 +32,7 @@
       "options": {
         "cwd": "apps/backend"
       },
+      "dependsOn": ["prisma:generate"],
       "cache": true
     },
     "test:cov": {
@@ -39,6 +40,7 @@
       "options": {
         "cwd": "apps/backend"
       },
+      "dependsOn": ["prisma:generate"],
       "outputs": ["{workspaceRoot}/apps/backend/coverage"],
       "cache": true
     },
@@ -55,6 +57,7 @@
       "options": {
         "cwd": "apps/backend"
       },
+      "dependsOn": ["prisma:generate"],
       "cache": true
     },
     "prisma:generate": {

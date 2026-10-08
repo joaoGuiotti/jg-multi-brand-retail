@@ -29,6 +29,9 @@ jobs:
       - name: Install Workspace Dependencies
         run: npm ci
 
+      - name: Generate Prisma Client
+        run: npx nx run backend:prisma:generate
+
       - name: Run Backend Linter
         run: npx nx run backend:lint
 
@@ -81,7 +84,8 @@ jobs:
           filters: |
             migrate:
               - 'apps/backend/prisma/**'
-              - 'apps/backend/package-lock.json'
+              - 'apps/backend/package.json'
+              - 'package-lock.json'
 
       - name: Create Test Environment File
         run: |
@@ -148,7 +152,8 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.changes.outputs.migrate == 'true'
         uses: docker/build-push-action@v6
         with:
-          context: ./apps/backend
+          context: .
+          file: ./apps/backend/Dockerfile
           target: migrate
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/retail-migrate:latest

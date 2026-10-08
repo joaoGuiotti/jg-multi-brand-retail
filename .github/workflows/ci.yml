@@ -15,9 +15,6 @@ jobs:
   backend-tests:
     name: Backend Tests & Build
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./apps/backend
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -27,29 +24,26 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: 'npm'
-          cache-dependency-path: apps/backend/package-lock.json
+          cache-dependency-path: package-lock.json
 
-      - name: Install Dependencies
+      - name: Install Workspace Dependencies
         run: npm ci
 
       - name: Generate Prisma Client
-        run: npx prisma generate
+        run: npx nx run backend:prisma:generate
 
-      - name: Run Linter
-        run: npm run lint
+      - name: Run Backend Linter
+        run: npx nx run backend:lint
 
-      - name: Run Unit Tests with Coverage
-        run: npm run test:cov
+      - name: Run Backend Unit Tests with Coverage
+        run: npx nx run backend:test:cov
 
-      - name: Build Application
-        run: npm run build
+      - name: Build Backend Application
+        run: npx nx run backend:build
 
   frontend-tests:
     name: Frontend Tests & Build
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./apps/frontend
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -59,16 +53,16 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: 'npm'
-          cache-dependency-path: apps/frontend/package-lock.json
+          cache-dependency-path: package-lock.json
 
-      - name: Install Dependencies
+      - name: Install Workspace Dependencies
         run: npm ci
 
-      - name: Run Unit Tests
-        run: npm run test -- --watch=false --browsers=chromium
+      - name: Run Frontend Unit Tests
+        run: npx nx run frontend:test -- --watch=false --browsers=chromium
 
-      - name: Build Application
-        run: npm run build
+      - name: Build Frontend Application
+        run: npx nx run frontend:build
 
   build-validation:
     name: Build Validation
@@ -90,7 +84,8 @@ jobs:
           filters: |
             migrate:
               - 'apps/backend/prisma/**'
-              - 'apps/backend/package-lock.json'
+              - 'apps/backend/package.json'
+              - 'package-lock.json'
 
       - name: Create Test Environment File
         run: |
@@ -157,7 +152,8 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.changes.outputs.migrate == 'true'
         uses: docker/build-push-action@v6
         with:
-          context: ./apps/backend
+          context: .
+          file: ./apps/backend/Dockerfile
           target: migrate
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/retail-migrate:latest

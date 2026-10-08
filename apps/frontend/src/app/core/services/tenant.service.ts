@@ -2,7 +2,7 @@ import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { PublicTenant } from '../models/auth.model';
 import { AuthService } from './auth.service';
 import { catchError, map, of, tap } from 'rxjs';
-import { ThemeService } from '../../shared/ui/services/theme/theme.service';
+import { ThemeService } from '@shared/ui';
 
 @Injectable({
   providedIn: 'root',

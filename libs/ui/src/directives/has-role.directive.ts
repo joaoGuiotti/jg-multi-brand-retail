@@ -1,5 +1,5 @@
 import { Directive, ElementRef, Input, Renderer2, effect, inject } from '@angular/core';
-import { AuthService } from '../../../core/services/auth.service';
+import { AuthService } from '@core/services/auth.service';
 
 export type HasRoleAction = 'hide' | 'disable';
 

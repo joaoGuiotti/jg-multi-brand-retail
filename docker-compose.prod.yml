@@ -35,8 +35,8 @@ services:
 
   migrate:
     build:
-      context: ./apps/backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./apps/backend/Dockerfile
       target: migrate
     restart: "no"
     environment:
@@ -51,8 +51,8 @@ services:
 
   backend:
     build:
-      context: ./apps/backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./apps/backend/Dockerfile
       target: runtime
     restart: unless-stopped
     environment:
@@ -82,8 +82,8 @@ services:
 
   frontend:
     build:
-      context: ./apps/frontend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./apps/frontend/Dockerfile
       target: runtime
     restart: unless-stopped
     ports:

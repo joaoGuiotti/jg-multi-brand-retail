@@ -12,6 +12,8 @@ export * from './pagination/pagination.component';
 export * from './table';
 export * from './theme-toggle/theme-toggle.component';
 export * from './stepper/stepper.component';
+export * from './toast/toast.component';
+export * from './toast/toast-container.component';
 
 // ── Types ───────────────────────────────────────────────────────────────────
 export type { BadgeSize, BadgeVariant } from './badge/badge.component';

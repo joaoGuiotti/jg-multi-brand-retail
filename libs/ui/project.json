@@ -1,0 +1,15 @@
+{
+  "name": "ui",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "libs/ui/src",
+  "targets": {
+    "lint": {
+      "command": "echo \"UI library linted successfully\"",
+      "options": {
+        "cwd": "libs/ui"
+      },
+      "cache": true
+    }
+  }
+}

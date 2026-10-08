@@ -6,24 +6,14 @@ import {
   UiCardComponent,
   UiNumberPipe,
   UiTableColumnDirective,
-  UiTableComponent
-} from '@shared/ui';
-import {
-  ReturnItem,
-  ReturnOrder,
-  ReturnStatus
-} from '../../../../core/models/return.model';
-import {
-  ReturnsService
-} from '../../../../core/services/returns.service';
-import {
-  TableColumn
-} from '../../../../shared/ui/components/table/models/table.types';
-import {
+  UiTableComponent,
+  TableColumn,
   MODAL_DATA,
   MODAL_REF,
-  ModalRef
-} from '../../../../shared/ui/services/modal/modal.types';
+  ModalRef,
+} from '@shared/ui';
+import { ReturnItem, ReturnOrder, ReturnStatus } from '../../../../core/models/return.model';
+import { ReturnsService } from '../../../../core/services/returns.service';
 
 @Component({
   selector: 'app-return-details',
@@ -35,7 +25,7 @@ import {
     UiCardComponent,
     UiTableComponent,
     UiTableColumnDirective,
-    UiNumberPipe
+    UiNumberPipe,
   ],
   template: `
     <div class="p-1">
@@ -44,13 +34,13 @@ import {
           <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
       }
-    
+
       @if (!loading() && returnOrder(); as order) {
         <div>
           <!-- Header Info -->
           <div class="flex items-center justify-between mb-6">
             <div>
-              <p class="text-content-secondary text-sm"> <b>ID:</b> {{ order.id }}</p>
+              <p class="text-content-secondary text-sm"><b>ID:</b> {{ order.id }}</p>
             </div>
             <ui-badge [variant]="getStatusVariant(order.status)" [dot]="true">
               {{ order.status }}
@@ -58,7 +48,11 @@ import {
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <ui-card padding="sm" [shadow]="false" class="bg-surface-hover/50">
-              <h3 class="text-sm font-semibold text-content-secondary uppercase mb-3 text-xs tracking-wider">Informações Gerais</h3>
+              <h3
+                class="text-sm font-semibold text-content-secondary uppercase mb-3 text-xs tracking-wider"
+              >
+                Informações Gerais
+              </h3>
               <div class="space-y-2">
                 <div class="flex justify-between">
                   <span class="text-sm text-content-secondary">Venda:</span>
@@ -66,7 +60,9 @@ import {
                 </div>
                 <div class="flex justify-between">
                   <span class="text-sm text-content-secondary">Data Solicitação:</span>
-                  <span class="text-sm font-medium text-content">{{ order.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                  <span class="text-sm font-medium text-content">{{
+                    order.createdAt | date: 'dd/MM/yyyy HH:mm'
+                  }}</span>
                 </div>
                 <div class="flex justify-between">
                   <span class="text-sm text-content-secondary">Tipo Reembolso:</span>
@@ -74,12 +70,18 @@ import {
                 </div>
                 <div class="flex justify-between">
                   <span class="text-sm text-content-secondary">Total Reembolso:</span>
-                  <span class="text-sm font-bold text-primary">{{ order.totalRefund | uiNumber: { prefix: 'R$ ' } }}</span>
+                  <span class="text-sm font-bold text-primary">{{
+                    order.totalRefund | uiNumber: { prefix: 'R$ ' }
+                  }}</span>
                 </div>
               </div>
             </ui-card>
             <ui-card padding="sm" [shadow]="false" class="bg-surface-hover/50">
-              <h3 class="text-sm font-semibold text-content-secondary uppercase mb-3 text-xs tracking-wider">Motivo</h3>
+              <h3
+                class="text-sm font-semibold text-content-secondary uppercase mb-3 text-xs tracking-wider"
+              >
+                Motivo
+              </h3>
               <p class="text-sm text-content italic">
                 {{ order.reason || 'Nenhum motivo fornecido.' }}
               </p>
@@ -90,7 +92,8 @@ import {
           <ui-table
             [columns]="itemColumns"
             [dataSource]="order.items"
-            [config]="{ pagination: { enabled: false } }">
+            [config]="{ pagination: { enabled: false } }"
+          >
             <div *uiTableColumn="'product'; let row">
               <div class="text-sm font-medium">{{ row.productId }}</div>
             </div>
@@ -107,16 +110,23 @@ import {
           <div class="mt-8 pt-6 border-t border-outline flex flex-wrap gap-3 justify-end">
             <ui-button variant="secondary" (clicked)="close()">Fechar</ui-button>
             @if (order.status === 'REQUESTED') {
-              <ui-button variant="danger" [loading]="actionLoading()" (clicked)="updateStatus('REJECTED')">
+              <ui-button
+                variant="danger"
+                [loading]="actionLoading()"
+                (clicked)="updateStatus('REJECTED')"
+              >
                 Reprovar
               </ui-button>
-              <ui-button variant="primary" [loading]="actionLoading()" (clicked)="updateStatus('APPROVED')">
+              <ui-button
+                variant="primary"
+                [loading]="actionLoading()"
+                (clicked)="updateStatus('APPROVED')"
+              >
                 Aprovar Devolução
               </ui-button>
             }
             @if (order.status === 'APPROVED') {
-              <ui-button variant="success"
-                [loading]="actionLoading()" (clicked)="processRefund()">
+              <ui-button variant="success" [loading]="actionLoading()" (clicked)="processRefund()">
                 Processar Reembolso
               </ui-button>
             }
@@ -124,11 +134,15 @@ import {
         </div>
       }
     </div>
-    `,
+  `,
   changeDetection: ChangeDetectionStrategy.Eager,
-  styles: [`
-    :host { display: block; }
-  `]
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
 })
 export class ReturnDetailsComponent implements OnInit {
   private returnsService = inject(ReturnsService);
@@ -144,7 +158,7 @@ export class ReturnDetailsComponent implements OnInit {
     { key: 'quantity', label: 'Qtd' },
     { key: 'unitPrice', label: 'Preço Un.', type: 'currency' },
     { key: 'condition', label: 'Condição' },
-    { key: 'total', label: 'Total' }
+    { key: 'total', label: 'Total' },
   ];
 
   ngOnInit() {
@@ -162,7 +176,7 @@ export class ReturnDetailsComponent implements OnInit {
         this.returnOrder.set(res.data);
         this.loading.set(false);
       },
-      error: () => this.loading.set(false)
+      error: () => this.loading.set(false),
     });
   }
 
@@ -176,7 +190,7 @@ export class ReturnDetailsComponent implements OnInit {
         this.actionLoading.set(false);
         this.modalRef.close(true);
       },
-      error: () => this.actionLoading.set(false)
+      error: () => this.actionLoading.set(false),
     });
   }
 
@@ -190,7 +204,7 @@ export class ReturnDetailsComponent implements OnInit {
         this.actionLoading.set(false);
         this.modalRef.close(true);
       },
-      error: () => this.actionLoading.set(false)
+      error: () => this.actionLoading.set(false),
     });
   }
 
@@ -200,20 +214,29 @@ export class ReturnDetailsComponent implements OnInit {
 
   getStatusVariant(status: ReturnStatus) {
     switch (status) {
-      case 'REQUESTED': return 'warning';
-      case 'APPROVED': return 'info';
-      case 'REFUNDED': return 'success';
-      case 'REJECTED': return 'error';
-      default: return 'default';
+      case 'REQUESTED':
+        return 'warning';
+      case 'APPROVED':
+        return 'info';
+      case 'REFUNDED':
+        return 'success';
+      case 'REJECTED':
+        return 'error';
+      default:
+        return 'default';
     }
   }
 
   getConditionVariant(condition: string) {
     switch (condition) {
-      case 'GOOD': return 'success';
-      case 'DAMAGED': return 'warning';
-      case 'DEFECTIVE': return 'error';
-      default: return 'default';
+      case 'GOOD':
+        return 'success';
+      case 'DAMAGED':
+        return 'warning';
+      case 'DEFECTIVE':
+        return 'error';
+      default:
+        return 'default';
     }
   }
 }

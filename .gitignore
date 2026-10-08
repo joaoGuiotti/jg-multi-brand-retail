@@ -36,3 +36,9 @@ coverage/
 .cache/
 tmp/
 temp/
+.nx/cache/
+.nx/workspace-data/
+
+
+
+.nx/migrate-runs

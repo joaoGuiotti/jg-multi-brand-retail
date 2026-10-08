@@ -1,9 +1,6 @@
 import {
-  effect,
   inject,
   Injectable,
-  Renderer2,
-  RendererFactory2,
   signal,
   DOCUMENT,
 } from '@angular/core';
@@ -18,21 +15,12 @@ export class ThemeService {
   private currentTheme = signal<Theme>('light');
 
   private document = inject(DOCUMENT);
-  private rendererFactory = inject(RendererFactory2);
-  private renderer: Renderer2;
-  private themeStyleElement: HTMLLinkElement | null = null;
 
   // Public readonly signal
   theme = this.currentTheme.asReadonly();
 
   constructor() {
-    this.renderer = this.rendererFactory.createRenderer(null, null);
     this.setupThemeEffect();
-
-    // Effect to inject stylesheet when theme changes
-    effect(() => {
-      this.injectThemeStylesheet(this.currentTheme());
-    });
   }
 
   /**
@@ -76,31 +64,6 @@ export class ThemeService {
     return prefersDark ? 'dark' : 'light';
   }
 
-  /**
-   * Inject theme stylesheet dynamically
-   */
-  private injectThemeStylesheet(theme: Theme): void {
-    // Remove existing theme stylesheet if it exists
-    if (this.themeStyleElement) {
-      this.renderer.removeChild(this.document.head, this.themeStyleElement);
-      this.themeStyleElement = null;
-    }
-
-    // Only inject a separate stylesheet for dark theme,
-    // since light theme variables are already in design-tokens.css
-    if (theme === 'dark') {
-      // Create new link element for theme stylesheet
-      const link = this.renderer.createElement('link') as HTMLLinkElement;
-      this.renderer.setAttribute(link, 'rel', 'stylesheet');
-      this.renderer.setAttribute(link, 'type', 'text/css');
-      this.renderer.setAttribute(link, 'href', `styles/themes/${theme}-theme.css`);
-      this.renderer.setAttribute(link, 'data-theme-stylesheet', theme);
-
-      // Append to head
-      this.renderer.appendChild(this.document.head, link);
-      this.themeStyleElement = link;
-    }
-  }
 
   /**
    * Set theme and update DOM

@@ -1,5 +1,5 @@
 @import '@angular/cdk/overlay-prebuilt.css';
-@import './app/shared/ui/styles/design-tokens.css';
+@import '../../../libs/ui/src/styles/design-tokens.css';
 
 :root {
   --tenant-primary-color: #3b82f6; /* Default Blue-500 */

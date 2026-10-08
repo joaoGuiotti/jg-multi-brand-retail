@@ -34,7 +34,9 @@ CMD ["npx", "prisma", "migrate", "deploy"]
 # Prunes devDependencies and strips non-runtime artifacts
 # ==========================================
 FROM deps AS prod-deps
-RUN npm prune --omit=dev && \
+# --ignore-scripts: avoid running workspace lifecycle hooks (e.g. husky `prepare`)
+# after devDependencies have been removed
+RUN npm prune --omit=dev --ignore-scripts && \
     rm -rf /app/node_modules/@prisma/engines \
            /app/node_modules/prisma \
            /app/node_modules/typescript \

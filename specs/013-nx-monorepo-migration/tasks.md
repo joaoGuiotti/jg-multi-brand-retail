@@ -85,6 +85,8 @@
 - [x] T020 [US3] Atualizar job `frontend-tests` em `.github/workflows/ci.yml` para utilizar comandos Nx (`npx nx run frontend:test` e `npx nx run frontend:build`)
 - [x] T021 [US3] Adaptar contexto de build e Dockerfile em `apps/frontend/Dockerfile` e `docker-compose.prod.yml` para suportar `libs/ui`
 - [x] T022 [US3] Validar integridade e sintaxe completa de `.github/workflows/ci.yml`
+- [x] T028 [US3] Adaptar `apps/backend/Dockerfile` ao npm workspaces (`npm prune --omit=dev --ignore-scripts`) e mover `husky`/`prepare` de `apps/frontend` para o `package.json` raiz
+- [ ] T029 [US3] Validar `docker compose -f docker-compose.prod.yml build` com sucesso (local e CI) como critério de pronto da Etapa 5
 
 **Checkpoint**: Pipeline de CI otimizado com suporte a Nx e compatibilidade mantida com Docker.
 
@@ -102,7 +104,7 @@
 - [x] T024 [US4] Implementar parada com solicitação de aprovação ao término da Etapa 2 (Integração do Backend)
 - [x] T025 [US4] Implementar parada com solicitação de aprovação ao término da Etapa 3 (Extração de libs/ui)
 - [x] T026 [US4] Implementar parada com solicitação de aprovação ao término da Etapa 4 (Integração e Validação do Frontend)
-- [x] T027 [US4] Implementar parada e validação final ao término da Etapa 5 (CI e Docker)
+- [ ] T027 [US4] Implementar parada e validação final ao término da Etapa 5 (CI e Docker) — reaberta: depende de T029
 
 **Checkpoint**: Total conformidade com a exigência de governança e aprovações passo a passo.
 

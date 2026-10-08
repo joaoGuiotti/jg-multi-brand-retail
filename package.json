@@ -21,9 +21,11 @@
     "docker:down": "docker-compose down",
     "generate": "nx run backend:prisma:generate",
     "migrate": "nx run backend:prisma:migrate",
-    "seed": "nx run backend:prisma:seed"
+    "seed": "nx run backend:prisma:seed",
+    "prepare": "husky apps/frontend/.husky || true"
   },
   "devDependencies": {
+    "husky": "^9.1.7",
     "nx": "^23.3.0"
   },
   "engines": {

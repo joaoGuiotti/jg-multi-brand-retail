@@ -115,10 +115,11 @@
                     <div
                       class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary"
                     >
-                      <i
-                        class="text-lg"
-                        [class]="p.method === 'CASH' ? 'i-lucide-banknote' : 'i-lucide-credit-card'"
-                      ></i>
+                      @if (p.method === 'CASH') {
+                        <svg lucideBanknote class="w-5 h-5"></svg>
+                      } @else {
+                        <svg lucideCreditCard class="w-5 h-5"></svg>
+                      }
                     </div>
                     <div class="flex flex-col">
                       <span class="text-sm font-bold text-content">{{ p.method }}</span>
@@ -218,7 +219,7 @@
                       <div
                         class="w-9 h-9 rounded-full bg-warning/10 flex items-center justify-center text-warning flex-shrink-0"
                       >
-                        <i class="text-lg i-lucide-arrow-left-right"></i>
+                        <svg lucideArrowLeftRight class="w-5 h-5"></svg>
                       </div>
                       <div class="flex flex-col">
                         <div class="flex items-center gap-2 flex-wrap">
@@ -256,13 +257,11 @@
                         [title]="isReturnExpanded(r.id) ? 'Recolher itens' : 'Expandir itens'"
                         (clicked)="$event.stopPropagation(); toggleReturnExpansion(r.id)"
                       >
-                        <i
-                          [class]="
-                            isReturnExpanded(r.id)
-                              ? 'i-lucide-chevron-up text-lg'
-                              : 'i-lucide-chevron-down text-lg'
-                          "
-                        ></i>
+                        @if (isReturnExpanded(r.id)) {
+                          <svg lucideChevronUp class="w-4 h-4"></svg>
+                        } @else {
+                          <svg lucideChevronDown class="w-4 h-4"></svg>
+                        }
                       </ui-button>
                     </div>
                   </div>

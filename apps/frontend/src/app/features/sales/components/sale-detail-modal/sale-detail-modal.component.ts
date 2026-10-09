@@ -21,6 +21,13 @@ import {
   UiTableColumnDirective,
   UiTableComponent,
 } from '@shared/ui';
+import {
+  LucideBanknote,
+  LucideCreditCard,
+  LucideArrowLeftRight,
+  LucideChevronUp,
+  LucideChevronDown,
+} from '@lucide/angular';
 import { finalize } from 'rxjs';
 import { Sale } from '../../../../core/models/sale.model';
 import { SalesService } from '../../../../core/services/sales.service';
@@ -37,6 +44,11 @@ import { SalesService } from '../../../../core/services/sales.service';
     UiTableComponent,
     UiTableColumnDirective,
     UiNumberPipe,
+    LucideBanknote,
+    LucideCreditCard,
+    LucideArrowLeftRight,
+    LucideChevronUp,
+    LucideChevronDown,
   ],
   changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './sale-detail-modal.component.html',

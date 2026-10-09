@@ -80,8 +80,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException('Tenant is inactive');
     }
 
-    // Configura o Tenant ID no contexto global da requisição via CLS
+    // Configura o Tenant ID e Role no contexto global da requisição via CLS
     this.cls.set('tenantId', payload.tenantId);
+    this.cls.set('role', user.role);
 
     return {
       id: user.id.toString(),

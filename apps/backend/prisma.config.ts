@@ -10,6 +10,6 @@ expand(myEnv);
 export default defineConfig({
     schema: 'prisma/schema.prisma',
     datasource: {
-        url: process.env.DB_URL,
+        url: process.env.MIGRATION_DATABASE_URL || process.env.DB_URL,
     },
 });

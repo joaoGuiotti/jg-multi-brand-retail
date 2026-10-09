@@ -26,6 +26,8 @@ import { MailService } from '../services/mail/mail.service';
 import { JwtStrategy } from '../strategies/jwt.strategy';
 import { PrismaModule } from './prisma.module';
 
+import { LogoutUseCase } from '../../application/use-cases/auth/logout.use-case';
+
 @Module({
   imports: [
     PrismaModule,
@@ -75,6 +77,7 @@ import { PrismaModule } from './prisma.module';
     },
     RegisterUseCase,
     LoginUseCase,
+    LogoutUseCase,
     RefreshTokenUseCase,
     GetProfileUseCase,
     CreateUserUseCase,
@@ -91,6 +94,7 @@ import { PrismaModule } from './prisma.module';
     PasswordResetTokenRepository,
     RegisterUseCase,
     LoginUseCase,
+    LogoutUseCase,
     RefreshTokenUseCase,
     GetProfileUseCase,
     CreateUserUseCase,

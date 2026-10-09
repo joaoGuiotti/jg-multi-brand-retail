@@ -20,6 +20,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import type { Response } from 'express';
 import {
   ApiBearerAuth,
@@ -63,6 +64,7 @@ export class SalesController {
     private generateSalesHistoryReportUseCase: GenerateSalesHistoryReportUseCase,
   ) {}
 
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
   @Post()
   @ApiOperation({
     summary: 'Iniciar nova venda',

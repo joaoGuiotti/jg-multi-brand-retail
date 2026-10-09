@@ -17,6 +17,9 @@ import {
 } from '@infrastructure/dtos/auth';
 import { GetPublicTenantUseCase } from '@application/use-cases/auth/get-public-tenant.use-case';
 import { RolesGuard } from '@infrastructure/guards/roles.guard';
+import { LogoutUseCase } from '@application/use-cases/auth/logout.use-case';
+import { Throttle } from '@nestjs/throttler';
+import type { Request, Response } from 'express';
 import {
   Body,
   Controller,
@@ -25,6 +28,9 @@ import {
   HttpStatus,
   Param,
   Post,
+  Req,
+  Res,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -54,6 +60,7 @@ export class AuthController {
   constructor(
     private readonly registerUseCase: RegisterUseCase,
     private readonly loginUseCase: LoginUseCase,
+    private readonly logoutUseCase: LogoutUseCase,
     private readonly refreshTokenUseCase: RefreshTokenUseCase,
     private readonly getProfileUseCase: GetProfileUseCase,
     private readonly createUserUseCase: CreateUserUseCase,
@@ -62,6 +69,25 @@ export class AuthController {
     private readonly resetPasswordUseCase: ResetPasswordUseCase,
     private readonly getPublicTenantUseCase: GetPublicTenantUseCase,
   ) {}
+
+  private setRefreshTokenCookie(res: Response, token: string) {
+    res.cookie('refreshToken', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/api/v1/auth',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias
+    });
+  }
+
+  private clearRefreshTokenCookie(res: Response) {
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/api/v1/auth',
+    });
+  }
 
   @Get('tenants/by-slug/:slug')
   @ApiOperation({
@@ -104,17 +130,22 @@ export class AuthController {
     description: 'Dados de registro inválidos ou e-mail já em uso',
     type: ValidationErrorResponseDto,
   })
-  async register(@Body() dto: RegisterDto) {
+  async register(
+    @Body() dto: RegisterDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const output = await this.registerUseCase.execute(dto);
+    this.setRefreshTokenCookie(res, output.refreshToken);
     return new AuthPresenter(output);
   }
 
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Autenticar usuário',
     description:
-      'Autentica o usuário com e-mail e senha no contexto do Tenant. Retorna `accessToken` (curta duração) e `refreshToken` (longa duração).',
+      'Autentica o usuário com e-mail e senha no contexto do Tenant. Retorna `accessToken` e envia `refreshToken` em HttpOnly Cookie.',
     operationId: 'auth_login',
   })
   @ApiResponse({
@@ -137,8 +168,17 @@ export class AuthController {
     description: 'Dados de login inválidos',
     type: ValidationErrorResponseDto,
   })
-  async login(@Body() dto: LoginDto) {
-    const output = await this.loginUseCase.execute(dto);
+  async login(
+    @Body() dto: LoginDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const output = await this.loginUseCase.execute({
+      ...dto,
+      ip: req.ip,
+      userAgent: req.headers['user-agent'],
+    });
+    this.setRefreshTokenCookie(res, output.refreshToken);
     return new AuthPresenter(output);
   }
 
@@ -147,7 +187,7 @@ export class AuthController {
   @ApiOperation({
     summary: 'Renovar tokens de acesso',
     description:
-      'Gera um novo par de tokens usando o `refreshToken` válido. Use quando o `accessToken` expirar.',
+      'Gera um novo par de tokens usando o `refreshToken` do HttpOnly Cookie (ou payload de fallback).',
     operationId: 'auth_refreshToken',
   })
   @ApiResponse({
@@ -156,11 +196,52 @@ export class AuthController {
   })
   @ApiResponse({
     status: 401,
-    description: 'Refresh token inválido ou expirado',
+    description: 'Refresh token inválido, expirado ou com reuso detectado',
     type: UnauthorizedResponseDto,
   })
-  async refreshToken(@Body() dto: RefreshTokenDto) {
-    return this.refreshTokenUseCase.execute(dto);
+  async refreshToken(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+    @Body() dto?: RefreshTokenDto,
+  ) {
+    const token = req.cookies?.refreshToken || dto?.refreshToken;
+    if (!token) {
+      throw new UnauthorizedException('Refresh token is required');
+    }
+
+    const output = await this.refreshTokenUseCase.execute({
+      refreshToken: token,
+      ip: req.ip,
+      userAgent: req.headers['user-agent'],
+    });
+
+    this.setRefreshTokenCookie(res, output.refreshToken);
+    return output;
+  }
+
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Encerrar sessão (Logout)',
+    description:
+      'Invalida a família de refresh tokens no banco e remove o cookie HttpOnly.',
+    operationId: 'auth_logout',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Sessão encerrada com sucesso',
+  })
+  async logout(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+    @Body() dto?: RefreshTokenDto,
+  ) {
+    const token = req.cookies?.refreshToken || dto?.refreshToken;
+    if (token) {
+      await this.logoutUseCase.execute({ refreshToken: token });
+    }
+    this.clearRefreshTokenCookie(res);
+    return { message: 'Logged out successfully' };
   }
 
   @Get('me')
@@ -255,6 +336,7 @@ export class AuthController {
     });
   }
 
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Post('forgot-password')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -276,6 +358,7 @@ export class AuthController {
     return this.forgotPasswordUseCase.execute(dto);
   }
 
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Post('reset-password')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({

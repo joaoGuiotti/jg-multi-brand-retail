@@ -25,11 +25,18 @@
     "prepare": "husky apps/frontend/.husky || true"
   },
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.10",
     "husky": "^9.1.7",
     "nx": "^23.3.0"
   },
   "engines": {
     "node": ">=20.0.0",
     "npm": ">=10.0.0"
+  },
+  "dependencies": {
+    "@nest-lab/throttler-storage-redis": "^1.2.0",
+    "@nestjs/throttler": "^6.7.1",
+    "cookie-parser": "^1.4.7",
+    "ioredis": "^6.0.0"
   }
 }

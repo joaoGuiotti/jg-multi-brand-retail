@@ -1,7 +1,7 @@
 <div class="p-6 min-w-[600px] flex justify-center items-center">
   @if (isLoading()) {
     <div class="flex justify-center items-center py-12">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <ui-loading message="Carregando detalhes da venda..."></ui-loading>
     </div>
   }
 
@@ -17,31 +17,44 @@
       <ui-card padding="sm" [shadow]="false">
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
           <div>
-            <p class="text-[10px] text-content-secondary uppercase font-bold tracking-widest mb-1">Invoice</p>
+            <p class="text-[10px] text-content-secondary uppercase font-bold tracking-widest mb-1">
+              Invoice
+            </p>
             <p class="text-base font-semibold text-content">#{{ data.invoiceNumber }}</p>
           </div>
           <div>
-            <p class="text-[10px] text-content-secondary uppercase font-bold tracking-widest mb-1">Date</p>
-            <p class="text-base font-semibold text-content">{{ data.createdAt | date: 'dd/MM/yyyy HH:mm' }}</p>
+            <p class="text-[10px] text-content-secondary uppercase font-bold tracking-widest mb-1">
+              Date
+            </p>
+            <p class="text-base font-semibold text-content">
+              {{ data.createdAt | date: 'dd/MM/yyyy HH:mm' }}
+            </p>
           </div>
           <div>
-            <p class="text-[10px] text-content-secondary uppercase font-bold tracking-widest mb-1">Status</p>
+            <p class="text-[10px] text-content-secondary uppercase font-bold tracking-widest mb-1">
+              Status
+            </p>
             <ui-badge [variant]="getStatusVariant(data.status)" [dot]="true" size="md">
               {{ data.status }}
             </ui-badge>
           </div>
           <div>
-            <p class="text-[10px] text-content-secondary uppercase font-bold tracking-widest mb-1">Items Count
+            <p class="text-[10px] text-content-secondary uppercase font-bold tracking-widest mb-1">
+              Items Count
             </p>
             <p class="text-base font-semibold text-content">{{ data.items.length }}</p>
           </div>
           @if ($any(data).customerName) {
-            <div class="col-span-2 lg:col-span-4 pt-4 border-t border-outline/50 mt-2"
+            <div class="col-span-2 lg:col-span-4 pt-4 border-t border-outline/50 mt-2">
+              <p
+                class="text-[10px] text-content-secondary uppercase font-bold tracking-widest mb-1"
               >
-              <p class="text-[10px] text-content-secondary uppercase font-bold tracking-widest mb-1">Customer</p>
+                Customer
+              </p>
               <div class="flex items-center gap-2">
                 <div
-                  class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                  class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs"
+                >
                   {{ $any(data).customerName.substring(0, 2).toUpperCase() }}
                 </div>
                 <p class="text-base font-semibold text-content">{{ $any(data).customerName }}</p>
@@ -56,7 +69,7 @@
           <span class="w-1.5 h-6 bg-primary rounded-full"></span>
           Sale Items
         </h3>
-        <ui-table [columns]="columns" [dataSource]="data.items" [config]="{ stripedRow: true  }">
+        <ui-table [columns]="columns" [dataSource]="data.items" [config]="{ stripedRow: true }">
           <!-- Product Name -->
           <div *uiTableColumn="'product.name'; let row">
             <div class="flex flex-col">
@@ -70,13 +83,15 @@
           </div>
           <!-- Unit Price -->
           <div *uiTableColumn="'unitPrice'; let row">
-            <span class="text-content-secondary">{{ row.unitPrice | uiNumber: { decimalPlaces: 2, prefix:
-            'R$ ' } }}</span>
+            <span class="text-content-secondary">{{
+              row.unitPrice | uiNumber: { decimalPlaces: 2, prefix: 'R$ ' }
+            }}</span>
           </div>
           <!-- Total -->
           <div *uiTableColumn="'total'; let row">
-            <span class="font-bold text-content">{{ row.total | uiNumber: { decimalPlaces: 2, prefix: 'R$ '
-            } }}</span>
+            <span class="font-bold text-content">{{
+              row.total | uiNumber: { decimalPlaces: 2, prefix: 'R$ ' }
+            }}</span>
           </div>
         </ui-table>
       </div>
@@ -89,25 +104,38 @@
           </h3>
           <div class="grid grid-cols-1 gap-3">
             @for (p of data.payments; track p) {
-              <ui-card padding="sm" [hoverable]="true" [shadow]="false"
-                class="border-outline transition-all hover:border-primary/30">
+              <ui-card
+                padding="sm"
+                [hoverable]="true"
+                [shadow]="false"
+                class="border-outline transition-all hover:border-primary/30"
+              >
                 <div class="flex items-center justify-between">
                   <div class="flex gap-4 items-center">
                     <div
-                      class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                      <i class="text-lg"
-                      [class]="p.method === 'CASH' ? 'i-lucide-banknote' : 'i-lucide-credit-card'"></i>
+                      class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary"
+                    >
+                      <i
+                        class="text-lg"
+                        [class]="p.method === 'CASH' ? 'i-lucide-banknote' : 'i-lucide-credit-card'"
+                      ></i>
                     </div>
                     <div class="flex flex-col">
                       <span class="text-sm font-bold text-content">{{ p.method }}</span>
-                      <span class="text-xs text-content-secondary">{{ p.createdAt | date: 'dd/MM/yyyy
-                      HH:mm' }}</span>
+                      <span class="text-xs text-content-secondary">{{
+                        p.createdAt
+                          | date
+                            : 'dd/MM/yyyy
+                      HH:mm'
+                      }}</span>
                     </div>
                   </div>
                   <div class="flex flex-col items-end gap-1">
-                    <span class="font-bold text-content">{{ p.amount | uiNumber: { decimalPlaces: 2, prefix:
-                    'R$ ' } }}</span>
-                    <ui-badge [variant]="p.status === 'PAID' ? 'success' : 'warning'" size="sm">{{ p.status
+                    <span class="font-bold text-content">{{
+                      p.amount | uiNumber: { decimalPlaces: 2, prefix: 'R$ ' }
+                    }}</span>
+                    <ui-badge [variant]="p.status === 'PAID' ? 'success' : 'warning'" size="sm">{{
+                      p.status
                     }}</ui-badge>
                   </div>
                 </div>
@@ -126,19 +154,22 @@
               <div class="space-y-3 pb-4 border-b border-outline/50">
                 <div class="flex justify-between text-sm">
                   <span class="text-content-secondary font-medium">Subtotal</span>
-                  <span class="text-content font-bold">{{ data.subtotal | uiNumber: { decimalPlaces: 2,
-                  prefix: 'R$ ' } }}</span>
+                  <span class="text-content font-bold">{{
+                    data.subtotal | uiNumber: { decimalPlaces: 2, prefix: 'R$ ' }
+                  }}</span>
                 </div>
                 <div class="flex justify-between text-sm text-error">
                   <span class="font-medium">Discount</span>
-                  <span class="font-bold">-{{ data.discount | uiNumber: { decimalPlaces: 2, prefix: 'R$ '
-                  } }}</span>
+                  <span class="font-bold"
+                    >-{{ data.discount | uiNumber: { decimalPlaces: 2, prefix: 'R$ ' } }}</span
+                  >
                 </div>
               </div>
               <div class="flex justify-between items-center">
                 <span class="text-base font-bold text-content">Grand Total</span>
-                <span class="text-3xl font-black text-primary">{{ data.total | uiNumber: { decimalPlaces: 2,
-                prefix: 'R$ ' } }}</span>
+                <span class="text-3xl font-black text-primary">{{
+                  data.total | uiNumber: { decimalPlaces: 2, prefix: 'R$ ' }
+                }}</span>
               </div>
             </div>
           </ui-card>
@@ -146,33 +177,171 @@
       </div>
       <!-- Returns Section -->
       @if (data.returns && data.returns.length > 0) {
-        <div>
-          <h3 class="text-lg font-bold text-content mb-4 flex items-center gap-2">
-            <span class="w-1.5 h-6 bg-warning rounded-full"></span>
-            Associated Returns
-          </h3>
-          <div class="grid grid-cols-1 gap-3">
-            @for (r of data.returns; track r) {
-              <ui-card padding="sm" [shadow]="false" class="border-outline">
-                <div class="flex items-center justify-between">
-                  <div class="flex gap-4 items-center">
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-bold text-content flex items-center gap-2">
+              <span class="w-1.5 h-6 bg-warning rounded-full"></span>
+              Devoluções Associadas
+              <ui-badge variant="warning" size="sm">
+                {{ data.returns.length }} {{ data.returns.length === 1 ? 'registro' : 'registros' }}
+              </ui-badge>
+            </h3>
+
+            <!-- Consolidated Total (US2) -->
+            <div
+              class="flex items-center gap-2 text-sm bg-surface-subtle px-3 py-1.5 rounded-lg border border-outline/60"
+            >
+              <span class="text-content-secondary font-medium">Total Reembolsado:</span>
+              <span class="font-bold text-warning">
+                {{ totalRefunded() | uiNumber: { decimalPlaces: 2, prefix: 'R$ ' } }}
+              </span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 gap-4">
+            @for (r of data.returns; track r.id) {
+              <ui-card
+                padding="sm"
+                [shadow]="false"
+                class="border-outline hover:border-warning/40 transition-colors"
+              >
+                <div class="flex flex-col gap-3">
+                  <!-- Header of the Return Order -->
+                  <div
+                    class="flex items-center justify-between cursor-pointer select-none"
+                    (click)="toggleReturnExpansion(r.id)"
+                    role="button"
+                    tabindex="0"
+                    (keydown.enter)="toggleReturnExpansion(r.id)"
+                  >
+                    <div class="flex gap-3 items-center">
+                      <div
+                        class="w-9 h-9 rounded-full bg-warning/10 flex items-center justify-center text-warning flex-shrink-0"
+                      >
+                        <i class="text-lg i-lucide-arrow-left-right"></i>
+                      </div>
+                      <div class="flex flex-col">
+                        <div class="flex items-center gap-2 flex-wrap">
+                          <span class="text-sm font-bold text-content"
+                            >Devolução #{{ r.id.substring(0, 8) }}</span
+                          >
+                          <ui-badge [variant]="getReturnStatusVariant(r.status)" size="sm">
+                            {{ r.status }}
+                          </ui-badge>
+                          @if (r.refundType) {
+                            <ui-badge variant="default" size="sm">
+                              {{ getRefundTypeLabel(r.refundType) }}
+                            </ui-badge>
+                          }
+                        </div>
+                        <span class="text-xs text-content-secondary">
+                          {{ r.createdAt | date: 'dd/MM/yyyy HH:mm' }}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                      <div class="flex flex-col items-end">
+                        <span class="text-xs text-content-secondary font-medium"
+                          >Valor Reembolsado</span
+                        >
+                        <span class="text-base font-extrabold text-content">
+                          {{ r.total | uiNumber: { decimalPlaces: 2, prefix: 'R$ ' } }}
+                        </span>
+                      </div>
+                      <ui-button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        [title]="isReturnExpanded(r.id) ? 'Recolher itens' : 'Expandir itens'"
+                        (clicked)="$event.stopPropagation(); toggleReturnExpansion(r.id)"
+                      >
+                        <i
+                          [class]="
+                            isReturnExpanded(r.id)
+                              ? 'i-lucide-chevron-up text-lg'
+                              : 'i-lucide-chevron-down text-lg'
+                          "
+                        ></i>
+                      </ui-button>
+                    </div>
+                  </div>
+
+                  <!-- Optional Reason Note -->
+                  @if (r.reason) {
                     <div
-                      class="w-10 h-10 rounded-full bg-warning/10 flex items-center justify-center text-warning">
-                      <i class="text-lg i-lucide-arrow-left-right"></i>
+                      class="bg-surface-subtle/80 px-3 py-1.5 rounded text-xs text-content-secondary border-l-2 border-warning"
+                    >
+                      <strong class="text-content">Motivo:</strong> {{ r.reason }}
                     </div>
-                    <div class="flex flex-col">
-                      <span class="text-sm font-bold text-content">Return #{{ r.id.substring(0, 8) }}</span>
-                      <span class="text-xs text-content-secondary">{{ r.createdAt | date: 'dd/MM/yyyy HH:mm'
-                      }}</span>
+                  }
+
+                  <!-- Detailed Returned Items List (US1 & US2) -->
+                  @if (isReturnExpanded(r.id)) {
+                    <div class="pt-2 border-t border-outline/50">
+                      @if (r.items && r.items.length > 0) {
+                        <div class="space-y-2">
+                          <p
+                            class="text-[11px] text-content-secondary uppercase font-bold tracking-wider"
+                          >
+                            Itens Devolvidos ({{ r.items.length }})
+                          </p>
+                          <ui-table
+                            [columns]="returnItemColumns"
+                            [dataSource]="r.items"
+                            [config]="{ stripedRow: true }"
+                          >
+                            <!-- Product Name & SKU -->
+                            <div *uiTableColumn="'productName'; let item">
+                              <div class="flex flex-col">
+                                <span class="font-medium text-content">{{
+                                  item.productName || 'Produto'
+                                }}</span>
+                                @if (item.sku) {
+                                  <span class="text-xs text-content-secondary"
+                                    >SKU: {{ item.sku }}</span
+                                  >
+                                }
+                              </div>
+                            </div>
+                            <!-- Quantity -->
+                            <div *uiTableColumn="'quantity'; let item">
+                              <span class="font-medium">{{ item.quantity }}</span>
+                            </div>
+                            <!-- Unit Price -->
+                            <div *uiTableColumn="'unitPrice'; let item">
+                              <span class="text-content-secondary">{{
+                                item.unitPrice | uiNumber: { decimalPlaces: 2, prefix: 'R$ ' }
+                              }}</span>
+                            </div>
+                            <!-- Condition -->
+                            <div *uiTableColumn="'condition'; let item">
+                              @if (item.condition) {
+                                <ui-badge
+                                  [variant]="getItemConditionVariant(item.condition)"
+                                  size="sm"
+                                >
+                                  {{ getItemConditionLabel(item.condition) }}
+                                </ui-badge>
+                              } @else {
+                                <span class="text-xs text-content-secondary">-</span>
+                              }
+                            </div>
+                            <!-- Total -->
+                            <div *uiTableColumn="'total'; let item">
+                              <span class="font-bold text-content">{{
+                                item.total | uiNumber: { decimalPlaces: 2, prefix: 'R$ ' }
+                              }}</span>
+                            </div>
+                          </ui-table>
+                        </div>
+                      } @else {
+                        <div class="py-2 text-xs text-content-secondary italic text-center">
+                          Nenhum detalhamento de item específico registrado para esta devolução.
+                        </div>
+                      }
                     </div>
-                  </div>
-                  <div class="flex flex-col items-end gap-1">
-                    <span class="font-bold text-content">{{ r.total | uiNumber: { decimalPlaces: 2, prefix: 'R$
-                    ' } }}</span>
-                    <ui-badge
-                      [variant]="r.status === 'REFUNDED' ? 'success' : (r.status === 'REJECTED' ? 'error' : 'warning')"
-                    size="sm">{{ r.status }}</ui-badge>
-                  </div>
+                  }
                 </div>
               </ui-card>
             }
@@ -182,9 +351,14 @@
       <div class="flex justify-end gap-3 pt-6 border-t border-outline">
         @if (data.status === 'COMPLETED') {
           <div class="flex-1">
-            <ui-button variant="secondary" [disabled]="hasPendingReturns()"
-              [title]="hasPendingReturns() ? 'There is already a return in progress for this sale.' : ''"
-              (clicked)="initiateReturn()">
+            <ui-button
+              variant="secondary"
+              [disabled]="hasPendingReturns()"
+              [title]="
+                hasPendingReturns() ? 'There is already a return in progress for this sale.' : ''
+              "
+              (clicked)="initiateReturn()"
+            >
               Iniciar Devolução
             </ui-button>
           </div>

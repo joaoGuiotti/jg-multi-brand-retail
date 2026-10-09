@@ -110,6 +110,9 @@ export class ReceiptPdfStrategy implements IPdfStrategy {
     this.renderReceiptMeta(doc, L, R);
     this.renderReceiptItems(doc, L, R);
     this.renderReceiptSummary(doc, L, R);
+    if (this.data.returns && this.data.returns.length > 0) {
+      this.renderReceiptReturns(doc, L, R);
+    }
     this.renderReceiptFooter(doc, R);
   }
 
@@ -295,7 +298,140 @@ export class ReceiptPdfStrategy implements IPdfStrategy {
       R,
     );
 
+    const returns = this.data.returns || [];
+    const totalRefunded = returns.reduce(
+      (acc, r) => acc + (Number(r.total) || 0),
+      0,
+    );
+
+    if (totalRefunded > 0) {
+      doc.moveDown(0.3);
+      doc.fontSize(9).font('Helvetica').fillColor('#cc0000');
+      this.pdfService.summaryRow(
+        doc,
+        'Total Devolvido:',
+        `-${totalRefunded.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`,
+        L,
+        R,
+      );
+      doc.moveDown(0.3);
+      this.pdfService.drawDivider(doc, L, R);
+      doc.moveDown(0.3);
+      doc.fontSize(11).font('Helvetica-Bold').fillColor('#000000');
+      const netTotal = Math.max(0, this.data.total - totalRefunded);
+      this.pdfService.summaryRow(
+        doc,
+        'SALDO LÍQUIDO:',
+        netTotal.toLocaleString('pt-BR', {
+          style: 'currency',
+          currency: 'BRL',
+        }),
+        L,
+        R,
+      );
+    }
+
     doc.moveDown(1.5);
+    this.pdfService.drawDivider(doc, L, R, true);
+    doc.moveDown(0.5);
+  }
+
+  private renderReceiptReturns(
+    doc: PDFKit.PDFDocument,
+    L: number,
+    R: number,
+  ): void {
+    const returns = this.data.returns || [];
+    if (returns.length === 0) return;
+
+    doc.fontSize(10).font('Helvetica-Bold').fillColor('#b45309');
+    doc.text('DEVOLUÇÕES / RETURNS', L, doc.y, {
+      align: 'center',
+      width: R - L,
+    });
+    doc.moveDown(0.3);
+    this.pdfService.drawDivider(doc, L, R, true);
+    doc.moveDown(0.3);
+
+    returns.forEach((ret, retIdx) => {
+      doc.fontSize(8).font('Helvetica-Bold').fillColor('#333333');
+      const shortId = ret.id.substring(0, 8).toUpperCase();
+      const statusText = `[${ret.status}]`;
+      const dateStr = ret.createdAt
+        ? new Date(ret.createdAt).toLocaleDateString('pt-BR')
+        : '';
+      doc.text(`Devolução #${shortId} ${statusText}  ${dateStr}`, L);
+
+      if (ret.reason) {
+        doc.fontSize(7).font('Helvetica').fillColor('#666666');
+        doc.text(`Motivo: ${ret.reason}`, L);
+      }
+
+      if (ret.items && ret.items.length > 0) {
+        doc.moveDown(0.2);
+        doc.fontSize(7).font('Helvetica-Bold').fillColor('#555555');
+        const hY = doc.y;
+        doc.text('ITEM DEVOLVIDO', L, hY, { width: 130 });
+        doc.text('QTD', 175, hY, { width: 35, align: 'center' });
+        doc.text('PREÇO', 213, hY, { width: 42, align: 'right' });
+        doc.text('TOTAL', 258, hY, { width: 42, align: 'right' });
+        doc.moveDown(0.2);
+
+        doc.font('Helvetica').fillColor('#444444');
+        ret.items.forEach((item) => {
+          const y = doc.y;
+          const nameWithSku = item.sku
+            ? `${item.name} (${item.sku})`
+            : item.name;
+          doc.text(nameWithSku, L, y, { width: 130, lineBreak: true });
+          const afterName = doc.y;
+          doc.text(String(item.quantity), 175, y, {
+            width: 35,
+            align: 'center',
+          });
+          doc.text(
+            item.unitPrice.toLocaleString('pt-BR', {
+              style: 'currency',
+              currency: 'BRL',
+            }),
+            213,
+            y,
+            { width: 42, align: 'right' },
+          );
+          doc.text(
+            item.total.toLocaleString('pt-BR', {
+              style: 'currency',
+              currency: 'BRL',
+            }),
+            258,
+            y,
+            { width: 42, align: 'right' },
+          );
+          doc.y = Math.max(afterName, doc.y);
+        });
+      }
+
+      doc.moveDown(0.2);
+      doc.fontSize(8).font('Helvetica-Bold').fillColor('#b45309');
+      this.pdfService.summaryRow(
+        doc,
+        'Total Reembolsado:',
+        Number(ret.total).toLocaleString('pt-BR', {
+          style: 'currency',
+          currency: 'BRL',
+        }),
+        L,
+        R,
+      );
+
+      if (retIdx < returns.length - 1) {
+        doc.moveDown(0.3);
+        this.pdfService.drawDivider(doc, L, R, false);
+        doc.moveDown(0.3);
+      }
+    });
+
+    doc.moveDown(1.0);
     this.pdfService.drawDivider(doc, L, R, true);
     doc.moveDown(0.5);
   }

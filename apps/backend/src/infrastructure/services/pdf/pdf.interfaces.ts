@@ -74,6 +74,25 @@ export interface ReceiptItemData {
   total: number;
 }
 
+export interface ReceiptReturnItemData {
+  name: string;
+  sku?: string | null;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+  condition?: string | null;
+}
+
+export interface ReceiptReturnData {
+  id: string;
+  status: string;
+  refundType?: string | null;
+  reason?: string | null;
+  createdAt?: Date;
+  total: number;
+  items?: ReceiptReturnItemData[];
+}
+
 export interface ReceiptData {
   /** Tenant / business name – auto-populated from TenantRepository */
   storeName: string;
@@ -88,4 +107,5 @@ export interface ReceiptData {
   subtotal: number;
   discount: number;
   total: number;
+  returns?: ReceiptReturnData[];
 }

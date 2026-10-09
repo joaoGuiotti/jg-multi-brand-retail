@@ -3,6 +3,7 @@ import {
   SaleOutput,
   PaymentOutput,
   ReturnSummaryOutput,
+  ReturnItemSummaryOutput,
 } from '@application/use-cases/sales/common/sale-output';
 import { PaginationOutput } from '@common/application/pagination-output';
 import { CollectionPresenter } from '@common/presenters/collection.presenter';
@@ -52,10 +53,35 @@ export class PaymentPresenter {
   }
 }
 
+export class ReturnItemSummaryPresenter {
+  id: string;
+  productId: string;
+  productName?: string;
+  sku?: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+  condition: string;
+
+  constructor(output: ReturnItemSummaryOutput) {
+    this.id = output.id;
+    this.productId = output.productId;
+    this.productName = output.productName;
+    this.sku = output.sku;
+    this.quantity = output.quantity;
+    this.unitPrice = output.unitPrice;
+    this.total = output.total;
+    this.condition = output.condition;
+  }
+}
+
 export class ReturnSummaryPresenter {
   id: string;
   status: string;
+  refundType?: string;
+  reason?: string | null;
   total: number;
+  items?: ReturnItemSummaryPresenter[];
 
   @Transform(({ value }) => value?.toISOString())
   createdAt: Date | undefined;
@@ -63,8 +89,13 @@ export class ReturnSummaryPresenter {
   constructor(output: ReturnSummaryOutput) {
     this.id = output.id;
     this.status = output.status;
+    this.refundType = output.refundType;
+    this.reason = output.reason;
     this.total = output.total;
     this.createdAt = output.createdAt;
+    this.items = (output.items || []).map(
+      (item) => new ReturnItemSummaryPresenter(item),
+    );
   }
 }
 

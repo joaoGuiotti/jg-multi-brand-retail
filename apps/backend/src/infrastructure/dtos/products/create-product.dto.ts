@@ -1,6 +1,8 @@
+import { ALLOWED_PRODUCT_UNITS } from '@domain/entities/products/product.entity';
 import { Type } from 'class-transformer';
 import {
   IsBoolean,
+  IsIn,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -60,6 +62,9 @@ export class CreateProductDto {
 
   @IsString()
   @IsOptional()
+  @IsIn(ALLOWED_PRODUCT_UNITS, {
+    message: `unit must be one of: ${ALLOWED_PRODUCT_UNITS.join(', ')}`,
+  })
   unit?: string;
 
   @IsBoolean()

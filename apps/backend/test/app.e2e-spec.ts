@@ -1,3 +1,7 @@
+import * as dotenv from 'dotenv';
+import { join } from 'path';
+dotenv.config({ path: join(__dirname, '../envs/.env') });
+
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';

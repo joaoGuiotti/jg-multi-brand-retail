@@ -23,16 +23,20 @@ export class PrismaPasswordResetTokenRepository implements PasswordResetTokenRep
   }
 
   async findById(id: string): Promise<PasswordResetToken | null> {
-    const token = await this.prisma.passwordResetToken.findUnique({
-      where: { id },
+    const token = await this.prisma.withAuthLookup(async (tx) => {
+      return await tx.passwordResetToken.findUnique({
+        where: { id },
+      });
     });
     return token ? PasswordResetTokenMapper.toDomain(token) : null;
   }
 
   async markAsUsed(id: string): Promise<void> {
-    await this.prisma.passwordResetToken.update({
-      where: { id },
-      data: { usedAt: new Date() },
+    await this.prisma.withAuthLookup(async (tx) => {
+      await tx.passwordResetToken.update({
+        where: { id },
+        data: { usedAt: new Date() },
+      });
     });
   }
 

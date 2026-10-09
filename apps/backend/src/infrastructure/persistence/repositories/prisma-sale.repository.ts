@@ -12,25 +12,25 @@ import { PrismaService } from '../prisma/prisma.service';
 export class PrismaSaleRepository implements SaleRepository {
   constructor(private prisma: PrismaService) {}
 
-  async create(tenantId: string, sale: Sale): Promise<Sale> {
+  async create(tenantId: string, sale: Sale, tx?: any): Promise<Sale> {
     const data = SaleMapper.toPersistence(sale);
     const items = sale.items.map((item) =>
-      SaleMapper.toPersistenceItem(item, sale.id.toString()),
+      SaleMapper.toPersistenceItem(item, sale.id.toString(), tenantId),
     );
 
-    const created = await this.prisma.$transaction(async (tx) => {
-      const newSale = await tx.sale.create({
+    const executeInTx = async (runner: any) => {
+      const newSale = await runner.sale.create({
         data: {
           ...data,
           tenantId,
         },
       });
 
-      await tx.saleItem.createMany({
+      await runner.saleItem.createMany({
         data: items,
       });
 
-      return tx.sale.findUnique({
+      return runner.sale.findUnique({
         where: { id: newSale.id, tenantId },
         include: {
           items: true,
@@ -42,9 +42,13 @@ export class PrismaSaleRepository implements SaleRepository {
           },
         },
       });
-    });
+    };
 
-    return SaleMapper.toDomain(created!);
+    const created = tx
+      ? await executeInTx(tx)
+      : await this.prisma.$transaction(async (innerTx) => executeInTx(innerTx));
+
+    return SaleMapper.toDomain(created);
   }
 
   async findById(tenantId: string, id: string): Promise<Sale | null> {
@@ -210,10 +214,11 @@ export class PrismaSaleRepository implements SaleRepository {
       .sort((a, b) => a.date.localeCompare(b.date));
   }
 
-  async update(tenantId: string, sale: Sale): Promise<Sale> {
+  async update(tenantId: string, sale: Sale, tx?: any): Promise<Sale> {
     const data = SaleMapper.toPersistence(sale);
+    const client = tx ?? this.prisma;
 
-    const updated = await this.prisma.sale.update({
+    const updated = await client.sale.update({
       where: {
         id: sale.id.toString(),
         tenantId,

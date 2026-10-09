@@ -1,7 +1,11 @@
 import { UseCase } from '@common/application/use-case.interface';
 import { Address } from '@domain/entities/customers/address.vo';
 import { CustomerRepository } from '@domain/repositories/customer-repository';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CustomerOutput, CustomerOutputMapper } from './common/customer-output';
 
 export type UpdateCustomerInput = {
@@ -11,7 +15,7 @@ export type UpdateCustomerInput = {
   lastName?: string;
   email?: string;
   phone?: string;
-  document?: string;
+  document?: string | null;
   isActive?: boolean;
   address?: {
     street: string;
@@ -46,7 +50,16 @@ export class UpdateCustomerUseCase implements UseCase<
     if (rest.isActive !== undefined) customer.updateIsActive(rest.isActive);
     if (address !== undefined) customer.updateAddress(Address.create(address));
 
-    const updated = await this.customerRepository.update(tenantId, customer);
-    return CustomerOutputMapper.toOutput(updated);
+    try {
+      const updated = await this.customerRepository.update(tenantId, customer);
+      return CustomerOutputMapper.toOutput(updated);
+    } catch (error) {
+      if ((error as { code?: string })?.code === 'P2002') {
+        throw new ConflictException(
+          'Customer with this document already exists',
+        );
+      }
+      throw error;
+    }
   }
 }

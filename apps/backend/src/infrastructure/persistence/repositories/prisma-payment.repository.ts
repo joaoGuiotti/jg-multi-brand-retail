@@ -12,9 +12,10 @@ import { PrismaService } from '../prisma/prisma.service';
 export class PrismaPaymentRepository implements PaymentRepository {
   constructor(private prisma: PrismaService) {}
 
-  async create(tenantId: string, payment: Payment): Promise<void> {
+  async create(tenantId: string, payment: Payment, tx?: any): Promise<void> {
+    const client = tx ?? this.prisma;
     const data = PaymentMapper.toPersistence(payment);
-    await this.prisma.payment.create({
+    await client.payment.create({
       data: {
         ...data,
         tenantId,

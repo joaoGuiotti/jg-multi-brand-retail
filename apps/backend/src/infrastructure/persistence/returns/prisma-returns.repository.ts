@@ -1,20 +1,20 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import {
-  ReturnsRepository,
-  ReturnFilters,
-  ReturnSearchResult,
-} from '../../../domain/repositories/returns/returns.repository.interface';
-import {
-  ReturnOrder,
-  ReturnStatus,
-  RefundType,
-} from '../../../domain/entities/returns/return-order.entity';
 import {
   ReturnItem,
   ReturnItemCondition,
-} from '../../../domain/entities/returns/return-item.entity';
+} from '@domain/entities/returns/return-item.entity';
+import {
+  RefundType,
+  ReturnOrder,
+  ReturnStatus,
+} from '@domain/entities/returns/return-order.entity';
+import {
+  ReturnFilters,
+  ReturnSearchResult,
+  ReturnsRepository,
+} from '@domain/repositories/returns/returns.repository.interface';
+import { Injectable } from '@nestjs/common';
 import { UniqueEntityID } from '../../../common/domain/unique-entity-id';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class PrismaReturnsRepository implements ReturnsRepository {
@@ -25,6 +25,7 @@ export class PrismaReturnsRepository implements ReturnsRepository {
       ReturnItem.create(
         {
           productId: item.productId,
+          saleItemId: item.saleItemId ?? item.sale_item_id ?? null,
           quantity: item.quantity,
           unitPrice: Number(item.unitPrice),
           total: Number(item.total),
@@ -54,7 +55,7 @@ export class PrismaReturnsRepository implements ReturnsRepository {
     );
   }
 
-  async save(returnOrder: ReturnOrder): Promise<void> {
+  async save(returnOrder: ReturnOrder, tx?: any): Promise<void> {
     const data = {
       tenantId: returnOrder.tenantId,
       saleId: returnOrder.saleId,
@@ -70,9 +71,11 @@ export class PrismaReturnsRepository implements ReturnsRepository {
       createdAt: returnOrder.createdAt,
     };
 
-    // Use a transaction to update the order and its items
-    await this.prisma.$transaction(async (tx) => {
-      await tx.returnOrder.upsert({
+    const updateData = { ...data };
+    delete (updateData as Record<string, unknown>).tenantId;
+
+    const executeUpsert = async (runner: any) => {
+      await runner.returnOrder.upsert({
         where: { id: returnOrder.id.toString() },
         create: {
           id: returnOrder.id.toString(),
@@ -80,6 +83,7 @@ export class PrismaReturnsRepository implements ReturnsRepository {
           items: {
             create: returnOrder.items.map((item) => ({
               id: item.id.toString(),
+              saleItemId: item.saleItemId ?? null,
               productId: item.productId,
               quantity: item.quantity,
               unitPrice: item.unitPrice,
@@ -89,11 +93,12 @@ export class PrismaReturnsRepository implements ReturnsRepository {
           },
         },
         update: {
-          ...data,
+          ...updateData,
           items: {
             deleteMany: {},
             create: returnOrder.items.map((item) => ({
               id: item.id.toString(),
+              saleItemId: item.saleItemId ?? null,
               productId: item.productId,
               quantity: item.quantity,
               unitPrice: item.unitPrice,
@@ -103,7 +108,15 @@ export class PrismaReturnsRepository implements ReturnsRepository {
           },
         },
       });
-    });
+    };
+
+    if (tx) {
+      await executeUpsert(tx);
+    } else {
+      await this.prisma.$transaction(async (innerTx) => {
+        await executeUpsert(innerTx);
+      });
+    }
   }
 
   async findById(tenantId: string, id: string): Promise<ReturnOrder | null> {
@@ -175,5 +188,26 @@ export class PrismaReturnsRepository implements ReturnsRepository {
       limit,
       totalPages: Math.ceil(total / limit),
     };
+  }
+
+  async recordRefundOutflow(
+    tenantId: string,
+    order: ReturnOrder,
+    invoiceNumber?: string,
+  ): Promise<void> {
+    const isCashRefund = order.refundType === 'CASH_REFUND';
+    await this.prisma.financialAccount.create({
+      data: {
+        tenantId,
+        type: 'PAYABLE',
+        description: `Reembolso de Devolução #${order.id.toString().substring(0, 8)} (${order.refundType === 'STORE_CREDIT' ? 'Crédito em Loja' : 'Reembolso em Dinheiro'} - Venda #${invoiceNumber || order.saleId})`,
+        amount: order.totalRefund,
+        dueDate: new Date(),
+        paidAt: isCashRefund ? new Date() : null,
+        status: isCashRefund ? 'PAID' : 'PENDING',
+        category: 'REFUND',
+        saleId: order.saleId,
+      },
+    });
   }
 }

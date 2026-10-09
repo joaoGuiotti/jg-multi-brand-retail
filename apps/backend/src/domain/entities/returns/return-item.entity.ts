@@ -9,6 +9,7 @@ export interface ReturnItemProps {
   unitPrice: number;
   total: number;
   condition: ReturnItemCondition;
+  saleItemId?: string | null;
 }
 
 export class ReturnItem extends Entity<ReturnItemProps> {
@@ -29,6 +30,9 @@ export class ReturnItem extends Entity<ReturnItemProps> {
     );
   }
 
+  get saleItemId(): string | null | undefined {
+    return this.props.saleItemId;
+  }
   get productId(): string {
     return this.props.productId;
   }

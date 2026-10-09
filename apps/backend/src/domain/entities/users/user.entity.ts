@@ -87,6 +87,11 @@ export class User extends AggregateRoot<UserProps> {
     this.props.updatedAt = new Date();
   }
 
+  public revokeAllSessions(): void {
+    this.props.tokenVersion = (this.props.tokenVersion ?? 1) + 1;
+    this.props.updatedAt = new Date();
+  }
+
   toJson() {
     return {
       id: this.id.toString(),

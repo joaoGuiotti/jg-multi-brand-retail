@@ -2,12 +2,7 @@ import { AggregateRoot } from '../../../common/domain/aggregate-root';
 import { UniqueEntityID } from '../../../common/domain/unique-entity-id';
 
 export type PaymentMethod =
-  | 'PIX'
-  | 'CREDIT_CARD'
-  | 'DEBIT_CARD'
-  | 'CASH'
-  | 'BOLETO'
-  | 'STORE_CREDIT';
+  'PIX' | 'CREDIT_CARD' | 'DEBIT_CARD' | 'CASH' | 'BOLETO' | 'STORE_CREDIT';
 export type PaymentStatus = 'PENDING' | 'PAID' | 'CANCELLED';
 
 export interface PaymentProps {

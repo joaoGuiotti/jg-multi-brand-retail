@@ -12,7 +12,9 @@ export class CommissionEventsHandler {
   @OnEvent('sale.completed', { async: true })
   async handleSaleCompletedEvent(event: SaleCompletedEvent) {
     try {
-      this.logger.log(`Calculating commission for sale ${event.sale.id.toString()}`);
+      this.logger.log(
+        `Calculating commission for sale ${event.sale.id.toString()}`,
+      );
 
       const tenant = await this.prisma.tenant.findUnique({
         where: { id: event.tenantId },
@@ -30,9 +32,9 @@ export class CommissionEventsHandler {
       if (commissionRate <= 0) return;
 
       const sale = event.sale;
-      
+
       const baseAmount = Number(sale.total);
-      
+
       const commissionAmount = (baseAmount * commissionRate) / 100;
 
       await this.prisma.commissionTransaction.create({
@@ -47,9 +49,14 @@ export class CommissionEventsHandler {
         },
       });
 
-      this.logger.log(`Commission of R$ ${commissionAmount} generated for sale ${event.sale.id.toString()}`);
+      this.logger.log(
+        `Commission of R$ ${commissionAmount} generated for sale ${event.sale.id.toString()}`,
+      );
     } catch (error) {
-      this.logger.error(`Error calculating commission: ${(error as any).message}`, (error as any).stack);
+      this.logger.error(
+        `Error calculating commission: ${error.message}`,
+        error.stack,
+      );
     }
   }
 }

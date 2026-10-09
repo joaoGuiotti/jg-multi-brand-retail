@@ -1,3 +1,4 @@
+import cookieParser from 'cookie-parser';
 import { WrapperDataInterceptor } from '@infrastructure/interceptors/wrapper-data/wrapper-data.interceptor';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -30,6 +31,8 @@ async function bootstrap() {
     origin: allowedOrigin,
     credentials: true,
   });
+
+  app.use(cookieParser());
 
   app.useGlobalPipes(
     new ValidationPipe({

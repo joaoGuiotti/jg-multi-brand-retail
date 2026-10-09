@@ -18,13 +18,17 @@ import { GetPublicTenantUseCase } from '../../application/use-cases/auth/get-pub
 import { TenantRepository } from '../../domain/repositories/tenant-repository';
 import { UserRepository } from '../../domain/repositories/user-repository';
 import { PasswordResetTokenRepository } from '../../domain/repositories/password-reset-token-repository';
+import { RefreshTokenRepository } from '../../domain/repositories/refresh-token-repository';
 import { AuthController } from '../controllers/auth.controller';
 import { PrismaTenantRepository } from '../persistence/repositories/prisma-tenant.repository';
 import { PrismaUserRepository } from '../persistence/repositories/prisma-user.repository';
 import { PrismaPasswordResetTokenRepository } from '../persistence/repositories/prisma-password-reset-token.repository';
+import { PrismaRefreshTokenRepository } from '../persistence/repositories/prisma-refresh-token.repository';
 import { MailService } from '../services/mail/mail.service';
 import { JwtStrategy } from '../strategies/jwt.strategy';
 import { PrismaModule } from './prisma.module';
+
+import { LogoutUseCase } from '../../application/use-cases/auth/logout.use-case';
 
 @Module({
   imports: [
@@ -73,8 +77,13 @@ import { PrismaModule } from './prisma.module';
       provide: PasswordResetTokenRepository,
       useClass: PrismaPasswordResetTokenRepository,
     },
+    {
+      provide: RefreshTokenRepository,
+      useClass: PrismaRefreshTokenRepository,
+    },
     RegisterUseCase,
     LoginUseCase,
+    LogoutUseCase,
     RefreshTokenUseCase,
     GetProfileUseCase,
     CreateUserUseCase,
@@ -89,8 +98,10 @@ import { PrismaModule } from './prisma.module';
     UserRepository,
     TenantRepository,
     PasswordResetTokenRepository,
+    RefreshTokenRepository,
     RegisterUseCase,
     LoginUseCase,
+    LogoutUseCase,
     RefreshTokenUseCase,
     GetProfileUseCase,
     CreateUserUseCase,

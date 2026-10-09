@@ -18,6 +18,14 @@ import { ReturnsModule } from './infrastructure/modules/returns.module';
 import { LoyaltyModule } from './infrastructure/modules/loyalty.module';
 import { FinanceModule } from './infrastructure/modules/finance.module';
 
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerModule, seconds } from '@nestjs/throttler';
+import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
+import { CustomThrottlerGuard } from './infrastructure/guards/custom-throttler.guard';
+import { ConfigService } from '@nestjs/config';
+
+import { HealthController } from './infrastructure/controllers/health.controller';
+
 const isDev = process.env.NODE_ENV !== 'production';
 
 @Module({
@@ -28,6 +36,30 @@ const isDev = process.env.NODE_ENV !== 'production';
     }),
     ConfigModule.forRoot(),
     EventEmitterModule.forRoot(),
+    ThrottlerModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => {
+        const redisUrl = config.get<string>('REDIS_URL');
+        let storage: any = undefined;
+        if (redisUrl && redisUrl.startsWith('redis://')) {
+          try {
+            storage = new ThrottlerStorageRedisService(redisUrl);
+          } catch {
+            storage = undefined;
+          }
+        }
+        return {
+          throttlers: [
+            {
+              name: 'default',
+              ttl: seconds(60),
+              limit: 100,
+            },
+          ],
+          storage,
+        };
+      },
+    }),
     PrismaModule,
     AuthModule,
     ProductsModule,
@@ -42,7 +74,13 @@ const isDev = process.env.NODE_ENV !== 'production';
     FinanceModule,
     ...(isDev ? [DevModule] : []),
   ],
-  controllers: [],
-  providers: [provideTransformInterceptor()],
+  controllers: [HealthController],
+  providers: [
+    provideTransformInterceptor(),
+    {
+      provide: APP_GUARD,
+      useClass: CustomThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}

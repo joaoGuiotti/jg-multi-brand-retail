@@ -7,6 +7,21 @@ datasource db {
   provider = "postgresql"
 }
 
+// =====================================================================
+// NOTAS DE ARQUITETURA (multi-tenant)
+// ---------------------------------------------------------------------
+// * Toda tabela de negócio carrega `tenant_id` (TEXT, uuid em string).
+// * `@@unique([tenantId, id])` nos "pais" + FKs COMPOSTAS `[tenantId, xId] ->
+//   [tenantId, id]` impedem, no banco, que uma linha do tenant A aponte para
+//   um registro do tenant B (integridade cross-tenant).
+// * Relações opcionais com FK composta usam `onDelete: Restrict` (o Prisma não
+//   permite SetNull quando `tenantId` é NOT NULL e faz parte da FK).
+// * `User.email` é @unique GLOBAL de propósito: o login é feito somente por
+//   e-mail e um usuário pertence a exatamente UM tenant (ver README).
+// * CHECKs, RLS, roles e as FKs compostas estão em migrations SQL manuais
+//   (apps/backend/prisma/migrations/*), pois o Prisma não os expressa.
+// =====================================================================
+
 // =====================
 // CORE ENTITIES
 // =====================
@@ -28,15 +43,19 @@ model Tenant {
   brands                  Brand[]
   suppliers               Supplier[]
   sales                   Sale[]
+  saleItems               SaleItem[]
   payments                Payment[]
   conditionals            Conditional[]
+  conditionalItems        ConditionalItem[]
   inventory               InventoryMovement[]
   auditLogs               AuditLog[]
   customers               Customer[]
   passwordResetTokens     PasswordResetToken[]
+  refreshTokens           RefreshToken[]
   notifications           Notification[]
   notificationPreferences NotificationPreference[]
   returnOrders            ReturnOrder[]
+  returnItems             ReturnItem[]
   loyaltyProgram          LoyaltyProgram?
   loyaltyAccounts         LoyaltyAccount[]
   loyaltyTransactions    LoyaltyTransaction[]
@@ -56,13 +75,21 @@ enum Role {
 model User {
   id           String   @id @default(uuid())
   tenantId     String   @map("tenant_id")
+  /// Único GLOBAL (decisão de design): login só por e-mail; 1 usuário => 1 tenant.
   email        String   @unique
   passwordHash String   @map("password_hash")
   role         Role
   name         String
   active       Boolean  @default(true)
+  /// Segredo TOTP cifrado em repouso (AES-256-GCM, formato `v1:iv:tag:ciphertext`).
   twoFaSecret  String?  @map("two_fa_secret")
+  twoFaEnabled Boolean  @default(false) @map("two_fa_enabled")
+  /// Somente HASHES (SHA-256) dos códigos de backup; nunca o código em claro.
+  twoFaBackupCodes String[] @default([]) @map("two_fa_backup_codes")
   tokenVersion Int      @default(1) @map("token_version")
+  failedLoginAttempts Int       @default(0) @map("failed_login_attempts")
+  lockedUntil         DateTime? @map("locked_until") @db.Timestamptz(3)
+  lastLoginAt         DateTime? @map("last_login_at") @db.Timestamptz(3)
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
@@ -72,6 +99,7 @@ model User {
   inventory               InventoryMovement[]
   auditLogs               AuditLog[]
   passwordResetTokens     PasswordResetToken[]
+  refreshTokens           RefreshToken[]
   notifications           Notification[]
   notificationPreferences NotificationPreference[]
   createdReturns          ReturnOrder[]            @relation("CreatedReturns")
@@ -79,6 +107,7 @@ model User {
   salesTargets            SalesTarget[]
   commissions             CommissionTransaction[]
 
+  @@unique([tenantId, id])
   @@index([tenantId])
   @@map("users")
 }
@@ -144,7 +173,10 @@ model Product {
   costPrice     Decimal  @map("cost_price") @db.Decimal(10, 2)
   salePrice     Decimal  @map("sale_price") @db.Decimal(10, 2)
   margin        Decimal  @db.Decimal(10, 2)
+  /// CHECK (stock_quantity >= 0) na migration 20261009100005.
   stockQuantity Int      @default(0) @map("stock_quantity")
+  /// Limitação documentada: quantidades são Int (venda somente por unidade
+  /// inteira). `unit` é validado contra uma lista permitida na camada de domínio.
   unit          String   @default("UN")
   active        Boolean  @default(true)
   metadata      Json?
@@ -161,6 +193,7 @@ model Product {
   returnItems      ReturnItem[]
 
   @@unique([tenantId, sku])
+  @@unique([tenantId, id])
   @@index([tenantId])
   @@index([barcode])
   @@map("products")
@@ -186,14 +219,15 @@ model Sale {
   invoiceNumber String?    @map("invoice_number")
   subtotal      Decimal    @db.Decimal(10, 2)
   discount      Decimal    @default(0) @db.Decimal(10, 2)
+  /// CHECK (total = subtotal - discount AND total >= 0) na migration 20261009100005.
   total         Decimal    @db.Decimal(10, 2)
   status        SaleStatus @default(PENDING)
   createdAt     DateTime   @default(now()) @map("created_at")
   updatedAt     DateTime   @updatedAt @map("updated_at")
 
   tenant       Tenant        @relation(fields: [tenantId], references: [id])
-  user         User          @relation(fields: [userId], references: [id])
-  customer     Customer?     @relation(fields: [customerId], references: [id])
+  user         User          @relation(fields: [tenantId, userId], references: [tenantId, id], onDelete: Restrict)
+  customer     Customer?     @relation(fields: [tenantId, customerId], references: [tenantId, id], onDelete: Restrict)
   items        SaleItem[]
   payments     Payment[]
   returnOrders ReturnOrder[]
@@ -201,6 +235,7 @@ model Sale {
   financialAccounts FinancialAccount[]
   commissionTransaction CommissionTransaction?
 
+  @@unique([tenantId, id])
   @@index([tenantId])
   @@index([createdAt])
   @@map("sales")
@@ -208,6 +243,7 @@ model Sale {
 
 model SaleItem {
   id        String  @id @default(uuid())
+  tenantId  String  @map("tenant_id")
   saleId    String  @map("sale_id")
   productId String  @map("product_id")
   quantity  Int
@@ -216,9 +252,13 @@ model SaleItem {
   total     Decimal @db.Decimal(10, 2)
   costPriceAtSale Decimal? @map("cost_price_at_sale") @db.Decimal(10, 2)
 
-  sale    Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
-  product Product @relation(fields: [productId], references: [id])
+  tenant  Tenant  @relation(fields: [tenantId], references: [id])
+  sale    Sale    @relation(fields: [tenantId, saleId], references: [tenantId, id], onDelete: Cascade)
+  product Product @relation(fields: [tenantId, productId], references: [tenantId, id], onDelete: Restrict)
+  returnItems ReturnItem[]
 
+  @@unique([tenantId, id])
+  @@index([tenantId])
   @@index([saleId])
   @@map("sale_items")
 }
@@ -256,7 +296,7 @@ model Payment {
   createdAt    DateTime      @default(now()) @map("created_at")
 
   tenant Tenant @relation(fields: [tenantId], references: [id])
-  sale   Sale   @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  sale   Sale   @relation(fields: [tenantId, saleId], references: [tenantId, id], onDelete: Cascade)
 
   @@index([tenantId])
   @@index([saleId])
@@ -286,10 +326,11 @@ model Conditional {
   convertedSaleId String?           @map("converted_sale_id")
 
   tenant   Tenant            @relation(fields: [tenantId], references: [id])
-  user     User              @relation(fields: [userId], references: [id])
-  customer Customer?         @relation(fields: [customerId], references: [id])
+  user     User              @relation(fields: [tenantId, userId], references: [tenantId, id], onDelete: Restrict)
+  customer Customer?         @relation(fields: [tenantId, customerId], references: [tenantId, id], onDelete: Restrict)
   items    ConditionalItem[]
 
+  @@unique([tenantId, id])
   @@index([tenantId])
   @@index([status])
   @@map("conditionals")
@@ -297,14 +338,17 @@ model Conditional {
 
 model ConditionalItem {
   id            String  @id @default(uuid())
+  tenantId      String  @map("tenant_id")
   conditionalId String  @map("conditional_id")
   productId     String  @map("product_id")
   quantity      Int
   unitPrice     Decimal @map("unit_price") @db.Decimal(10, 2)
 
-  conditional Conditional @relation(fields: [conditionalId], references: [id], onDelete: Cascade)
-  product     Product     @relation(fields: [productId], references: [id])
+  tenant      Tenant      @relation(fields: [tenantId], references: [id])
+  conditional Conditional @relation(fields: [tenantId, conditionalId], references: [tenantId, id], onDelete: Cascade)
+  product     Product     @relation(fields: [tenantId, productId], references: [tenantId, id], onDelete: Restrict)
 
+  @@index([tenantId])
   @@index([conditionalId])
   @@map("conditional_items")
 }
@@ -326,13 +370,14 @@ model InventoryMovement {
   productId String       @map("product_id")
   userId    String       @map("user_id")
   type      MovementType
+  /// CHECK (quantity > 0) na migration 20261009100005.
   quantity  Int
   reference String?
   createdAt DateTime     @default(now()) @map("created_at")
 
   tenant  Tenant  @relation(fields: [tenantId], references: [id])
-  product Product @relation(fields: [productId], references: [id])
-  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [tenantId, productId], references: [tenantId, id], onDelete: Restrict)
+  user    User    @relation(fields: [tenantId, userId], references: [tenantId, id], onDelete: Restrict)
 
   @@index([tenantId])
   @@index([productId])
@@ -379,7 +424,9 @@ model Customer {
   email     String
   phone     String
   isActive  Boolean @default(true) @map("is_active")
-  document  String  @unique @default("") @map("document") @db.VarChar(14)
+  /// CPF/CNPJ somente dígitos (normalizado e validado no domínio). NULL = sem
+  /// documento (vários por tenant). Único POR TENANT (e não mais global).
+  document  String? @map("document") @db.VarChar(14)
 
   // Address (flattened from Address VO)
   street     String
@@ -398,6 +445,8 @@ model Customer {
   returnOrders ReturnOrder[]
   loyaltyAccount LoyaltyAccount?
 
+  @@unique([tenantId, document])
+  @@unique([tenantId, id])
   @@index([tenantId])
   @@index([email])
   @@map("customers")
@@ -422,6 +471,35 @@ model PasswordResetToken {
   @@index([tenantId])
   @@index([userId])
   @@map("password_reset_tokens")
+}
+
+// =====================
+// AUTH — REFRESH TOKENS (opacos, rotativos, com detecção de reuso)
+// =====================
+
+model RefreshToken {
+  id                String    @id @default(uuid())
+  tenantId          String    @map("tenant_id")
+  userId            String    @map("user_id")
+  /// SHA-256 (hex) do token opaco. O token em claro nunca é persistido.
+  tokenHash         String    @unique @map("token_hash")
+  /// Todos os tokens derivados do mesmo login compartilham a família; reuso
+  /// de um token já rotacionado/revogado revoga a família inteira.
+  familyId          String    @map("family_id")
+  expiresAt         DateTime  @map("expires_at") @db.Timestamptz(3)
+  revokedAt         DateTime? @map("revoked_at") @db.Timestamptz(3)
+  replacedByTokenId String?   @map("replaced_by_token_id")
+  userAgent         String?   @map("user_agent")
+  ip                String?
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  user   User   @relation(fields: [tenantId, userId], references: [tenantId, id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([userId])
+  @@index([familyId])
+  @@map("refresh_tokens")
 }
 
 // =====================
@@ -503,6 +581,12 @@ enum RefundType {
   EXCHANGE
 }
 
+enum ReturnItemCondition {
+  GOOD
+  DAMAGED
+  DEFECTIVE
+}
+
 model ReturnOrder {
   id          String       @id @default(uuid())
   tenantId    String       @map("tenant_id")
@@ -519,30 +603,39 @@ model ReturnOrder {
   createdAt   DateTime     @default(now()) @map("created_at")
 
   tenant   Tenant       @relation(fields: [tenantId], references: [id])
-  sale     Sale         @relation(fields: [saleId], references: [id])
-  user     User         @relation(fields: [userId], references: [id], name: "CreatedReturns")
-  approver User?        @relation(fields: [approvedBy], references: [id], name: "ApprovedReturns")
-  customer Customer?    @relation(fields: [customerId], references: [id])
+  sale     Sale         @relation(fields: [tenantId, saleId], references: [tenantId, id], onDelete: Restrict)
+  user     User         @relation(fields: [tenantId, userId], references: [tenantId, id], onDelete: Restrict, name: "CreatedReturns")
+  approver User?        @relation(fields: [tenantId, approvedBy], references: [tenantId, id], onDelete: Restrict, name: "ApprovedReturns")
+  customer Customer?    @relation(fields: [tenantId, customerId], references: [tenantId, id], onDelete: Restrict)
   items    ReturnItem[]
 
+  @@unique([tenantId, id])
   @@index([tenantId])
   @@index([saleId])
   @@map("return_orders")
 }
 
 model ReturnItem {
-  id            String  @id @default(uuid())
-  returnOrderId String  @map("return_order_id")
-  productId     String  @map("product_id")
+  id            String              @id @default(uuid())
+  tenantId      String              @map("tenant_id")
+  returnOrderId String              @map("return_order_id")
+  productId     String              @map("product_id")
+  /// Item da venda original que está sendo devolvido. NULL apenas em dados
+  /// legados cujo backfill foi ambíguo (reportado na migration).
+  saleItemId    String?             @map("sale_item_id")
   quantity      Int
-  unitPrice     Decimal @map("unit_price") @db.Decimal(10, 2)
-  total         Decimal @db.Decimal(10, 2)
-  condition     String  @default("GOOD") // "GOOD" | "DAMAGED" | "DEFECTIVE"
+  unitPrice     Decimal             @map("unit_price") @db.Decimal(10, 2)
+  total         Decimal             @db.Decimal(10, 2)
+  condition     ReturnItemCondition @default(GOOD)
 
-  returnOrder ReturnOrder @relation(fields: [returnOrderId], references: [id], onDelete: Cascade)
-  product     Product     @relation(fields: [productId], references: [id])
+  tenant      Tenant       @relation(fields: [tenantId], references: [id])
+  returnOrder ReturnOrder  @relation(fields: [tenantId, returnOrderId], references: [tenantId, id], onDelete: Cascade)
+  product     Product      @relation(fields: [tenantId, productId], references: [tenantId, id], onDelete: Restrict)
+  saleItem    SaleItem?    @relation(fields: [tenantId, saleItemId], references: [tenantId, id], onDelete: Restrict)
 
+  @@index([tenantId])
   @@index([returnOrderId])
+  @@index([saleItemId])
   @@map("return_items")
 }
 
@@ -574,17 +667,19 @@ model LoyaltyAccount {
   tenantId         String   @map("tenant_id")
   customerId       String   @unique @map("customer_id")
   loyaltyProgramId String   @map("loyalty_program_id")
+  /// CHECK (balance >= 0) na migration 20261009100005.
   balance          Int      @default(0)
   totalEarned      Int      @default(0) @map("total_earned")
   totalRedeemed    Int      @default(0) @map("total_redeemed")
   createdAt        DateTime @default(now()) @map("created_at")
 
   tenant         Tenant               @relation(fields: [tenantId], references: [id])
-  customer       Customer             @relation(fields: [customerId], references: [id])
+  customer       Customer             @relation(fields: [tenantId, customerId], references: [tenantId, id], onDelete: Restrict)
   loyaltyProgram LoyaltyProgram       @relation(fields: [loyaltyProgramId], references: [id])
   transactions   LoyaltyTransaction[]
 
   @@unique([tenantId, customerId])
+  @@unique([tenantId, id])
   @@index([tenantId])
   @@map("loyalty_accounts")
 }
@@ -606,9 +701,13 @@ model LoyaltyTransaction {
   createdAt DateTime               @default(now()) @map("created_at")
 
   tenant  Tenant         @relation(fields: [tenantId], references: [id])
-  account LoyaltyAccount @relation(fields: [accountId], references: [id])
-  sale    Sale?          @relation(fields: [saleId], references: [id])
+  account LoyaltyAccount @relation(fields: [tenantId, accountId], references: [tenantId, id], onDelete: Restrict)
+  sale    Sale?          @relation(fields: [tenantId, saleId], references: [tenantId, id], onDelete: Restrict)
 
+  /// Idempotência por venda: no máximo 1 EARN, 1 REDEEM e 1 ADJUST (estorno)
+  /// por (conta, venda). Em PostgreSQL NULLs são distintos em índices únicos,
+  /// portanto ajustes manuais (saleId NULL) nunca conflitam entre si.
+  @@unique([accountId, saleId, type])
   @@index([accountId])
   @@index([tenantId])
   @@map("loyalty_transactions")
@@ -645,7 +744,7 @@ model FinancialAccount {
   updatedAt   DateTime               @updatedAt @map("updated_at")
 
   tenant Tenant @relation(fields: [tenantId], references: [id])
-  sale   Sale?  @relation(fields: [saleId], references: [id])
+  sale   Sale?  @relation(fields: [tenantId, saleId], references: [tenantId, id], onDelete: Restrict)
 
   @@index([tenantId])
   @@index([saleId])
@@ -694,11 +793,11 @@ model CommissionTransaction {
   updatedAt         DateTime         @updatedAt @map("updated_at")
 
   tenant Tenant @relation(fields: [tenantId], references: [id])
-  user   User   @relation(fields: [userId], references: [id])
-  sale   Sale   @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [tenantId, userId], references: [tenantId, id], onDelete: Restrict)
+  sale   Sale   @relation(fields: [tenantId, saleId], references: [tenantId, id], onDelete: Cascade)
 
+  @@unique([tenantId, saleId])
   @@index([tenantId])
   @@index([userId])
   @@map("commission_transactions")
 }
-

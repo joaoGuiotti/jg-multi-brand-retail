@@ -11,7 +11,7 @@ export type CreateCustomerInput = {
   lastName: string;
   email: string;
   phone: string;
-  document: string;
+  document?: string | null;
   isActive?: boolean;
   address: {
     street: string;
@@ -47,7 +47,17 @@ export class CreateCustomerUseCase implements UseCase<
       address: Address.create(address),
     });
 
-    const created = await this.customerRepository.create(tenantId, customer);
-    return CustomerOutputMapper.toOutput(created);
+    try {
+      const created = await this.customerRepository.create(tenantId, customer);
+      return CustomerOutputMapper.toOutput(created);
+    } catch (error) {
+      // Unicidade (tenantId, document) garantida pelo banco; evita race entre requests.
+      if ((error as { code?: string })?.code === 'P2002') {
+        throw new ConflictException(
+          'Customer with this document already exists',
+        );
+      }
+      throw error;
+    }
   }
 }

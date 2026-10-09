@@ -23,7 +23,7 @@ describe('AdjustPointsManualUseCase', () => {
       saveTransaction: jest.fn(),
       findTransactionsByAccountId: jest.fn(),
       findTransactionsBySaleId: jest.fn(),
-    } as any;
+    };
 
     mockPrisma = {
       $transaction: jest.fn(async (cb) => {

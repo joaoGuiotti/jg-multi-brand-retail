@@ -8,9 +8,10 @@ export type UpdateCommissionRateInput = {
 };
 
 @Injectable()
-export class UpdateCommissionRateUseCase
-  implements UseCase<UpdateCommissionRateInput, any>
-{
+export class UpdateCommissionRateUseCase implements UseCase<
+  UpdateCommissionRateInput,
+  any
+> {
   constructor(private tenantRepository: TenantRepository) {}
 
   async execute(input: UpdateCommissionRateInput) {

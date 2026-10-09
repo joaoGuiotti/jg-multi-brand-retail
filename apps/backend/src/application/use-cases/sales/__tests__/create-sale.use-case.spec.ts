@@ -51,6 +51,12 @@ describe('CreateSaleUseCase', () => {
     prisma = {
       $transaction: jest.fn((callback) => callback(prisma)),
       financialAccount: { create: jest.fn() },
+      product: {
+        updateMany: jest.fn().mockResolvedValue({ count: 1 }),
+      },
+      inventoryMovement: {
+        create: jest.fn().mockResolvedValue({}),
+      },
     };
     eventPublisher = { publishEvents: jest.fn() };
     useCase = new CreateSaleUseCase(

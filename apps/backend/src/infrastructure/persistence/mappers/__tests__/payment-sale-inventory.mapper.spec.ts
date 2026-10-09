@@ -184,8 +184,9 @@ describe('SaleMapper', () => {
       discount: 0,
       total: 20,
     });
-    const raw = SaleMapper.toPersistenceItem(item, 'sale-1');
+    const raw = SaleMapper.toPersistenceItem(item, 'sale-1', 'tenant-1');
     expect(raw.saleId).toBe('sale-1');
+    expect(raw.tenantId).toBe('tenant-1');
     expect(raw.productId).toBe('p1');
   });
 });

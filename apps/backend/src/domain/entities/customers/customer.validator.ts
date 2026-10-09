@@ -1,7 +1,32 @@
 import { ClassValidatorFields } from '@common/domain/validators/class-validator-field';
 import { Notification } from '@common/domain/validators/notification';
-import { IsBoolean, IsString, Matches, MaxLength } from 'class-validator';
+import {
+  isValidBrazilianDocument,
+  normalizeDocument,
+} from '@domain/shared/brazilian-document';
+import {
+  IsBoolean,
+  MaxLength,
+  Validate,
+  ValidateIf,
+  ValidationArguments,
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
+} from 'class-validator';
 import { Customer } from './customer.entity';
+
+@ValidatorConstraint({ name: 'brazilianDocument', async: false })
+export class BrazilianDocumentConstraint implements ValidatorConstraintInterface {
+  validate(value: unknown): boolean {
+    if (typeof value !== 'string') return false;
+    const normalized = normalizeDocument(value);
+    return isValidBrazilianDocument(normalized);
+  }
+
+  defaultMessage(_args: ValidationArguments): string {
+    return 'document must be a valid CPF (11 digits) or CNPJ (14 digits)';
+  }
+}
 
 export class CustomerRules {
   @MaxLength(100, { groups: ['firstName'] })
@@ -19,12 +44,12 @@ export class CustomerRules {
   @IsBoolean({ groups: ['isActive'] })
   isActive: boolean;
 
-  @IsString({ groups: ['document'] })
-  @Matches(/^\d{11}$|^\d{14}$/, {
+  // Documento é opcional: null = cliente sem documento (vários por tenant).
+  @ValidateIf((o: CustomerRules) => o.document !== null, {
     groups: ['document'],
-    message: 'document must be a valid CPF (11 digits) or CNPJ (14 digits)',
   })
-  document: string;
+  @Validate(BrazilianDocumentConstraint, { groups: ['document'] })
+  document: string | null;
 
   constructor(customer: Customer) {
     this.firstName = customer.firstName;

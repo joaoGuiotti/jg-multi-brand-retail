@@ -15,7 +15,7 @@ export type CustomerOutput = {
   lastName: string;
   email: string;
   phone: string;
-  document: string;
+  document: string | null;
   isActive: boolean;
   address: AddressOutput;
 };

@@ -23,7 +23,7 @@ export interface ReturnSearchResult {
 }
 
 export abstract class ReturnsRepository {
-  abstract save(returnOrder: ReturnOrder): Promise<void>;
+  abstract save(returnOrder: ReturnOrder, tx?: any): Promise<void>;
   abstract findById(tenantId: string, id: string): Promise<ReturnOrder | null>;
   abstract findAll(
     tenantId: string,
@@ -33,4 +33,9 @@ export abstract class ReturnsRepository {
     tenantId: string,
     saleId: string,
   ): Promise<ReturnOrder[]>;
+  abstract recordRefundOutflow(
+    tenantId: string,
+    order: ReturnOrder,
+    invoiceNumber?: string,
+  ): Promise<void>;
 }

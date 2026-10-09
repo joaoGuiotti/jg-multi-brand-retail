@@ -51,7 +51,8 @@ export class CommissionsController {
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   async setSalesTarget(
     @CurrentUser() user: any,
-    @Body() dto: { userId: string; month: number; year: number; targetAmount: number },
+    @Body()
+    dto: { userId: string; month: number; year: number; targetAmount: number },
   ) {
     return this.setSalesTargetUseCase.execute({
       tenantId: user.tenantId,

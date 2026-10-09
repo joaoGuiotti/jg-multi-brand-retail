@@ -1,16 +1,21 @@
+import * as crypto from 'crypto';
+import { v4 as uuidv4 } from 'uuid';
 import { UseCase } from '@common/application/use-case.interface';
 import { User } from '@domain/entities/users/user.entity';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Optional, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { TenantRepository } from '../../../domain/repositories/tenant-repository';
 import { UserRepository } from '../../../domain/repositories/user-repository';
+import { RefreshTokenRepository } from '../../../domain/repositories/refresh-token-repository';
 
 export type LoginInput = {
   email: string;
   password: string;
+  ip?: string;
+  userAgent?: string;
 };
 
 export type LoginOutput = {
@@ -37,6 +42,7 @@ export class LoginUseCase implements UseCase<LoginInput, LoginOutput> {
     private tenantRepository: TenantRepository,
     private jwtService: JwtService,
     private configService: ConfigService,
+    @Optional() private refreshTokenRepository?: RefreshTokenRepository,
   ) {}
 
   async execute(input: LoginInput): Promise<LoginOutput> {
@@ -71,7 +77,13 @@ export class LoginUseCase implements UseCase<LoginInput, LoginOutput> {
     }
 
     // Generate tokens
-    const tokens = await this.generateTokens(user, tenantId, tenant.logoUrl);
+    const tokens = await this.generateTokens(
+      user,
+      tenantId,
+      tenant.logoUrl,
+      input.ip,
+      input.userAgent,
+    );
 
     return {
       user: {
@@ -94,7 +106,10 @@ export class LoginUseCase implements UseCase<LoginInput, LoginOutput> {
     user: User,
     tenantId: string,
     logoUrl?: string | null,
+    ip?: string,
+    userAgent?: string,
   ) {
+    const familyId = uuidv4();
     const payload = {
       sub: user.id.toString(),
       email: user.email,
@@ -103,6 +118,7 @@ export class LoginUseCase implements UseCase<LoginInput, LoginOutput> {
       tenantId: tenantId,
       logoUrl: logoUrl,
       tokenVersion: user.tokenVersion,
+      familyId,
     };
 
     const [accessToken, refreshToken] = await Promise.all([
@@ -115,6 +131,23 @@ export class LoginUseCase implements UseCase<LoginInput, LoginOutput> {
         expiresIn: '7d',
       }),
     ]);
+
+    if (this.refreshTokenRepository) {
+      const tokenHash = crypto
+        .createHash('sha256')
+        .update(refreshToken)
+        .digest('hex');
+
+      await this.refreshTokenRepository.create({
+        tenantId,
+        userId: user.id.toString(),
+        tokenHash,
+        familyId,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        ip: ip ?? null,
+        userAgent: userAgent ?? null,
+      });
+    }
 
     return { accessToken, refreshToken };
   }

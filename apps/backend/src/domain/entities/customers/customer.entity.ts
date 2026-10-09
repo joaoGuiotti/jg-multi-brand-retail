@@ -1,5 +1,6 @@
 import { AggregateRoot } from '@common/domain/aggregate-root';
 import { UniqueEntityID } from '@common/domain/unique-entity-id';
+import { normalizeDocument } from '@domain/shared/brazilian-document';
 import { Address } from './address.vo';
 import { CustomerValidatorFactory } from './customer.validator';
 
@@ -10,17 +11,24 @@ export interface CustomerProps {
   email: string;
   address: Address;
   isActive: boolean;
-  document: string;
+  /** CPF/CNPJ somente dígitos, ou null/undefined quando o cliente não tem documento. */
+  document?: string | null;
 }
 
 export class Customer extends AggregateRoot<CustomerProps> {
   constructor(props: CustomerProps, id?: UniqueEntityID) {
-    super(props, id ?? UniqueEntityID.create());
+    const rawDoc = props.document;
+    const doc =
+      rawDoc === '' || rawDoc === null || rawDoc === undefined ? null : rawDoc;
+    super({ ...props, document: doc }, id ?? UniqueEntityID.create());
   }
 
   static create(props: CustomerProps, id?: UniqueEntityID): Customer {
     const customer = new Customer(props, id);
     customer.validate();
+    if (!customer.notification.hasErrors() && customer.props.document) {
+      customer.props.document = normalizeDocument(customer.props.document);
+    }
     return customer;
   }
 
@@ -42,8 +50,8 @@ export class Customer extends AggregateRoot<CustomerProps> {
   public get isActive(): boolean {
     return this.props.isActive;
   }
-  public get document(): string {
-    return this.props.document;
+  public get document(): string | null {
+    return this.props.document ?? null;
   }
 
   public updateFirstName(firstName: string): void {
@@ -76,9 +84,16 @@ export class Customer extends AggregateRoot<CustomerProps> {
     this.validate(['isActive']);
   }
 
-  public updateDocument(document: string): void {
-    this.props.document = document;
+  public updateDocument(document: string | null): void {
+    const doc =
+      document === '' || document === null || document === undefined
+        ? null
+        : document;
+    this.props.document = doc;
     this.validate(['document']);
+    if (!this.notification.hasErrors() && doc) {
+      this.props.document = normalizeDocument(doc);
+    }
   }
 
   public validate(fields?: string[]): void {

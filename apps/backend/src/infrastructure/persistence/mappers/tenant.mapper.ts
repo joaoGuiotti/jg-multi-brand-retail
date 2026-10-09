@@ -25,7 +25,9 @@ export class TenantMapper {
       name: tenant.name,
       slug: tenant.slug,
       logoUrl: tenant.logoUrl ?? null,
-      commissionRate: tenant.commissionRate ? Number(tenant.commissionRate) : null,
+      commissionRate: tenant.commissionRate
+        ? Number(tenant.commissionRate)
+        : null,
       settings: tenant.settings ? tenant.settings : undefined,
       active: tenant.active,
       createdAt: tenant.createdAt,

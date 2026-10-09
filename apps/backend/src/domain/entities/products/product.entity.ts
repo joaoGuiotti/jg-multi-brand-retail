@@ -2,6 +2,18 @@ import { AggregateRoot } from '../../../common/domain/aggregate-root';
 import { UniqueEntityID } from '../../../common/domain/unique-entity-id';
 import { StockChangedEvent } from '../../events/inventory/stock-changed.event';
 
+export const ALLOWED_PRODUCT_UNITS = [
+  'UN',
+  'PC',
+  'CX',
+  'PAR',
+  'KIT',
+  'M',
+  'KG',
+  'L',
+] as const;
+export type AllowedProductUnit = (typeof ALLOWED_PRODUCT_UNITS)[number];
+
 export interface ProductProps {
   name: string;
   description?: string | null;
@@ -27,11 +39,16 @@ export class Product extends AggregateRoot<ProductProps> {
   }
 
   public static create(props: ProductProps, id?: UniqueEntityID): Product {
+    const rawUnit = (props.unit ?? 'UN').toUpperCase();
+    const unit = (ALLOWED_PRODUCT_UNITS as readonly string[]).includes(rawUnit)
+      ? rawUnit
+      : 'UN';
+
     const product = new Product(
       {
         ...props,
         stockQuantity: props.stockQuantity ?? 0,
-        unit: props.unit ?? 'UN',
+        unit,
         active: props.active ?? true,
         createdAt: props.createdAt ?? new Date(),
         updatedAt: props.updatedAt ?? new Date(),

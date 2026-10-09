@@ -57,6 +57,7 @@ const makeReturnsRepo = (order: any) => ({
   save: jest.fn().mockResolvedValue(undefined),
   findAll: jest.fn().mockResolvedValue([]),
   findBySaleId: jest.fn().mockResolvedValue([]),
+  recordRefundOutflow: jest.fn().mockResolvedValue(undefined),
 });
 
 const makeSaleRepo = (sale: any = null) => ({
@@ -86,7 +87,13 @@ const makeUseCase = (order: any, sale: any = null) => {
     notification as any,
     earnPointsUseCase as any,
   );
-  return { useCase, returnsRepo, saleRepo, notification, earnPointsUseCase };
+  return {
+    useCase,
+    returnsRepo,
+    saleRepo,
+    notification,
+    earnPointsUseCase,
+  };
 };
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
@@ -211,6 +218,44 @@ describe('ProcessRefundUseCase', () => {
       await useCase.execute('tenant-1', 'return-1');
 
       expect(earnPointsUseCase.reversePoints).not.toHaveBeenCalled();
+    });
+
+    it('should delegate financial outflow to returnsRepository.recordRefundOutflow for CASH_REFUND', async () => {
+      const order = makeReturnOrder('APPROVED');
+      const sale = makeSale('RETURN_REQUESTED', null);
+      const { useCase, returnsRepo } = makeUseCase(order, sale);
+
+      await useCase.execute('tenant-1', 'return-1');
+
+      expect(returnsRepo.recordRefundOutflow).toHaveBeenCalledWith(
+        'tenant-1',
+        order,
+        expect.any(String),
+      );
+    });
+
+    it('should delegate financial outflow to returnsRepository.recordRefundOutflow for STORE_CREDIT', async () => {
+      const order = ReturnOrder.create({
+        tenantId: 'tenant-1',
+        saleId: 'sale-1',
+        userId: 'user-1',
+        status: 'REQUESTED',
+        refundType: 'STORE_CREDIT',
+        reason: 'test',
+        totalRefund: 100,
+        items: [],
+      });
+      order.approve('admin-1');
+      const sale = makeSale('RETURN_REQUESTED', null);
+      const { useCase, returnsRepo } = makeUseCase(order, sale);
+
+      await useCase.execute('tenant-1', 'return-1');
+
+      expect(returnsRepo.recordRefundOutflow).toHaveBeenCalledWith(
+        'tenant-1',
+        order,
+        expect.any(String),
+      );
     });
   });
 });

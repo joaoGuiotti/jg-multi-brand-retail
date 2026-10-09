@@ -16,7 +16,7 @@ const createCustomer = () => {
       state: 'SP',
       zipCode: '00000-000',
     }),
-    document: '12345678901',
+    document: '52998224725',
     isActive: true,
   });
 };
@@ -84,7 +84,7 @@ describe('Customer Entity', () => {
         lastName: 'Doe',
         phone: '123456789',
         email: 'john.doe@example.com',
-        document: '12345678901',
+        document: '52998224725',
         address: Address.create({
           street: '123 Main St',
           number: '123',
@@ -233,7 +233,7 @@ describe('Customer Entity', () => {
 
     it('Should validate document as valid CNPJ (14 digits)', () => {
       const customer = createCustomer();
-      customer.updateDocument('12345678901234');
+      customer.updateDocument('11222333000181');
       expect(customer.notification.hasErrors()).toBe(false);
     });
   });

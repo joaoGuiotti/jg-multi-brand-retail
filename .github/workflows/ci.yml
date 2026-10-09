@@ -92,6 +92,8 @@ jobs:
           cat << 'EOF' > .env.test
           DB_USER=postgres
           DB_PASSWORD=ci_test_password_123
+          MIGRATION_DB_USER=postgres
+          MIGRATION_DB_PASSWORD=ci_test_password_123
           DB_NAME=retail_ci
           JWT_SECRET=ci_super_secret_jwt_key_32_characters_minimum!
           JWT_REFRESH_SECRET=ci_super_secret_jwt_refresh_key_32_chars!

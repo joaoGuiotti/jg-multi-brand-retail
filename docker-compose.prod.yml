@@ -19,7 +19,7 @@ services:
     environment:
       POSTGRES_DB: ${DB_NAME:?DB_NAME é obrigatória}
       POSTGRES_USER: ${MIGRATION_DB_USER:-postgres}
-      POSTGRES_PASSWORD: ${MIGRATION_DB_PASSWORD:?MIGRATION_DB_PASSWORD é obrigatória}
+      POSTGRES_PASSWORD: ${MIGRATION_DB_PASSWORD:-${DB_PASSWORD:?MIGRATION_DB_PASSWORD é obrigatória}}
     volumes:
       - postgres_prod_data:/var/lib/postgresql/data
     networks:
@@ -72,8 +72,8 @@ services:
     restart: "no"
     environment:
       NODE_ENV: production
-      MIGRATION_DATABASE_URL: "postgresql://${MIGRATION_DB_USER:-postgres}:${MIGRATION_DB_PASSWORD:?MIGRATION_DB_PASSWORD é obrigatória}@db:5432/${DB_NAME:?DB_NAME é obrigatória}?schema=public"
-      DB_URL: "postgresql://${MIGRATION_DB_USER:-postgres}:${MIGRATION_DB_PASSWORD:?MIGRATION_DB_PASSWORD é obrigatória}@db:5432/${DB_NAME:?DB_NAME é obrigatória}?schema=public"
+      MIGRATION_DATABASE_URL: "postgresql://${MIGRATION_DB_USER:-postgres}:${MIGRATION_DB_PASSWORD:-${DB_PASSWORD:?MIGRATION_DB_PASSWORD é obrigatória}}@db:5432/${DB_NAME:?DB_NAME é obrigatória}?schema=public"
+      DB_URL: "postgresql://${MIGRATION_DB_USER:-postgres}:${MIGRATION_DB_PASSWORD:-${DB_PASSWORD:?MIGRATION_DB_PASSWORD é obrigatória}}@db:5432/${DB_NAME:?DB_NAME é obrigatória}?schema=public"
     depends_on:
       db:
         condition: service_healthy
@@ -179,7 +179,7 @@ services:
       PGPORT: 5432
       PGDATABASE: ${DB_NAME:?DB_NAME é obrigatória}
       PGUSER: ${MIGRATION_DB_USER:-postgres}
-      PGPASSWORD: ${MIGRATION_DB_PASSWORD:?MIGRATION_DB_PASSWORD é obrigatória}
+      PGPASSWORD: ${MIGRATION_DB_PASSWORD:-${DB_PASSWORD:?MIGRATION_DB_PASSWORD é obrigatória}}
       BACKUP_DIR: "/backups"
       RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-7}
       BACKUP_ENCRYPTION_KEY: ${BACKUP_ENCRYPTION_KEY:-retail_backup_secret_key_2026}

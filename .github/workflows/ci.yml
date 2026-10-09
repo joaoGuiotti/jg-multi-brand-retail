@@ -77,6 +77,13 @@ jobs:
         with:
           fetch-depth: 2
 
+      - name: Set lowercased repository owner
+        id: repo_owner
+        run: |
+          LOWER_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          echo "owner=${LOWER_OWNER}" >> "$GITHUB_OUTPUT"
+          echo "REPO_OWNER_LOWER=${LOWER_OWNER}" >> "$GITHUB_ENV"
+
       - name: Check changes for Prisma migrate
         uses: dorny/paths-filter@v3
         id: changes
@@ -158,5 +165,5 @@ jobs:
           file: ./apps/backend/Dockerfile
           target: migrate
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/retail-migrate:latest
+          tags: ghcr.io/${{ steps.repo_owner.outputs.owner }}/retail-migrate:latest
 

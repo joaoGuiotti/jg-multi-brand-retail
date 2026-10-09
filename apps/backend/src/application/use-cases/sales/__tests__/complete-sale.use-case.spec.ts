@@ -31,10 +31,10 @@ describe('CompleteSaleUseCase', () => {
 
   beforeEach(() => {
     saleRepository = { findById: jest.fn(), update: jest.fn() };
-    prisma = { 
+    prisma = {
       payment: { findMany: jest.fn(), updateMany: jest.fn() },
       financialAccount: { updateMany: jest.fn() },
-      $transaction: jest.fn((callback) => callback(prisma))
+      $transaction: jest.fn((callback) => callback(prisma)),
     };
     eventPublisher = { publishEvents: jest.fn() };
     useCase = new CompleteSaleUseCase(saleRepository, prisma, eventPublisher);

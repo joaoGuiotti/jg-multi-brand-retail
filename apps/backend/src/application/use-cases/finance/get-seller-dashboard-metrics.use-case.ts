@@ -10,9 +10,10 @@ export type GetSellerDashboardMetricsInput = {
 };
 
 @Injectable()
-export class GetSellerDashboardMetricsUseCase
-  implements UseCase<GetSellerDashboardMetricsInput, any>
-{
+export class GetSellerDashboardMetricsUseCase implements UseCase<
+  GetSellerDashboardMetricsInput,
+  any
+> {
   constructor(private prisma: PrismaService) {}
 
   async execute(input: GetSellerDashboardMetricsInput) {

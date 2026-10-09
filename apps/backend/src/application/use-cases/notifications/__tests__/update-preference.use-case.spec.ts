@@ -31,7 +31,7 @@ describe('UpdatePreferenceUseCase', () => {
       tenantId,
       userId,
       ...dto,
-    } as any);
+    });
 
     const result = await useCase.execute(tenantId, userId, dto);
 

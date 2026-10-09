@@ -1,5 +1,13 @@
-import { Type } from 'class-transformer';
-import { IsBoolean, IsEmail, IsOptional, IsString } from 'class-validator';
+import { BrazilianDocumentConstraint } from '@domain/entities/customers/customer.validator';
+import { normalizeDocument } from '@domain/shared/brazilian-document';
+import { Transform, Type } from 'class-transformer';
+import {
+  IsBoolean,
+  IsEmail,
+  IsOptional,
+  IsString,
+  Validate,
+} from 'class-validator';
 import { AddressDto } from './create-customer.dto';
 
 export class UpdateCustomerDto {
@@ -19,9 +27,13 @@ export class UpdateCustomerDto {
   @IsOptional()
   phone?: string;
 
-  @IsString()
+  /** Enviar null/"" remove o documento do cliente. */
   @IsOptional()
-  document?: string;
+  @Transform(({ value }) =>
+    typeof value === 'string' ? normalizeDocument(value) : value,
+  )
+  @Validate(BrazilianDocumentConstraint)
+  document?: string | null;
 
   @IsBoolean()
   @IsOptional()

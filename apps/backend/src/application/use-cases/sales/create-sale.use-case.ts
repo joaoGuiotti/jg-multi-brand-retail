@@ -109,7 +109,6 @@ export class CreateSaleUseCase implements UseCase<CreateSaleInput, SaleOutput> {
       );
 
       product.adjustStock(-itemDto.quantity, tenantId, 'EXIT');
-      await this.productRepository.update(tenantId, product);
       modifiedProducts.push(product);
     }
 
@@ -156,10 +155,41 @@ export class CreateSaleUseCase implements UseCase<CreateSaleInput, SaleOutput> {
     }
 
     const created = await this.prisma.$transaction(async (tx) => {
-      const createdSale = await this.saleRepository.create(tenantId, sale);
+      // 1. Débito atômico de estoque e registro de InventoryMovement na mesma transação
+      for (const itemDto of itemsInput) {
+        const updateResult = await tx.product.updateMany({
+          where: {
+            id: itemDto.productId,
+            tenantId,
+            stockQuantity: { gte: itemDto.quantity },
+          },
+          data: {
+            stockQuantity: { decrement: itemDto.quantity },
+          },
+        });
+
+        if (updateResult.count !== 1) {
+          throw new BadRequestException(
+            `Insufficient stock for product ${itemDto.productId}. Stock was modified concurrently.`,
+          );
+        }
+
+        await tx.inventoryMovement.create({
+          data: {
+            tenantId,
+            productId: itemDto.productId,
+            userId,
+            type: 'EXIT',
+            quantity: itemDto.quantity,
+            reference: `Venda #${sale.id.toString()}`,
+          },
+        });
+      }
+
+      const createdSale = await this.saleRepository.create(tenantId, sale, tx);
 
       for (const payment of paymentsToCreate) {
-        await this.paymentRepository.create(tenantId, payment);
+        await this.paymentRepository.create(tenantId, payment, tx);
 
         // Gerar Conta a Receber associada
         const dueDate = new Date();

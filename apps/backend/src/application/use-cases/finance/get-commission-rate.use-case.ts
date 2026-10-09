@@ -7,9 +7,10 @@ export type GetCommissionRateInput = {
 };
 
 @Injectable()
-export class GetCommissionRateUseCase
-  implements UseCase<GetCommissionRateInput, any>
-{
+export class GetCommissionRateUseCase implements UseCase<
+  GetCommissionRateInput,
+  any
+> {
   constructor(private tenantRepository: TenantRepository) {}
 
   async execute(input: GetCommissionRateInput) {

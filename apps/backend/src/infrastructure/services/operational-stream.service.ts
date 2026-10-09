@@ -32,16 +32,13 @@ export class OperationalStreamService {
   getStream(tenantId: string): Observable<MessageEvent> {
     return this.eventSubject.asObservable().pipe(
       filter((event) => event.tenantId === tenantId),
-      map(
-        (event) =>
-          ({
-            data: {
-              type: event.type,
-              payload: event.payload,
-              timestamp: event.timestamp,
-            },
-          }) as MessageEvent,
-      ),
+      map((event) => ({
+        data: {
+          type: event.type,
+          payload: event.payload,
+          timestamp: event.timestamp,
+        },
+      })),
     );
   }
 }

@@ -4,11 +4,7 @@ import { UniqueEntityID } from '../../../common/domain/unique-entity-id';
 import { SaleCompletedEvent } from '../../events/sales/sale-completed.event';
 
 export type SaleStatus =
-  | 'PENDING'
-  | 'COMPLETED'
-  | 'RETURN_REQUESTED'
-  | 'RETURNED'
-  | 'CANCELLED';
+  'PENDING' | 'COMPLETED' | 'RETURN_REQUESTED' | 'RETURNED' | 'CANCELLED';
 
 export interface SaleItemProps {
   productId: string;
@@ -151,7 +147,10 @@ export class Sale extends AggregateRoot<SaleProps> {
     if (!this.props.invoiceNumber) {
       const date = new Date();
       const datePart = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
-      const randomPart = Math.random().toString(36).substring(2, 7).toUpperCase();
+      const randomPart = Math.random()
+        .toString(36)
+        .substring(2, 7)
+        .toUpperCase();
       this.props.invoiceNumber = `INV-${datePart}-${randomPart}`;
     }
 

@@ -11,9 +11,10 @@ export type SetSalesTargetInput = {
 };
 
 @Injectable()
-export class SetSalesTargetUseCase
-  implements UseCase<SetSalesTargetInput, any>
-{
+export class SetSalesTargetUseCase implements UseCase<
+  SetSalesTargetInput,
+  any
+> {
   constructor(private prisma: PrismaService) {}
 
   async execute(input: SetSalesTargetInput) {

@@ -38,7 +38,9 @@ describe('ListCommissionsUseCase', () => {
 
     expect(result.data).toHaveLength(1);
     expect(result.data[0].userName).toBe('Seller 1');
-    expect(result.data[0].createdAt).toBe(new Date('2026-06-01T10:00:00Z').toISOString());
+    expect(result.data[0].createdAt).toBe(
+      new Date('2026-06-01T10:00:00Z').toISOString(),
+    );
     expect(result.meta.total).toBe(1);
     expect(result.meta.page).toBe(1);
   });
@@ -61,7 +63,7 @@ describe('ListCommissionsUseCase', () => {
             lt: new Date(2026, 6, 1),
           },
         }),
-      })
+      }),
     );
   });
 });

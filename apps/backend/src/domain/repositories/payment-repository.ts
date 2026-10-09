@@ -19,7 +19,7 @@ export interface PaymentSearchResult {
 }
 
 export abstract class PaymentRepository {
-  abstract create(tenantId: string, payment: Payment): Promise<void>;
+  abstract create(tenantId: string, payment: Payment, tx?: any): Promise<void>;
   abstract findById(tenantId: string, id: string): Promise<Payment | null>;
   abstract findAll(
     tenantId: string,

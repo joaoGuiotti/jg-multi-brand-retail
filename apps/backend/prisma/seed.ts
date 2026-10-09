@@ -19,6 +19,7 @@ async function main() {
   console.log('🌱 Seeding database...');
 
   // Limpar dados existentes (cuidado em produção!)
+  await prisma.refreshToken.deleteMany();
   await prisma.loyaltyTransaction.deleteMany();
   await prisma.loyaltyAccount.deleteMany();
   await prisma.loyaltyProgram.deleteMany();
@@ -47,12 +48,45 @@ async function main() {
 
   console.log('✅ Dados existentes removidos');
 
+  // Criar Tenant de Gestão da Plataforma (SUPER_ADMIN)
+  const platformTenant = await prisma.tenant.create({
+    data: {
+      name: 'Plataforma Retail Master',
+      slug: 'platform',
+      logoUrl:
+        'https://api.dicebear.com/9.x/shapes/png?seed=platform&backgroundColor=0a2540',
+      active: true,
+      settings: {
+        currency: 'BRL',
+        timezone: 'America/Sao_Paulo',
+        features: {
+          platformManagement: true,
+        },
+      },
+    },
+  });
+  console.log('✅ Tenant Plataforma criado:', platformTenant.name);
+
+  // Criar Super Admin vinculado ao tenant platform
+  const superAdmin = await prisma.user.create({
+    data: {
+      tenantId: platformTenant.id,
+      email: 'admin@sistema.com',
+      passwordHash: await bcrypt.hash('admin123', 10),
+      role: Role.SUPER_ADMIN,
+      name: 'Super Admin',
+      active: true,
+    },
+  });
+  console.log('✅ Super Admin criado:', superAdmin.email);
+
   // Criar Tenant de Teste
   const tenant1 = await prisma.tenant.create({
     data: {
       name: 'Loja Demo',
       slug: 'loja-demo',
-      logoUrl: 'https://api.dicebear.com/9.x/shapes/png?seed=standard-retail&backgroundColor=0a2540',
+      logoUrl:
+        'https://api.dicebear.com/9.x/shapes/png?seed=standard-retail&backgroundColor=0a2540',
       active: true,
       settings: {
         currency: 'BRL',
@@ -63,27 +97,12 @@ async function main() {
         },
         theme: {
           primaryColor: '#10b981', // Emerald-500
-          accentColor: '#047857',  // Emerald-700
+          accentColor: '#047857', // Emerald-700
         },
       },
     },
   });
-
-  console.log('✅ Tenant criado:', tenant1.name);
-
-  // Criar Super Admin
-  const superAdmin = await prisma.user.create({
-    data: {
-      tenantId: tenant1.id,
-      email: 'admin@sistema.com',
-      passwordHash: await bcrypt.hash('admin123', 10),
-      role: Role.SUPER_ADMIN,
-      name: 'Super Admin',
-      active: true,
-    },
-  });
-
-  console.log('✅ Super Admin criado:', superAdmin.email);
+  console.log('✅ Tenant Loja Demo criado:', tenant1.name);
 
   // Criar Admin da Loja
   const admin = await prisma.user.create({
@@ -262,7 +281,6 @@ async function main() {
       payments: {
         create: [
           {
-            tenantId: tenant1.id,
             method: 'PIX',
             amount: 8500,
             installments: 1,
@@ -300,7 +318,7 @@ async function main() {
         email: 'ana.oliveira@email.com',
         phone: '(11) 99123-4567',
         isActive: true,
-        document: '12345678901',
+        document: '52998224725',
         street: 'Rua das Flores',
         number: '123',
         complement: 'Apto 4B',
@@ -315,7 +333,7 @@ async function main() {
         email: 'carlos.mendes@email.com',
         phone: '(21) 98765-1234',
         isActive: true,
-        document: '12345678902',
+        document: '11144477735',
         street: 'Av. Atlântica',
         number: '500',
         complement: null,
@@ -330,7 +348,7 @@ async function main() {
         email: 'mariana.santos@email.com',
         phone: '(31) 97654-3210',
         isActive: true,
-        document: '12345678903',
+        document: '39053344705',
         street: 'Rua da Bahia',
         number: '800',
         complement: 'Sala 3',
@@ -345,7 +363,7 @@ async function main() {
         email: 'roberto.lima@email.com',
         phone: '(41) 96543-2109',
         isActive: false,
-        document: '12345678904',
+        document: '16899535009',
         street: 'Rua XV de Novembro',
         number: '42',
         complement: null,

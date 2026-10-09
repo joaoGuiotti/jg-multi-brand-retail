@@ -38,7 +38,7 @@ export class SaleMapper {
         subtotal: Number(raw.subtotal),
         discount: Number(raw.discount),
         total: Number(raw.total),
-        status: raw.status as any,
+        status: raw.status,
         items,
         createdAt: raw.createdAt,
         updatedAt: raw.updatedAt,
@@ -64,9 +64,10 @@ export class SaleMapper {
     };
   }
 
-  static toPersistenceItem(item: SaleItem, saleId: string) {
+  static toPersistenceItem(item: SaleItem, saleId: string, tenantId: string) {
     return {
       id: item.id.toString(),
+      tenantId,
       saleId,
       productId: item.productId,
       quantity: item.quantity,

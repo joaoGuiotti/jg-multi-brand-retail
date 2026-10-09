@@ -33,7 +33,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   // Cache simples de tenants (ID -> status e tempo de expiração) para evitar bater no DB todo request
-  private tenantCache = new Map<string, { active: boolean; expiresAt: number }>();
+  private tenantCache = new Map<
+    string,
+    { active: boolean; expiresAt: number }
+  >();
   private readonly CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutos
 
   async validate(payload: JwtPayload) {
@@ -63,7 +66,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (cachedTenant && cachedTenant.expiresAt > Date.now()) {
       isTenantActive = cachedTenant.active;
     } else {
-      const tenantRecord = await this.tenantRepository.findById(payload.tenantId);
+      const tenantRecord = await this.tenantRepository.findById(
+        payload.tenantId,
+      );
       isTenantActive = tenantRecord ? tenantRecord.active : false;
       this.tenantCache.set(payload.tenantId, {
         active: isTenantActive,
@@ -84,11 +89,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       name: user.name,
       role: user.role,
       tenantId: payload.tenantId,
-      // Nota: o objeto tenant aqui retorna null para o nome/slug pois priorizamos o cache para evitar db hit. 
+      // Nota: o objeto tenant aqui retorna null para o nome/slug pois priorizamos o cache para evitar db hit.
       // Se necessário nos controllers, deve-se buscar explicitamente.
       tenant: {
         id: payload.tenantId,
-        name: 'Cached', 
+        name: 'Cached',
         slug: 'cached',
       },
     };

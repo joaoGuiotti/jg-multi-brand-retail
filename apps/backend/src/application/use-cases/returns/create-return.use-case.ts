@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  Optional,
 } from '@nestjs/common';
 import { ReturnsRepository } from '../../../domain/repositories/returns/returns.repository.interface';
 import { SaleRepository } from '../../../domain/repositories/sale-repository';
@@ -13,6 +14,7 @@ import { CreateNotificationUseCase } from '../notifications/create-notification.
 import { NotificationPriority } from '../../../domain/entities/notifications/notification.entity';
 import { Role } from '@prisma/client';
 import { ReturnOutput } from './common/return-output';
+import { PrismaService } from '../../../infrastructure/persistence/prisma/prisma.service';
 
 @Injectable()
 export class CreateReturnUseCase {
@@ -21,6 +23,7 @@ export class CreateReturnUseCase {
     private readonly saleRepository: SaleRepository,
     private readonly userRepository: UserRepository,
     private readonly createNotificationUseCase: CreateNotificationUseCase,
+    @Optional() private readonly prisma?: PrismaService,
   ) {}
 
   async execute(
@@ -28,6 +31,35 @@ export class CreateReturnUseCase {
     userId: string,
     dto: CreateReturnDto,
   ): Promise<ReturnOutput> {
+    const { returnOrder, sale, output } = this.prisma
+      ? await this.prisma.$transaction(
+          async (tx) => {
+            // Trava pessimista no registro da venda para evitar devoluções concorrentes simultâneas
+            await tx.$queryRaw`
+              SELECT id FROM sales WHERE id = ${dto.saleId} AND tenant_id = ${tenantId} FOR UPDATE
+            `;
+            return await this.processReturn(tenantId, userId, dto, tx);
+          },
+          { timeout: 15000, maxWait: 5000 },
+        )
+      : await this.processReturn(tenantId, userId, dto);
+
+    // 7. Notifica administradores APÓS o commit da transação de banco de dados
+    try {
+      await this.notifyAdmins(tenantId, sale, returnOrder);
+    } catch {
+      // Falha no envio de notificações secundárias não deve abortar o resultado
+    }
+
+    return output;
+  }
+
+  private async processReturn(
+    tenantId: string,
+    userId: string,
+    dto: CreateReturnDto,
+    tx?: any,
+  ): Promise<{ returnOrder: ReturnOrder; sale: any; output: ReturnOutput }> {
     // 1. Verify sale exists and belongs to tenant
     const sale = await this.saleRepository.findById(tenantId, dto.saleId);
     if (!sale) {
@@ -43,23 +75,46 @@ export class CreateReturnUseCase {
       );
     }
 
-    // 3. Validate items
+    // 3. Busca devoluções anteriores para garantir que a soma acumulada não exceda a venda
+    const existingReturns = await this.returnsRepository.findBySaleId(
+      tenantId,
+      dto.saleId,
+    );
+    const activeReturns = (existingReturns ?? []).filter(
+      (r) => r.status !== 'REJECTED',
+    );
+
+    // 4. Validate items
     const returnItems: ReturnItem[] = [];
     let totalRefund = 0;
 
     for (const itemDto of dto.items) {
-      const saleItem = sale.items.find(
-        (i) => i.productId === itemDto.productId,
-      );
+      const saleItem = itemDto.saleItemId
+        ? sale.items.find((i) => i.id.toString() === itemDto.saleItemId)
+        : sale.items.find((i) => i.productId === itemDto.productId);
+
       if (!saleItem) {
         throw new BadRequestException(
           `Product ${itemDto.productId} not found in this sale`,
         );
       }
 
-      if (itemDto.quantity > saleItem.quantity) {
+      // Calcula a quantidade já devolvida ou em solicitação para este item
+      const alreadyReturnedQty = activeReturns.reduce((sum, ret) => {
+        const matchingItems = ret.items.filter((it) =>
+          it.saleItemId
+            ? it.saleItemId === saleItem.id.toString()
+            : it.productId === itemDto.productId,
+        );
+        return (
+          sum + matchingItems.reduce((acc, curr) => acc + curr.quantity, 0)
+        );
+      }, 0);
+
+      const maxReturnable = saleItem.quantity - alreadyReturnedQty;
+      if (itemDto.quantity > maxReturnable) {
         throw new BadRequestException(
-          `Quantity for product ${itemDto.productId} exceeds sale quantity`,
+          `Quantity for product ${itemDto.productId} exceeds returnable quantity (${maxReturnable} available of ${saleItem.quantity} sold, requested ${itemDto.quantity})`,
         );
       }
 
@@ -69,6 +124,7 @@ export class CreateReturnUseCase {
       returnItems.push(
         ReturnItem.create({
           productId: itemDto.productId,
+          saleItemId: saleItem.id.toString(),
           quantity: itemDto.quantity,
           unitPrice: saleItem.unitPrice,
           total: itemTotal,
@@ -77,7 +133,7 @@ export class CreateReturnUseCase {
       );
     }
 
-    // 4. Create ReturnOrder
+    // 5. Create ReturnOrder
     const returnOrder = ReturnOrder.create({
       tenantId,
       saleId: dto.saleId,
@@ -90,30 +146,13 @@ export class CreateReturnUseCase {
       items: returnItems,
     });
 
-    await this.returnsRepository.save(returnOrder);
+    await this.returnsRepository.save(returnOrder, tx);
 
-    // 5. Transition sale to RETURN_REQUESTED
+    // 6. Transition sale to RETURN_REQUESTED
     sale.requestReturn();
-    await this.saleRepository.update(tenantId, sale);
+    await this.saleRepository.update(tenantId, sale, tx);
 
-    // 6. Notify ADMINs
-    const users = await this.userRepository.findAllByTenant(tenantId);
-    const admins = users.filter(
-      (u) => u.role === Role.ADMIN || u.role === Role.SUPER_ADMIN,
-    );
-
-    for (const admin of admins) {
-      await this.createNotificationUseCase.execute(tenantId, {
-        userId: admin.id.toString(),
-        type: 'RETURN_PENDING' as any,
-        priority: NotificationPriority.HIGH,
-        title: 'Nova Solicitação de Devolução',
-        message: `Uma nova solicitação de devolução foi criada para a venda #${sale.invoiceNumber ?? sale.id.toString()}.`,
-        actionUrl: `/returns/${returnOrder.id.toString()}`,
-      });
-    }
-
-    return {
+    const output: ReturnOutput = {
       id: returnOrder.id.toString(),
       tenantId: returnOrder.tenantId,
       saleId: returnOrder.saleId,
@@ -136,5 +175,29 @@ export class CreateReturnUseCase {
         condition: item.condition,
       })),
     };
+
+    return { returnOrder, sale, output };
+  }
+
+  private async notifyAdmins(
+    tenantId: string,
+    sale: any,
+    returnOrder: ReturnOrder,
+  ): Promise<void> {
+    const users = await this.userRepository.findAllByTenant(tenantId);
+    const admins = users.filter(
+      (u) => u.role === Role.ADMIN || u.role === Role.SUPER_ADMIN,
+    );
+
+    for (const admin of admins) {
+      await this.createNotificationUseCase.execute(tenantId, {
+        userId: admin.id.toString(),
+        type: 'RETURN_PENDING' as any,
+        priority: NotificationPriority.HIGH,
+        title: 'Nova Solicitação de Devolução',
+        message: `Uma nova solicitação de devolução foi criada para a venda #${sale.invoiceNumber ?? sale.id.toString()}.`,
+        actionUrl: `/returns/${returnOrder.id.toString()}`,
+      });
+    }
   }
 }

@@ -30,5 +30,4 @@ export interface DashboardStockChangedPayload {
 // ─── Event Envelope ───────────────────────────────────────────────────────────
 
 export type DashboardEventPayload =
-  | DashboardSaleCompletedPayload
-  | DashboardStockChangedPayload;
+  DashboardSaleCompletedPayload | DashboardStockChangedPayload;

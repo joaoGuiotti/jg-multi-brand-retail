@@ -7,11 +7,11 @@ export class PaymentMapper {
     return Payment.create(
       {
         saleId: raw.saleId,
-        method: raw.method as any,
+        method: raw.method,
         amount: raw.amount.toNumber(),
         installments: raw.installments,
         fee: raw.fee.toNumber(),
-        status: raw.status as any,
+        status: raw.status,
         paidAt: raw.paidAt,
         metadata: raw.metadata,
         createdAt: raw.createdAt,

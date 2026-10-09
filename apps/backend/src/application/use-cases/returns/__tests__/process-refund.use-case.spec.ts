@@ -75,7 +75,13 @@ const makeEarnPointsUseCase = () => ({
   reversePoints: jest.fn().mockResolvedValue(undefined),
 });
 
-const makeUseCase = (order: any, sale: any = null) => {
+const makePrisma = () => ({
+  financialAccount: {
+    create: jest.fn().mockResolvedValue({}),
+  },
+});
+
+const makeUseCase = (order: any, sale: any = null, prisma: any = null) => {
   const returnsRepo = makeReturnsRepo(order);
   const saleRepo = makeSaleRepo(sale);
   const notification = makeNotification();
@@ -85,8 +91,16 @@ const makeUseCase = (order: any, sale: any = null) => {
     saleRepo,
     notification as any,
     earnPointsUseCase as any,
+    prisma,
   );
-  return { useCase, returnsRepo, saleRepo, notification, earnPointsUseCase };
+  return {
+    useCase,
+    returnsRepo,
+    saleRepo,
+    notification,
+    earnPointsUseCase,
+    prisma,
+  };
 };
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
@@ -211,6 +225,56 @@ describe('ProcessRefundUseCase', () => {
       await useCase.execute('tenant-1', 'return-1');
 
       expect(earnPointsUseCase.reversePoints).not.toHaveBeenCalled();
+    });
+
+    it('should create a PAID financial account (PAYABLE) for CASH_REFUND outflow', async () => {
+      const order = makeReturnOrder('APPROVED');
+      const sale = makeSale('RETURN_REQUESTED', null);
+      const prisma = makePrisma();
+      const { useCase } = makeUseCase(order, sale, prisma);
+
+      await useCase.execute('tenant-1', 'return-1');
+
+      expect(prisma.financialAccount.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          tenantId: 'tenant-1',
+          type: 'PAYABLE',
+          status: 'PAID',
+          category: 'REFUND',
+          amount: 100,
+          paidAt: expect.any(Date),
+        }),
+      });
+    });
+
+    it('should create a PENDING financial account for STORE_CREDIT', async () => {
+      const order = ReturnOrder.create({
+        tenantId: 'tenant-1',
+        saleId: 'sale-1',
+        userId: 'user-1',
+        status: 'REQUESTED',
+        refundType: 'STORE_CREDIT',
+        reason: 'test',
+        totalRefund: 100,
+        items: [],
+      });
+      order.approve('admin-1');
+      const sale = makeSale('RETURN_REQUESTED', null);
+      const prisma = makePrisma();
+      const { useCase } = makeUseCase(order, sale, prisma);
+
+      await useCase.execute('tenant-1', 'return-1');
+
+      expect(prisma.financialAccount.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          tenantId: 'tenant-1',
+          type: 'PAYABLE',
+          status: 'PENDING',
+          category: 'REFUND',
+          amount: 100,
+          paidAt: null,
+        }),
+      });
     });
   });
 });

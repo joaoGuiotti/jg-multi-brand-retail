@@ -113,8 +113,22 @@ export class RedeemPointsUseCase {
         throw new BadRequestException(err.message);
       }
 
-      // 6. Atualiza a conta e salva
-      await this.loyaltyRepository.saveAccount(account, tx);
+      // 6. Atualiza a conta e salva com decremento atômico seguro
+      const updateResult = await tx.loyaltyAccount.updateMany({
+        where: {
+          id: account.id.toString(),
+          tenantId,
+          balance: { gte: actualPointsToRedeem },
+        },
+        data: {
+          balance: { decrement: actualPointsToRedeem },
+          totalRedeemed: { increment: actualPointsToRedeem },
+        },
+      });
+
+      if (updateResult.count !== 1) {
+        throw new BadRequestException('Saldo de pontos insuficiente.');
+      }
 
       // 7. Registra a transação de débito no extrato imutável (pontos negativos)
       const transaction = LoyaltyTransaction.create({

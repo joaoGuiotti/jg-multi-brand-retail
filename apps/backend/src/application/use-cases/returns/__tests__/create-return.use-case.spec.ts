@@ -207,5 +207,84 @@ describe('CreateReturnUseCase', () => {
 
       expect(result.totalRefund).toBe(100);
     });
+
+    it('should link saleItemId to return item', async () => {
+      const sale = makeSale('COMPLETED');
+      const { useCase, saleRepo, returnsRepo } = makeUseCase();
+      saleRepo.findById.mockResolvedValue(sale);
+
+      await useCase.execute(
+        'tenant-1',
+        'user-1',
+        makeDto({
+          items: [{ productId: 'prod-1', quantity: 1, condition: 'GOOD' }],
+        }),
+      );
+
+      expect(returnsRepo.save).toHaveBeenCalledTimes(1);
+      const savedOrder = returnsRepo.save.mock.calls[0][0];
+      expect(savedOrder.items[0].saleItemId).toBe(sale.items[0].id.toString());
+    });
+
+    it('should reject return if accumulated quantity across previous returns exceeds sold quantity', async () => {
+      const sale = makeSale('COMPLETED'); // quantity sold is 3
+      const { useCase, saleRepo, returnsRepo } = makeUseCase();
+      saleRepo.findById.mockResolvedValue(sale);
+
+      // Existing active return order has already returned 2 units
+      const existingReturn = {
+        status: 'REQUESTED',
+        items: [
+          {
+            productId: 'prod-1',
+            saleItemId: sale.items[0].id.toString(),
+            quantity: 2,
+          },
+        ],
+      };
+      returnsRepo.findBySaleId.mockResolvedValue([existingReturn]);
+
+      // Requesting 2 more units (2 + 2 = 4 > 3 sold) must fail
+      await expect(
+        useCase.execute(
+          'tenant-1',
+          'user-1',
+          makeDto({
+            items: [{ productId: 'prod-1', quantity: 2, condition: 'GOOD' }],
+          }),
+        ),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should allow partial return if accumulated quantity does not exceed sold quantity', async () => {
+      const sale = makeSale('COMPLETED'); // quantity sold is 3
+      const { useCase, saleRepo, returnsRepo } = makeUseCase();
+      saleRepo.findById.mockResolvedValue(sale);
+
+      // Existing active return order returned 1 unit
+      const existingReturn = {
+        status: 'APPROVED',
+        items: [
+          {
+            productId: 'prod-1',
+            saleItemId: sale.items[0].id.toString(),
+            quantity: 1,
+          },
+        ],
+      };
+      returnsRepo.findBySaleId.mockResolvedValue([existingReturn]);
+
+      // Requesting 2 more units (1 + 2 = 3 <= 3 sold) must succeed
+      const result = await useCase.execute(
+        'tenant-1',
+        'user-1',
+        makeDto({
+          items: [{ productId: 'prod-1', quantity: 2, condition: 'GOOD' }],
+        }),
+      );
+
+      expect(result.status).toBe('REQUESTED');
+      expect(returnsRepo.save).toHaveBeenCalledTimes(1);
+    });
   });
 });

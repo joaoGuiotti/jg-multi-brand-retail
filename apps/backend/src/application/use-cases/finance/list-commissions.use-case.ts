@@ -34,9 +34,10 @@ export type ListCommissionsOutput = {
 };
 
 @Injectable()
-export class ListCommissionsUseCase
-  implements UseCase<ListCommissionsInput, ListCommissionsOutput>
-{
+export class ListCommissionsUseCase implements UseCase<
+  ListCommissionsInput,
+  ListCommissionsOutput
+> {
   constructor(private prisma: PrismaService) {}
 
   async execute(input: ListCommissionsInput): Promise<ListCommissionsOutput> {

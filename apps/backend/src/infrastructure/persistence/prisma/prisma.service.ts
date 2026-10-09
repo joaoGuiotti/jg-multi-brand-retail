@@ -8,8 +8,12 @@ import { Pool } from 'pg';
 @Injectable()
 export class PrismaService
   extends PrismaClient
-  implements OnModuleInit, OnModuleDestroy {
-  constructor(private configService: ConfigService, private cls: ClsService) {
+  implements OnModuleInit, OnModuleDestroy
+{
+  constructor(
+    private configService: ConfigService,
+    private cls: ClsService,
+  ) {
     const connectionString = configService.get<string>('DB_URL');
     const pool = new Pool({ connectionString });
     const adapter = new PrismaPg(pool);
@@ -24,10 +28,15 @@ export class PrismaService
         $allModels: {
           async $allOperations({ model, operation, args, query }) {
             const tenantId = cls.get('tenantId');
-            const modelsWithoutTenantId = ['Tenant', 'SaleItem', 'ConditionalItem', 'ReturnItem'];
-            
+            const modelsWithoutTenantId = [
+              'Tenant',
+              'SaleItem',
+              'ConditionalItem',
+              'ReturnItem',
+            ];
+
             if (tenantId && model && !modelsWithoutTenantId.includes(model)) {
-              const anyArgs = args as any || {};
+              const anyArgs = (args as any) || {};
               if (
                 operation.startsWith('find') ||
                 operation.startsWith('update') ||

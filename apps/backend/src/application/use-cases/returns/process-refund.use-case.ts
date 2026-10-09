@@ -1,18 +1,20 @@
 import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-  Logger,
-} from '@nestjs/common';
-import { ReturnsRepository } from '../../../domain/repositories/returns/returns.repository.interface';
-import { SaleRepository } from '../../../domain/repositories/sale-repository';
-import { ReturnOutput } from './common/return-output';
-import { CreateNotificationUseCase } from '../notifications/create-notification.use-case';
-import {
-  NotificationType,
   NotificationPriority,
-} from '../../../domain/entities/notifications/notification.entity';
+  NotificationType,
+} from '@domain/entities/notifications/notification.entity';
+import { ReturnsRepository } from '@domain/repositories/returns/returns.repository.interface';
+import { SaleRepository } from '@domain/repositories/sale-repository';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+  Optional,
+} from '@nestjs/common';
+import { PrismaService } from '../../../infrastructure/persistence/prisma/prisma.service';
 import { EarnPointsUseCase } from '../loyalty/earn-points.use-case';
+import { CreateNotificationUseCase } from '../notifications/create-notification.use-case';
+import { ReturnOutput } from './common/return-output';
 
 @Injectable()
 export class ProcessRefundUseCase {
@@ -23,6 +25,7 @@ export class ProcessRefundUseCase {
     private readonly saleRepository: SaleRepository,
     private readonly createNotificationUseCase: CreateNotificationUseCase,
     private readonly earnPointsUseCase: EarnPointsUseCase,
+    @Optional() private readonly prisma?: PrismaService,
   ) {}
 
   async execute(tenantId: string, id: string): Promise<ReturnOutput> {
@@ -62,6 +65,31 @@ export class ProcessRefundUseCase {
             error,
           );
         }
+      }
+    }
+
+    // Se houver valor reembolsado, registrar saída financeira (PAYABLE / PAID se CASH_REFUND)
+    if (this.prisma && order.totalRefund > 0) {
+      try {
+        const isCashRefund = order.refundType === 'CASH_REFUND';
+        await this.prisma.financialAccount.create({
+          data: {
+            tenantId,
+            type: 'PAYABLE',
+            description: `Reembolso de Devolução #${order.id.toString().substring(0, 8)} (${order.refundType === 'STORE_CREDIT' ? 'Crédito em Loja' : 'Reembolso em Dinheiro'} - Venda #${sale?.invoiceNumber || order.saleId})`,
+            amount: order.totalRefund,
+            dueDate: new Date(),
+            paidAt: isCashRefund ? new Date() : null,
+            status: isCashRefund ? 'PAID' : 'PENDING',
+            category: 'REFUND',
+            saleId: order.saleId,
+          },
+        });
+      } catch (error) {
+        this.logger.error(
+          `Failed to create financial account outflow for return ${order.id.toString()}:`,
+          error,
+        );
       }
     }
 

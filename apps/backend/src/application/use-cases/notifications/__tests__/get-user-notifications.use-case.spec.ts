@@ -24,7 +24,7 @@ describe('GetUserNotificationsUseCase', () => {
     repository.getUserNotifications.mockResolvedValue({
       data: [],
       meta: { total: 0, page: 1, limit: 10, totalPages: 0 },
-    } as any);
+    });
 
     await useCase.execute(tenantId, userId, filters);
 
@@ -44,7 +44,7 @@ describe('GetUserNotificationsUseCase', () => {
     repository.getUserNotifications.mockResolvedValue({
       data: [],
       meta: { total: 0, page: 1, limit: 20, totalPages: 0 },
-    } as any);
+    });
 
     await useCase.execute(tenantId, userId, filters);
 

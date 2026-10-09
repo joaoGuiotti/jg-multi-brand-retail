@@ -113,7 +113,7 @@ describe('UpdateReturnStatusUseCase', () => {
       const { useCase, returnsRepo, saleRepo } = makeUseCase(order, sale);
 
       const result = await useCase.execute('tenant-1', 'admin-1', 'return-1', {
-        status: 'APPROVED' as any,
+        status: 'APPROVED',
       });
 
       expect(result.status).toBe('APPROVED');
@@ -127,7 +127,7 @@ describe('UpdateReturnStatusUseCase', () => {
       const { useCase, notification } = makeUseCase(order);
 
       await useCase.execute('tenant-1', 'admin-1', 'return-1', {
-        status: 'APPROVED' as any,
+        status: 'APPROVED',
       });
 
       expect(notification.execute).toHaveBeenCalledWith(
@@ -144,7 +144,7 @@ describe('UpdateReturnStatusUseCase', () => {
       const { useCase, saleRepo } = makeUseCase(order, sale);
 
       const result = await useCase.execute('tenant-1', 'admin-1', 'return-1', {
-        status: 'REJECTED' as any,
+        status: 'REJECTED',
         reason: 'Fora do prazo',
       });
 
@@ -173,7 +173,7 @@ describe('UpdateReturnStatusUseCase', () => {
       const { useCase, notification } = makeUseCase(order);
 
       await useCase.execute('tenant-1', 'admin-1', 'return-1', {
-        status: 'REJECTED' as any,
+        status: 'REJECTED',
         reason: 'Fora do prazo',
       });
 

@@ -26,6 +26,8 @@ describe('GetCommissionRateUseCase', () => {
 
   it('should throw NotFoundException if tenant not found', async () => {
     tenantRepository.findById.mockResolvedValue(null);
-    await expect(useCase.execute({ tenantId: 'tenant-1' })).rejects.toThrow(NotFoundException);
+    await expect(useCase.execute({ tenantId: 'tenant-1' })).rejects.toThrow(
+      NotFoundException,
+    );
   });
 });

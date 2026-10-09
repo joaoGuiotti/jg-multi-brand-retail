@@ -33,6 +33,9 @@ describe('RedeemPointsUseCase', () => {
       payment: {
         findMany: jest.fn().mockResolvedValue([]),
       },
+      loyaltyAccount: {
+        updateMany: jest.fn().mockResolvedValue({ count: 1 }),
+      },
     } as any;
 
     useCase = new RedeemPointsUseCase(mockRepository, mockPrisma);
@@ -174,10 +177,17 @@ describe('RedeemPointsUseCase', () => {
       capped: false,
     });
 
-    expect(mockRepository.saveAccount).toHaveBeenCalledWith(
-      account,
-      mockPrisma,
-    );
+    expect(mockPrisma.loyaltyAccount.updateMany).toHaveBeenCalledWith({
+      where: {
+        id: account.id.toString(),
+        tenantId: 'tenant-1',
+        balance: { gte: 200 },
+      },
+      data: {
+        balance: { decrement: 200 },
+        totalRedeemed: { increment: 200 },
+      },
+    });
     expect(mockRepository.saveTransaction).toHaveBeenCalledWith(
       expect.objectContaining({
         props: expect.objectContaining({
@@ -245,5 +255,53 @@ describe('RedeemPointsUseCase', () => {
       saleTotal: 25.0,
       capped: true,
     });
+  });
+
+  it('should throw BadRequestException if atomic updateMany fails (race condition or insufficient balance)', async () => {
+    const program = LoyaltyProgram.create({
+      tenantId: 'tenant-1',
+      name: 'Test',
+      pointsPerReal: 1.0,
+      redeemRatio: 0.01,
+      minRedeemPoints: 100,
+      maxDiscountPct: 50,
+      active: true,
+      expirationDays: null,
+    });
+    mockRepository.findProgramByTenantId.mockResolvedValue(program);
+
+    const account = LoyaltyAccount.create({
+      tenantId: 'tenant-1',
+      customerId: 'customer-1',
+      loyaltyProgramId: program.id.toString(),
+      balance: 500,
+      totalEarned: 500,
+      totalRedeemed: 0,
+    });
+    mockRepository.findAccountByCustomerIdForUpdate.mockResolvedValue(account);
+
+    const mockSale = {
+      id: 'sale-1',
+      tenantId: 'tenant-1',
+      subtotal: 100.0,
+      discount: 0.0,
+      total: 100.0,
+      status: 'PENDING',
+    };
+    (mockPrisma.sale.findUnique as jest.Mock).mockResolvedValue(mockSale);
+
+    // Simulate concurrent redemption won the race, count is 0
+    (mockPrisma.loyaltyAccount.updateMany as jest.Mock).mockResolvedValue({
+      count: 0,
+    });
+
+    await expect(
+      useCase.execute({
+        tenantId: 'tenant-1',
+        customerId: 'customer-1',
+        pointsToRedeem: 200,
+        saleId: 'sale-1',
+      }),
+    ).rejects.toThrow(BadRequestException);
   });
 });

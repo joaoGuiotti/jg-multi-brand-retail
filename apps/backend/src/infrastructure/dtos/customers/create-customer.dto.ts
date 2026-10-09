@@ -1,5 +1,13 @@
-import { Type } from 'class-transformer';
-import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { BrazilianDocumentConstraint } from '@domain/entities/customers/customer.validator';
+import { normalizeDocument } from '@domain/shared/brazilian-document';
+import { Transform, Type } from 'class-transformer';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Validate,
+} from 'class-validator';
 
 export class AddressDto {
   @IsString()
@@ -44,9 +52,13 @@ export class CreateCustomerDto {
   @IsNotEmpty()
   phone: string;
 
-  @IsString()
-  @IsNotEmpty()
-  document: string;
+  /** CPF/CNPJ (aceita máscara; persistido só com dígitos). Opcional. */
+  @IsOptional()
+  @Transform(({ value }) =>
+    typeof value === 'string' ? normalizeDocument(value) : value,
+  )
+  @Validate(BrazilianDocumentConstraint)
+  document?: string | null;
 
   @Type(() => AddressDto)
   address: AddressDto;

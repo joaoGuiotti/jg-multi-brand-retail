@@ -22,11 +22,25 @@ export type PaymentOutput = {
   createdAt?: Date;
 };
 
+export type ReturnItemSummaryOutput = {
+  id: string;
+  productId: string;
+  productName?: string;
+  sku?: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+  condition: string;
+};
+
 export type ReturnSummaryOutput = {
   id: string;
   status: string;
+  refundType?: string;
+  reason?: string | null;
   total: number;
   createdAt?: Date;
+  items?: ReturnItemSummaryOutput[];
 };
 
 export type SaleOutput = {
@@ -83,11 +97,23 @@ export class SaleOutputMapper {
         installments: p.installments,
         createdAt: p.createdAt,
       })),
-      returns: entity.returns.map((r) => ({
+      returns: (entity.returns || []).map((r: any) => ({
         id: r.id.toString(),
         status: r.status,
-        total: Number(r.totalRefund || r.total),
+        refundType: r.refundType,
+        reason: r.reason ?? null,
+        total: Number(r.totalRefund || r.total || 0),
         createdAt: r.createdAt,
+        items: (r.items || []).map((item: any) => ({
+          id: item.id.toString(),
+          productId: item.productId,
+          productName: item.product?.name ?? item.productName,
+          sku: item.product?.sku ?? item.sku,
+          quantity: item.quantity,
+          unitPrice: Number(item.unitPrice),
+          total: Number(item.total),
+          condition: item.condition,
+        })),
       })),
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,

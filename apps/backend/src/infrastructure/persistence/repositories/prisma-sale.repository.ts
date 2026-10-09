@@ -76,8 +76,26 @@ export class PrismaSaleRepository implements SaleRepository {
           select: {
             id: true,
             status: true,
+            refundType: true,
+            reason: true,
             createdAt: true,
             totalRefund: true,
+            items: {
+              select: {
+                id: true,
+                productId: true,
+                quantity: true,
+                unitPrice: true,
+                total: true,
+                condition: true,
+                product: {
+                  select: {
+                    name: true,
+                    sku: true,
+                  },
+                },
+              },
+            },
           },
         },
       },

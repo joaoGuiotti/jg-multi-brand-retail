@@ -44,6 +44,44 @@ describe('GetSaleUseCase', () => {
     const result = await useCase.execute({ tenantId: 'tenant-1', id: 's1' });
     expect(result.status).toBe('PENDING');
   });
+
+  it('should return sale output with enriched return items when returns exist', async () => {
+    const saleWithReturns = makeSale({
+      returns: [
+        {
+          id: 'ret-1',
+          status: 'REFUNDED',
+          refundType: 'STORE_CREDIT',
+          reason: 'Defeito de fábrica',
+          totalRefund: 20,
+          createdAt: new Date(),
+          items: [
+            {
+              id: 'ret-item-1',
+              productId: 'p1',
+              product: { name: 'Produto 1', sku: 'SKU-1' },
+              quantity: 1,
+              unitPrice: 20,
+              total: 20,
+              condition: 'DEFECTIVE',
+            },
+          ],
+        },
+      ],
+    });
+    saleRepository.findById.mockResolvedValue(saleWithReturns);
+    const result = await useCase.execute({ tenantId: 'tenant-1', id: 's1' });
+
+    expect(result.returns).toHaveLength(1);
+    expect(result.returns[0].id).toBe('ret-1');
+    expect(result.returns[0].status).toBe('REFUNDED');
+    expect(result.returns[0].refundType).toBe('STORE_CREDIT');
+    expect(result.returns[0].reason).toBe('Defeito de fábrica');
+    expect(result.returns[0].items).toHaveLength(1);
+    expect(result.returns[0].items![0].productName).toBe('Produto 1');
+    expect(result.returns[0].items![0].sku).toBe('SKU-1');
+    expect(result.returns[0].items![0].condition).toBe('DEFECTIVE');
+  });
 });
 
 describe('ListSalesUseCase', () => {

@@ -43,6 +43,22 @@ export class GenerateSaleReceiptUseCase implements UseCase<
       subtotal: sale.subtotal,
       discount: sale.discount,
       total: sale.total,
+      returns: (sale.returns || []).map((ret: any) => ({
+        id: ret.id ? ret.id.toString() : '',
+        status: ret.status,
+        refundType: ret.refundType,
+        reason: ret.reason,
+        createdAt: ret.createdAt,
+        total: Number(ret.totalRefund ?? ret.total ?? 0),
+        items: (ret.items || []).map((item: any) => ({
+          name: item.product?.name || item.productName || item.productId,
+          sku: item.product?.sku || item.sku,
+          quantity: item.quantity,
+          unitPrice: Number(item.unitPrice),
+          total: Number(item.total),
+          condition: item.condition,
+        })),
+      })),
     });
 
     return receipt.toBuffer();

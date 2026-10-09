@@ -2,7 +2,7 @@
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-10-07
-**Feature**: [spec.md](file:///c:/DEV/github/antigravity-test-app-01/.specify/features/013-nx-monorepo-migration/spec.md)
+**Feature**: [spec.md](file:///c:/DEV/github/antigravity-test-app-01/specs/013-nx-monorepo-migration/spec.md)
 
 ## Content Quality
 

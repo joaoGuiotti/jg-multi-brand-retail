@@ -150,17 +150,41 @@ npm run test:e2e
 npm run test:cov
 ```
 
-## 📦 Deployment
+## 📦 Deployment & Infraestrutura de Produção
 
-O projeto está configurado para deploy via Docker:
+O projeto está configurado para deploy via Docker com isolamento estrito de redes (*tier isolation*), separação de privilégios de banco e backup automatizado:
+
+### 1. Configuração de Variáveis de Ambiente
+Copie o template de produção e configure as credenciais:
+```bash
+cp .env.prod.example .env.prod
+```
+* **Aplicação (`DB_USER=retail_app`)**: conecta com privilégios restritos (DML apenas) e sem `BYPASSRLS`, forçando isolamento multi-tenant real por Row-Level Security.
+* **Migrações (`MIGRATION_DB_USER=postgres`)**: papel com privilégios DDL e `BYPASSRLS` utilizado estritamente pelo container `migrate` do Prisma.
+
+### 2. Executando o Stack de Produção
+```bash
+# Subir todo o stack de produção (DB, Redis, Migrate, Backend, Frontend e Backup)
+docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
+```
+* **Redes Isoladas**: `frontend_net` (Nginx <-> Backend) e `backend_net` (Backend <-> PostgreSQL/Redis, com `internal: true`).
+* **Healthchecks**: Backend monitora `/health` e PostgreSQL via `pg_isready`.
+* **Resource Limits**: Limites de CPU e memória configurados em todos os serviços.
+
+### 3. Estratégia de Backup & Restore Criptografado (AES-256)
+Os scripts em `scripts/backup/` executam dumps consistentes, criptografia OpenSSL e retenção:
 
 ```bash
-# Build das imagens
-docker-compose build
+# Executar backup manual
+./scripts/backup/backup.sh
 
-# Subir em produção
-docker-compose -f docker-compose.prod.yml up -d
+# Validar integridade do dump criptografado sem alterar dados (dry-run)
+./scripts/backup/restore.sh --file ./backups/retail_retail_saas_YYYYMMDD_HHMMSS.dump.enc --dry-run
+
+# Restaurar banco a partir de um backup criptografado
+./scripts/backup/restore.sh --file ./backups/retail_retail_saas_YYYYMMDD_HHMMSS.dump.enc --target-db retail_saas
 ```
+* No compose de produção, o container `backup` executa diariamente às 03:00 UTC via crontab com rotação de retenção configurável (`BACKUP_RETENTION_DAYS=7`).
 
 ## 🤝 Contribuindo
 

@@ -18,6 +18,8 @@ import { ReturnsModule } from './infrastructure/modules/returns.module';
 import { LoyaltyModule } from './infrastructure/modules/loyalty.module';
 import { FinanceModule } from './infrastructure/modules/finance.module';
 
+import { HealthController } from './infrastructure/controllers/health.controller';
+
 const isDev = process.env.NODE_ENV !== 'production';
 
 @Module({
@@ -42,7 +44,7 @@ const isDev = process.env.NODE_ENV !== 'production';
     FinanceModule,
     ...(isDev ? [DevModule] : []),
   ],
-  controllers: [],
+  controllers: [HealthController],
   providers: [provideTransformInterceptor()],
 })
 export class AppModule {}

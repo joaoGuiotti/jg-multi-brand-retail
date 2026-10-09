@@ -1,12 +1,7 @@
-x-db-env: &db-env
-  DB_VENDOR: "postgresql"
-  DB_HOST: "db"
-  DB_PORT: ${DB_PORT:-5432}
-  DB_NAME: ${DB_NAME:?DB_NAME é obrigatória}
-  DB_USER: ${DB_USER:?DB_USER é obrigatória}
-  DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD é obrigatória}
-  DB_URL: "postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?schema=public"
-  DATABASE_URL: "postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?schema=public"
+# ==============================================================================
+# DOCKER COMPOSE - AMBIENTE DE PRODUÇÃO HARDENED
+# jg-multi-brand-retail - Fase 3: Infraestrutura, Docker & Backup
+# ==============================================================================
 
 x-logging: &default-logging
   driver: "json-file"
@@ -15,24 +10,60 @@ x-logging: &default-logging
     max-file: "3"
 
 services:
+  # ----------------------------------------------------------------------------
+  # 1. BANCO DE DADOS POSTGRESQL (Isolado na backend_net, sem portas expostas)
+  # ----------------------------------------------------------------------------
   db:
     image: postgres:15-alpine
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${DB_NAME:?DB_NAME é obrigatória}
-      POSTGRES_USER: ${DB_USER:?DB_USER é obrigatória}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD é obrigatória}
+      POSTGRES_USER: ${MIGRATION_DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${MIGRATION_DB_PASSWORD:?MIGRATION_DB_PASSWORD é obrigatória}
     volumes:
       - postgres_prod_data:/var/lib/postgresql/data
     networks:
-      - internal
+      - backend_net
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: 1024M
     logging: *default-logging
 
+  # ----------------------------------------------------------------------------
+  # 2. REDIS (Cache e Filas BullMQ, isolado na backend_net, sem portas expostas)
+  # ----------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-retail_redis_pass}
+    volumes:
+      - redis_prod_data:/data
+    networks:
+      - backend_net
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a ${REDIS_PASSWORD:-retail_redis_pass} ping | grep PONG"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+    logging: *default-logging
+
+  # ----------------------------------------------------------------------------
+  # 3. MIGRAÇÕES AUTOMÁTICAS (Executa como migrator com BYPASSRLS antes do app)
+  # ----------------------------------------------------------------------------
   migrate:
     build:
       context: .
@@ -40,15 +71,24 @@ services:
       target: migrate
     restart: "no"
     environment:
-      <<: *db-env
       NODE_ENV: production
+      MIGRATION_DATABASE_URL: "postgresql://${MIGRATION_DB_USER:-postgres}:${MIGRATION_DB_PASSWORD:?MIGRATION_DB_PASSWORD é obrigatória}@db:5432/${DB_NAME:?DB_NAME é obrigatória}?schema=public"
+      DB_URL: "postgresql://${MIGRATION_DB_USER:-postgres}:${MIGRATION_DB_PASSWORD:?MIGRATION_DB_PASSWORD é obrigatória}@db:5432/${DB_NAME:?DB_NAME é obrigatória}?schema=public"
     depends_on:
       db:
         condition: service_healthy
     networks:
-      - internal
+      - backend_net
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
     logging: *default-logging
 
+  # ----------------------------------------------------------------------------
+  # 4. BACKEND NESTJS (Executa como retail_app sem BYPASSRLS)
+  # ----------------------------------------------------------------------------
   backend:
     build:
       context: .
@@ -56,15 +96,23 @@ services:
       target: runtime
     restart: unless-stopped
     environment:
-      <<: *db-env
       NODE_ENV: production
       PORT: 3000
+      DB_VENDOR: "postgresql"
+      DB_HOST: "db"
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:?DB_NAME é obrigatória}
+      DB_USER: ${DB_USER:-retail_app}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD é obrigatória}
+      DB_URL: "postgresql://${DB_USER:-retail_app}:${DB_PASSWORD:?DB_PASSWORD é obrigatória}@db:5432/${DB_NAME}?schema=public"
+      DATABASE_URL: "postgresql://${DB_USER:-retail_app}:${DB_PASSWORD:?DB_PASSWORD é obrigatória}@db:5432/${DB_NAME}?schema=public"
+      REDIS_URL: "redis://:${REDIS_PASSWORD:-retail_redis_pass}@redis:6379"
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET é obrigatória}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?JWT_REFRESH_SECRET é obrigatória}
       FRONTEND_URL: ${FRONTEND_URL:?FRONTEND_URL é obrigatória}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-15m}
       REFRESH_TOKEN_EXPIRES_IN: ${REFRESH_TOKEN_EXPIRES_IN:-7d}
-      MAIL_HOST: ${MAIL_HOST:-localhost}
+      MAIL_HOST: ${MAIL_HOST:-mailpit}
       MAIL_PORT: ${MAIL_PORT:-1025}
       MAIL_USER: ${MAIL_USER:-}
       MAIL_PASS: ${MAIL_PASS:-}
@@ -72,14 +120,27 @@ services:
     depends_on:
       migrate:
         condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    networks:
+      - backend_net
+      - frontend_net
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"const http = require('http'); http.get('http://127.0.0.1:3000/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1));\""]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     deploy:
       resources:
         limits:
+          cpus: "1.0"
           memory: 512M
-    networks:
-      - internal
     logging: *default-logging
 
+  # ----------------------------------------------------------------------------
+  # 5. FRONTEND ANGULAR / NGINX (Apenas porta pública 80 exposta)
+  # ----------------------------------------------------------------------------
   frontend:
     build:
       context: .
@@ -92,12 +153,66 @@ services:
       backend:
         condition: service_healthy
     networks:
-      - internal
+      - frontend_net
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
     logging: *default-logging
 
-networks:
-  internal:
-    driver: bridge
+  # ----------------------------------------------------------------------------
+  # 6. SERVIÇO DE BACKUP AUTOMATIZADO COM CRONTAB & CRIPTOGRAFIA
+  # ----------------------------------------------------------------------------
+  backup:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        apk add --no-cache bash openssl
+        echo "Configurando crontab de backup diário (03:00 UTC)..."
+        echo "0 3 * * * /scripts/backup/backup.sh >> /backups/backup_cron.log 2>&1" > /etc/crontabs/root
+        crond -f -l 2
+    environment:
+      PGHOST: "db"
+      PGPORT: 5432
+      PGDATABASE: ${DB_NAME:?DB_NAME é obrigatória}
+      PGUSER: ${MIGRATION_DB_USER:-postgres}
+      PGPASSWORD: ${MIGRATION_DB_PASSWORD:?MIGRATION_DB_PASSWORD é obrigatória}
+      BACKUP_DIR: "/backups"
+      RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-7}
+      BACKUP_ENCRYPTION_KEY: ${BACKUP_ENCRYPTION_KEY:-retail_backup_secret_key_2026}
+      S3_BUCKET: ${S3_BUCKET:-}
+    volumes:
+      - ./scripts/backup:/scripts/backup:ro
+      - backup_data:/backups
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - backend_net
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+    logging: *default-logging
 
+# ------------------------------------------------------------------------------
+# REDES: Separação estrita de fronteiras de rede (Tier Isolation)
+# ------------------------------------------------------------------------------
+networks:
+  frontend_net:
+    driver: bridge
+  backend_net:
+    driver: bridge
+    internal: true
+
+# ------------------------------------------------------------------------------
+# VOLUMES PERSISTENTES
+# ------------------------------------------------------------------------------
 volumes:
   postgres_prod_data:
+  redis_prod_data:
+  backup_data:

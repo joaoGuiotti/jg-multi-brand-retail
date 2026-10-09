@@ -57,6 +57,7 @@ const makeReturnsRepo = (order: any) => ({
   save: jest.fn().mockResolvedValue(undefined),
   findAll: jest.fn().mockResolvedValue([]),
   findBySaleId: jest.fn().mockResolvedValue([]),
+  recordRefundOutflow: jest.fn().mockResolvedValue(undefined),
 });
 
 const makeSaleRepo = (sale: any = null) => ({
@@ -75,13 +76,7 @@ const makeEarnPointsUseCase = () => ({
   reversePoints: jest.fn().mockResolvedValue(undefined),
 });
 
-const makePrisma = () => ({
-  financialAccount: {
-    create: jest.fn().mockResolvedValue({}),
-  },
-});
-
-const makeUseCase = (order: any, sale: any = null, prisma: any = null) => {
+const makeUseCase = (order: any, sale: any = null) => {
   const returnsRepo = makeReturnsRepo(order);
   const saleRepo = makeSaleRepo(sale);
   const notification = makeNotification();
@@ -91,7 +86,6 @@ const makeUseCase = (order: any, sale: any = null, prisma: any = null) => {
     saleRepo,
     notification as any,
     earnPointsUseCase as any,
-    prisma,
   );
   return {
     useCase,
@@ -99,7 +93,6 @@ const makeUseCase = (order: any, sale: any = null, prisma: any = null) => {
     saleRepo,
     notification,
     earnPointsUseCase,
-    prisma,
   };
 };
 
@@ -227,27 +220,21 @@ describe('ProcessRefundUseCase', () => {
       expect(earnPointsUseCase.reversePoints).not.toHaveBeenCalled();
     });
 
-    it('should create a PAID financial account (PAYABLE) for CASH_REFUND outflow', async () => {
+    it('should delegate financial outflow to returnsRepository.recordRefundOutflow for CASH_REFUND', async () => {
       const order = makeReturnOrder('APPROVED');
       const sale = makeSale('RETURN_REQUESTED', null);
-      const prisma = makePrisma();
-      const { useCase } = makeUseCase(order, sale, prisma);
+      const { useCase, returnsRepo } = makeUseCase(order, sale);
 
       await useCase.execute('tenant-1', 'return-1');
 
-      expect(prisma.financialAccount.create).toHaveBeenCalledWith({
-        data: expect.objectContaining({
-          tenantId: 'tenant-1',
-          type: 'PAYABLE',
-          status: 'PAID',
-          category: 'REFUND',
-          amount: 100,
-          paidAt: expect.any(Date),
-        }),
-      });
+      expect(returnsRepo.recordRefundOutflow).toHaveBeenCalledWith(
+        'tenant-1',
+        order,
+        expect.any(String),
+      );
     });
 
-    it('should create a PENDING financial account for STORE_CREDIT', async () => {
+    it('should delegate financial outflow to returnsRepository.recordRefundOutflow for STORE_CREDIT', async () => {
       const order = ReturnOrder.create({
         tenantId: 'tenant-1',
         saleId: 'sale-1',
@@ -260,21 +247,15 @@ describe('ProcessRefundUseCase', () => {
       });
       order.approve('admin-1');
       const sale = makeSale('RETURN_REQUESTED', null);
-      const prisma = makePrisma();
-      const { useCase } = makeUseCase(order, sale, prisma);
+      const { useCase, returnsRepo } = makeUseCase(order, sale);
 
       await useCase.execute('tenant-1', 'return-1');
 
-      expect(prisma.financialAccount.create).toHaveBeenCalledWith({
-        data: expect.objectContaining({
-          tenantId: 'tenant-1',
-          type: 'PAYABLE',
-          status: 'PENDING',
-          category: 'REFUND',
-          amount: 100,
-          paidAt: null,
-        }),
-      });
+      expect(returnsRepo.recordRefundOutflow).toHaveBeenCalledWith(
+        'tenant-1',
+        order,
+        expect.any(String),
+      );
     });
   });
 });

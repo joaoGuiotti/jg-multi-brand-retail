@@ -33,4 +33,9 @@ export abstract class ReturnsRepository {
     tenantId: string,
     saleId: string,
   ): Promise<ReturnOrder[]>;
+  abstract recordRefundOutflow(
+    tenantId: string,
+    order: ReturnOrder,
+    invoiceNumber?: string,
+  ): Promise<void>;
 }

@@ -2,21 +2,18 @@ import { LogoutUseCase } from './logout.use-case';
 
 describe('LogoutUseCase', () => {
   let useCase: LogoutUseCase;
-  let prisma: any;
+  let refreshTokenRepository: any;
 
   beforeEach(() => {
-    prisma = {
-      withAuthLookup: jest.fn(async (cb) => cb(prisma)),
-      refreshToken: {
-        findUnique: jest.fn(),
-        updateMany: jest.fn(),
-      },
+    refreshTokenRepository = {
+      findByTokenHash: jest.fn(),
+      revokeFamily: jest.fn(),
     };
-    useCase = new LogoutUseCase(prisma);
+    useCase = new LogoutUseCase(refreshTokenRepository);
   });
 
   it('should revoke the token family when refreshToken is provided', async () => {
-    prisma.refreshToken.findUnique.mockResolvedValue({
+    refreshTokenRepository.findByTokenHash.mockResolvedValue({
       id: 'token-1',
       familyId: 'family-123',
     });
@@ -24,15 +21,14 @@ describe('LogoutUseCase', () => {
     const result = await useCase.execute({ refreshToken: 'some-valid-token' });
 
     expect(result).toEqual({ message: 'Logged out successfully' });
-    expect(prisma.refreshToken.updateMany).toHaveBeenCalledWith({
-      where: { familyId: 'family-123' },
-      data: { revokedAt: expect.any(Date) },
-    });
+    expect(refreshTokenRepository.revokeFamily).toHaveBeenCalledWith(
+      'family-123',
+    );
   });
 
   it('should return successfully even when no refreshToken is provided', async () => {
     const result = await useCase.execute({});
     expect(result).toEqual({ message: 'Logged out successfully' });
-    expect(prisma.refreshToken.findUnique).not.toHaveBeenCalled();
+    expect(refreshTokenRepository.findByTokenHash).not.toHaveBeenCalled();
   });
 });

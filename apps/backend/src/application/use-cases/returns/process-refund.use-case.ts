@@ -9,9 +9,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
-  Optional,
 } from '@nestjs/common';
-import { PrismaService } from '../../../infrastructure/persistence/prisma/prisma.service';
 import { EarnPointsUseCase } from '../loyalty/earn-points.use-case';
 import { CreateNotificationUseCase } from '../notifications/create-notification.use-case';
 import { ReturnOutput } from './common/return-output';
@@ -25,7 +23,6 @@ export class ProcessRefundUseCase {
     private readonly saleRepository: SaleRepository,
     private readonly createNotificationUseCase: CreateNotificationUseCase,
     private readonly earnPointsUseCase: EarnPointsUseCase,
-    @Optional() private readonly prisma?: PrismaService,
   ) {}
 
   async execute(tenantId: string, id: string): Promise<ReturnOutput> {
@@ -69,22 +66,13 @@ export class ProcessRefundUseCase {
     }
 
     // Se houver valor reembolsado, registrar saída financeira (PAYABLE / PAID se CASH_REFUND)
-    if (this.prisma && order.totalRefund > 0) {
+    if (order.totalRefund > 0) {
       try {
-        const isCashRefund = order.refundType === 'CASH_REFUND';
-        await this.prisma.financialAccount.create({
-          data: {
-            tenantId,
-            type: 'PAYABLE',
-            description: `Reembolso de Devolução #${order.id.toString().substring(0, 8)} (${order.refundType === 'STORE_CREDIT' ? 'Crédito em Loja' : 'Reembolso em Dinheiro'} - Venda #${sale?.invoiceNumber || order.saleId})`,
-            amount: order.totalRefund,
-            dueDate: new Date(),
-            paidAt: isCashRefund ? new Date() : null,
-            status: isCashRefund ? 'PAID' : 'PENDING',
-            category: 'REFUND',
-            saleId: order.saleId,
-          },
-        });
+        await this.returnsRepository.recordRefundOutflow(
+          tenantId,
+          order,
+          sale?.invoiceNumber || order.saleId,
+        );
       } catch (error) {
         this.logger.error(
           `Failed to create financial account outflow for return ${order.id.toString()}:`,

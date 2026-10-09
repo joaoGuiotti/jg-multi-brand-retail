@@ -118,4 +118,36 @@ describe('LoginUseCase', () => {
     expect(result.accessToken).toBe('fake-token');
     expect(result.refreshToken).toBe('fake-token');
   });
+
+  it('should store refresh token when RefreshTokenRepository is provided', async () => {
+    const refreshTokenRepository = { create: jest.fn() };
+    const useCaseWithRepo = new LoginUseCase(
+      userRepository,
+      tenantRepository,
+      jwtService,
+      configService,
+      refreshTokenRepository as any,
+    );
+
+    const user = makeUser();
+    const tenant = makeTenant();
+    userRepository.findByEmail.mockResolvedValue({
+      user,
+      tenantId: 'tenant-1',
+    });
+    tenantRepository.findById.mockResolvedValue(tenant);
+    (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+
+    await useCaseWithRepo.execute({
+      email: 'test@mail.com',
+      password: 'correct',
+    });
+
+    expect(refreshTokenRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        tenantId: 'tenant-1',
+        userId: user.id.toString(),
+      }),
+    );
+  });
 });

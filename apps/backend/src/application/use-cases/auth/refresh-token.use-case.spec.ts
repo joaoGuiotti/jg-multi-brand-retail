@@ -24,7 +24,7 @@ describe('RefreshTokenUseCase', () => {
   let userRepository: any;
   let jwtService: any;
   let configService: any;
-  let prisma: any;
+  let refreshTokenRepository: any;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -39,26 +39,19 @@ describe('RefreshTokenUseCase', () => {
     configService = {
       get: jest.fn().mockReturnValue('secret'),
     };
-    prisma = {
-      withAuthLookup: jest.fn(async (callback) => {
-        return await callback(prisma);
-      }),
-      refreshToken: {
-        findUnique: jest.fn(),
-        update: jest.fn(),
-        updateMany: jest.fn(),
-        create: jest.fn(),
-      },
-      auditLog: {
-        create: jest.fn(),
-      },
+    refreshTokenRepository = {
+      findByTokenHash: jest.fn(),
+      revokeFamily: jest.fn(),
+      rotateToken: jest.fn(),
+      recordSecurityAlert: jest.fn(),
+      create: jest.fn(),
     };
 
     useCase = new RefreshTokenUseCase(
       userRepository,
       jwtService,
       configService,
-      prisma,
+      refreshTokenRepository,
     );
   });
 
@@ -80,7 +73,7 @@ describe('RefreshTokenUseCase', () => {
     });
 
     // Token already revoked/replaced
-    prisma.refreshToken.findUnique.mockResolvedValue({
+    refreshTokenRepository.findByTokenHash.mockResolvedValue({
       id: 'token-old-id',
       familyId: 'family-1',
       tenantId: 'tenant-1',
@@ -105,20 +98,19 @@ describe('RefreshTokenUseCase', () => {
       ),
     );
 
-    // Family revoked
-    expect(prisma.refreshToken.updateMany).toHaveBeenCalledWith({
-      where: { familyId: 'family-1' },
-      data: { revokedAt: expect.any(Date) },
-    });
+    // Family revoked via repository
+    expect(refreshTokenRepository.revokeFamily).toHaveBeenCalledWith(
+      'family-1',
+    );
 
-    // Audit log created
-    expect(prisma.auditLog.create).toHaveBeenCalledWith({
-      data: expect.objectContaining({
-        tenantId: 'tenant-1',
-        userId: 'user-1',
-        entityType: 'SECURITY_ALERT',
-        entityId: 'family-1',
-      }),
+    // Audit log / security alert created via repository
+    expect(refreshTokenRepository.recordSecurityAlert).toHaveBeenCalledWith({
+      tenantId: 'tenant-1',
+      userId: 'user-1',
+      familyId: 'family-1',
+      revokedTokenId: 'token-old-id',
+      ip: '127.0.0.1',
+      userAgent: 'curl/7.68.0',
     });
 
     // User token version bumped to revoke all active access tokens
@@ -133,7 +125,7 @@ describe('RefreshTokenUseCase', () => {
       tokenVersion: 1,
     });
 
-    prisma.refreshToken.findUnique.mockResolvedValue({
+    refreshTokenRepository.findByTokenHash.mockResolvedValue({
       id: 'token-1',
       familyId: 'family-1',
       tenantId: 'tenant-1',
@@ -155,7 +147,7 @@ describe('RefreshTokenUseCase', () => {
       tokenVersion: 1,
     });
 
-    prisma.refreshToken.findUnique.mockResolvedValue({
+    refreshTokenRepository.findByTokenHash.mockResolvedValue({
       id: 'token-1',
       familyId: 'family-1',
       tenantId: 'tenant-1',
@@ -185,7 +177,7 @@ describe('RefreshTokenUseCase', () => {
       tokenVersion: 1,
     });
 
-    prisma.refreshToken.findUnique.mockResolvedValue({
+    refreshTokenRepository.findByTokenHash.mockResolvedValue({
       id: 'token-1',
       familyId: 'family-1',
       tenantId: 'tenant-1',
@@ -203,22 +195,14 @@ describe('RefreshTokenUseCase', () => {
     expect(result.accessToken).toBe('new-fake-token');
     expect(result.refreshToken).toBe('new-fake-token');
 
-    // Old token marked replaced and revoked
-    expect(prisma.refreshToken.update).toHaveBeenCalledWith({
-      where: { id: 'token-1' },
-      data: {
-        revokedAt: expect.any(Date),
-        replacedByTokenId: expect.any(String),
-      },
-    });
-
-    // New token created with same familyId
-    expect(prisma.refreshToken.create).toHaveBeenCalledWith({
-      data: expect.objectContaining({
+    // Token rotated atomically via repository
+    expect(refreshTokenRepository.rotateToken).toHaveBeenCalledWith(
+      'token-1',
+      expect.objectContaining({
         familyId: 'family-1',
         tenantId: 'tenant-1',
         userId: TEST_USER_ID,
       }),
-    });
+    );
   });
 });

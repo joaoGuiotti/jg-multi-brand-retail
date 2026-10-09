@@ -11,7 +11,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from '@prisma/client';
-import { PrismaService } from '../../../infrastructure/persistence/prisma/prisma.service';
+import { RefreshTokenRepository } from '../../../domain/repositories/refresh-token-repository';
 
 export type RefreshTokenInput = {
   refreshToken: string;
@@ -35,7 +35,7 @@ export class RefreshTokenUseCase implements UseCase<
     private userRepository: UserRepository,
     private jwtService: JwtService,
     private configService: ConfigService,
-    @Optional() private prisma?: PrismaService,
+    @Optional() private refreshTokenRepository?: RefreshTokenRepository,
   ) {}
 
   async execute(input: RefreshTokenInput): Promise<RefreshTokenOutput> {
@@ -51,18 +51,15 @@ export class RefreshTokenUseCase implements UseCase<
     const tenantId = payload.tenantId;
     const userId = payload.sub;
 
-    // Se temos acesso ao Prisma, aplicamos controle rigoroso de família, rotação e reuso
-    if (this.prisma) {
+    // Se temos acesso ao repositório de refresh tokens, aplicamos controle rigoroso de família, rotação e reuso
+    if (this.refreshTokenRepository) {
       const tokenHash = crypto
         .createHash('sha256')
         .update(input.refreshToken)
         .digest('hex');
 
-      const tokenRecord = await this.prisma.withAuthLookup(async (tx) => {
-        return await tx.refreshToken.findUnique({
-          where: { tokenHash },
-        });
-      });
+      const tokenRecord =
+        await this.refreshTokenRepository.findByTokenHash(tokenHash);
 
       if (tokenRecord) {
         // DETECÇÃO DE REUSO (ALERTA DE ROUBO DE TOKEN)
@@ -75,29 +72,16 @@ export class RefreshTokenUseCase implements UseCase<
           );
 
           // 1. Revoga IMEDIATAMENTE toda a família de tokens
-          await this.prisma.withAuthLookup(async (tx) => {
-            await tx.refreshToken.updateMany({
-              where: { familyId: tokenRecord.familyId },
-              data: { revokedAt: new Date() },
-            });
+          await this.refreshTokenRepository.revokeFamily(tokenRecord.familyId);
 
-            // 2. Registra evento de segurança em audit_logs
-            await tx.auditLog.create({
-              data: {
-                tenantId: tokenRecord.tenantId,
-                userId: tokenRecord.userId,
-                entityType: 'SECURITY_ALERT',
-                entityId: tokenRecord.familyId,
-                action: 'UPDATE',
-                changes: {
-                  event: 'REFRESH_TOKEN_REUSE_DETECTED',
-                  familyId: tokenRecord.familyId,
-                  revokedTokenId: tokenRecord.id,
-                  ip: input.ip ?? null,
-                  userAgent: input.userAgent ?? null,
-                },
-              },
-            });
+          // 2. Registra evento de segurança
+          await this.refreshTokenRepository.recordSecurityAlert({
+            tenantId: tokenRecord.tenantId,
+            userId: tokenRecord.userId,
+            familyId: tokenRecord.familyId,
+            revokedTokenId: tokenRecord.id,
+            ip: input.ip ?? null,
+            userAgent: input.userAgent ?? null,
           });
 
           // 3. Força invalidação de sessões de todos os dispositivos do usuário incrementando tokenVersion
@@ -151,36 +135,23 @@ export class RefreshTokenUseCase implements UseCase<
           .update(tokens.refreshToken)
           .digest('hex');
 
-        await this.prisma.withAuthLookup(async (tx) => {
-          // Invalida o token anterior
-          await tx.refreshToken.update({
-            where: { id: tokenRecord.id },
-            data: {
-              revokedAt: new Date(),
-              replacedByTokenId: newTokenId,
-            },
-          });
-
-          // Cria novo token na mesma família
-          await tx.refreshToken.create({
-            data: {
-              id: newTokenId,
-              tenantId,
-              userId: user.id.toString(),
-              tokenHash: newTokenHash,
-              familyId: newFamilyId,
-              expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-              ip: input.ip ?? null,
-              userAgent: input.userAgent ?? null,
-            },
-          });
+        // Rotaciona atomicamente no repositório
+        await this.refreshTokenRepository.rotateToken(tokenRecord.id, {
+          id: newTokenId,
+          tenantId,
+          userId: user.id.toString(),
+          tokenHash: newTokenHash,
+          familyId: newFamilyId,
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          ip: input.ip ?? null,
+          userAgent: input.userAgent ?? null,
         });
 
         return tokens;
       }
     }
 
-    // Fallback defensivo para unit tests mockados sem DB
+    // Fallback defensivo para unit tests mockados sem repositório de refresh token
     const user = await this.userRepository.findById(tenantId, userId);
     if (!user || !user.active) {
       throw new UnauthorizedException('Invalid refresh token');

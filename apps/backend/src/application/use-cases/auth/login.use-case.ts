@@ -9,7 +9,7 @@ import { Role } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { TenantRepository } from '../../../domain/repositories/tenant-repository';
 import { UserRepository } from '../../../domain/repositories/user-repository';
-import { PrismaService } from '../../../infrastructure/persistence/prisma/prisma.service';
+import { RefreshTokenRepository } from '../../../domain/repositories/refresh-token-repository';
 
 export type LoginInput = {
   email: string;
@@ -42,7 +42,7 @@ export class LoginUseCase implements UseCase<LoginInput, LoginOutput> {
     private tenantRepository: TenantRepository,
     private jwtService: JwtService,
     private configService: ConfigService,
-    @Optional() private prisma?: PrismaService,
+    @Optional() private refreshTokenRepository?: RefreshTokenRepository,
   ) {}
 
   async execute(input: LoginInput): Promise<LoginOutput> {
@@ -132,22 +132,20 @@ export class LoginUseCase implements UseCase<LoginInput, LoginOutput> {
       }),
     ]);
 
-    if (this.prisma) {
+    if (this.refreshTokenRepository) {
       const tokenHash = crypto
         .createHash('sha256')
         .update(refreshToken)
         .digest('hex');
 
-      await this.prisma.refreshToken.create({
-        data: {
-          tenantId,
-          userId: user.id.toString(),
-          tokenHash,
-          familyId,
-          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-          ip: ip ?? null,
-          userAgent: userAgent ?? null,
-        },
+      await this.refreshTokenRepository.create({
+        tenantId,
+        userId: user.id.toString(),
+        tokenHash,
+        familyId,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        ip: ip ?? null,
+        userAgent: userAgent ?? null,
       });
     }
 

@@ -189,4 +189,25 @@ export class PrismaReturnsRepository implements ReturnsRepository {
       totalPages: Math.ceil(total / limit),
     };
   }
+
+  async recordRefundOutflow(
+    tenantId: string,
+    order: ReturnOrder,
+    invoiceNumber?: string,
+  ): Promise<void> {
+    const isCashRefund = order.refundType === 'CASH_REFUND';
+    await this.prisma.financialAccount.create({
+      data: {
+        tenantId,
+        type: 'PAYABLE',
+        description: `Reembolso de Devolução #${order.id.toString().substring(0, 8)} (${order.refundType === 'STORE_CREDIT' ? 'Crédito em Loja' : 'Reembolso em Dinheiro'} - Venda #${invoiceNumber || order.saleId})`,
+        amount: order.totalRefund,
+        dueDate: new Date(),
+        paidAt: isCashRefund ? new Date() : null,
+        status: isCashRefund ? 'PAID' : 'PENDING',
+        category: 'REFUND',
+        saleId: order.saleId,
+      },
+    });
+  }
 }
